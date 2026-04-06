@@ -1,0 +1,110 @@
+:root {
+  --focus-ring: 0 0 0 3px rgba(82, 183, 168, 0.35);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+}
+
+.hero {
+  background:
+    radial-gradient(circle at 80% 10%, rgba(82, 183, 168, 0.35), transparent 35%),
+    radial-gradient(circle at 20% 80%, rgba(245, 158, 11, 0.3), transparent 45%),
+    linear-gradient(120deg, #0f1b2d 0%, #005b88 58%, #0f1b2d 100%);
+}
+
+.hero-glow {
+  position: absolute;
+  width: 30rem;
+  height: 30rem;
+  right: -10rem;
+  top: -8rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.1);
+  filter: blur(60px);
+  pointer-events: none;
+}
+
+.panel {
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: linear-gradient(140deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.08));
+  backdrop-filter: blur(3px);
+}
+
+.card {
+  border: 1px solid rgba(15, 27, 45, 0.08);
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  box-shadow: 0 10px 28px rgba(15, 27, 45, 0.07);
+}
+
+.nav-link {
+  border-bottom: 2px solid transparent;
+  padding-bottom: 0.2rem;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.nav-link:hover,
+.nav-link:focus-visible {
+  border-color: #52b7a8;
+  color: white;
+  outline: none;
+}
+
+.link {
+  color: #005b88;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.link:hover,
+.link:focus-visible {
+  color: #003f5f;
+}
+
+.form-label {
+  display: inline-block;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.form-input {
+  margin-top: 0.35rem;
+  width: 100%;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(15, 27, 45, 0.25);
+  background: white;
+  padding: 0.62rem 0.75rem;
+  font-size: 0.95rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.form-input:focus-visible {
+  border-color: #52b7a8;
+  box-shadow: var(--focus-ring);
+  outline: none;
+}
+
+.form-error {
+  margin-top: 0.3rem;
+  font-size: 0.78rem;
+  color: #b91c1c;
+  min-height: 1rem;
+}
+
+.input-invalid {
+  border-color: #b91c1c;
+  background: #fff6f6;
+}
+
+@media (max-width: 640px) {
+  .hero-glow {
+    width: 20rem;
+    height: 20rem;
+    right: -8rem;
+    top: -6rem;
+  }
+}
