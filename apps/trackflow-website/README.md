@@ -35,3 +35,25 @@ python3 -m http.server 8080
 - `script.js`: client-side validation, warning logic, lead scoring simulation.
 - `robots.txt`: crawler directives.
 - `sitemap.xml`: static sitemap for indexing.
+
+## Deploy to Vercel
+
+Deploy from this folder so Vercel treats this app as the project root:
+
+```bash
+cd apps/trackflow-website
+npx vercel
+```
+
+For a production deployment:
+
+```bash
+cd apps/trackflow-website
+npx vercel --prod
+```
+
+Notes:
+
+- The first command links this directory to a Vercel project.
+- If Vercel asks for framework preset, choose `Other`.
+- Build command can be left empty for this static site.
