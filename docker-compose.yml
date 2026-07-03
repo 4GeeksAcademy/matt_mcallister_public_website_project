@@ -1,0 +1,34 @@
+services:
+  ui:
+    build: ./uis
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+    volumes:
+      - .:/monorepo
+      - /monorepo/uis/website/node_modules
+      - /monorepo/uis/backoffice/node_modules
+    env_file:
+      - .env.example
+      - path: .env
+        required: false
+    networks:
+      - trackflow_network
+
+  backend:
+    build: ./services
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./services/inventory-api:/app
+    env_file:
+      - .env.example
+      - path: .env
+        required: false
+    command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+    networks:
+      - trackflow_network
+
+networks:
+  trackflow_network:
+    name: trackflow_network
