@@ -33,3 +33,13 @@ def client(tinydb: TinyDB) -> TestClient:
     with TestClient(app) as test_client:
         yield test_client
     app.dependency_overrides.clear()
+
+
+def register_user(client, email: str, password: str = "strongpass"):
+    return client.post("/auth/register", json={"email": email, "password": password})
+
+
+def login_token(client, email: str, password: str = "strongpass") -> str:
+    response = client.post("/auth/login", json={"email": email, "password": password})
+    assert response.status_code == 200
+    return response.json()["access_token"]

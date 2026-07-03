@@ -1,10 +1,4 @@
-def _register(client, email: str, password: str = "strongpass"):
-    return client.post("/auth/register", json={"email": email, "password": password})
-
-
-def _token_for(client, email: str, password: str = "strongpass") -> str:
-    response = client.post("/auth/login", json={"email": email, "password": password})
-    return response.json()["access_token"]
+from conftest import login_token, register_user
 
 
 def test_users_list_requires_auth(client):
@@ -21,10 +15,10 @@ def test_public_users_create_returns_user(client, tinydb):
 
 
 def test_user_cannot_update_another_user(client):
-    _register(client, "owner1@example.com")
-    _register(client, "owner2@example.com")
+    register_user(client, "owner1@example.com")
+    register_user(client, "owner2@example.com")
 
-    token = _token_for(client, "owner1@example.com")
+    token = login_token(client, "owner1@example.com")
     response = client.put(
         "/users/2",
         json={"is_active": False},
@@ -34,8 +28,8 @@ def test_user_cannot_update_another_user(client):
 
 
 def test_user_can_update_self(client):
-    _register(client, "self@example.com")
-    token = _token_for(client, "self@example.com")
+    register_user(client, "self@example.com")
+    token = login_token(client, "self@example.com")
     response = client.put(
         "/users/1",
         json={"is_active": False},
@@ -46,6 +40,6 @@ def test_user_can_update_self(client):
 
 
 def test_duplicate_email_conflict(client):
-    _register(client, "dup@example.com")
+    register_user(client, "dup@example.com")
     response = client.post("/users", json={"email": "dup@example.com", "password": "strongpass"})
     assert response.status_code == 409
