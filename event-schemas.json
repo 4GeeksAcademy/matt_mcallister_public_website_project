@@ -1,0 +1,213 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "TrackFlowTelemetryEventSchemas",
+  "description": "JSON Schema definitions for TrackFlow telemetry events (envelope + per-event property allowlists).",
+  "schemaVersion": "1.0.0",
+  "definitions": {
+    "envelope": {
+      "type": "object",
+      "required": [
+        "eventId",
+        "timestamp",
+        "sessionId",
+        "userId",
+        "event_type",
+        "schemaVersion",
+        "requestId",
+        "properties"
+      ],
+      "properties": {
+        "eventId": { "type": "string", "format": "uuid" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "sessionId": { "type": "string", "minLength": 1 },
+        "userId": { "type": "string", "minLength": 1 },
+        "event_type": { "type": "string", "minLength": 1 },
+        "schemaVersion": { "type": "string", "const": "1.0.0" },
+        "requestId": { "type": "string", "minLength": 1 },
+        "properties": { "type": "object" }
+      },
+      "additionalProperties": false
+    },
+    "warehouse": {
+      "type": "string",
+      "enum": ["los_angeles", "zaragoza"]
+    },
+    "product_category": {
+      "type": "string",
+      "enum": ["fashion", "electronics", "cosmetics"]
+    },
+    "inventoryProperties": {
+      "type": "object",
+      "required": [
+        "warehouse",
+        "client_id",
+        "product_id",
+        "product_category",
+        "quantity"
+      ],
+      "properties": {
+        "warehouse": { "$ref": "#/definitions/warehouse" },
+        "client_id": { "type": "string" },
+        "product_id": { "type": "string" },
+        "product_category": { "$ref": "#/definitions/product_category" },
+        "quantity": { "type": "number" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "events": {
+    "inbound_order_created": {
+      "classification": "mandatory",
+      "description": "Warehouse registers receipt of goods from a client.",
+      "sensitive": false,
+      "properties": {
+        "$ref": "#/definitions/inventoryProperties",
+        "extra": {
+          "order_id": { "type": "string", "required": false }
+        }
+      },
+      "propertyAllowlist": [
+        "warehouse",
+        "client_id",
+        "product_id",
+        "product_category",
+        "quantity",
+        "order_id"
+      ]
+    },
+    "outbound_order_created": {
+      "classification": "mandatory",
+      "description": "Warehouse completes picking and dispatch of an order.",
+      "sensitive": false,
+      "propertyAllowlist": [
+        "warehouse",
+        "client_id",
+        "product_id",
+        "product_category",
+        "quantity",
+        "order_id"
+      ]
+    },
+    "stock_threshold_triggered": {
+      "classification": "mandatory",
+      "description": "SKU stock falls below the client's configured minimum.",
+      "sensitive": false,
+      "propertyAllowlist": [
+        "warehouse",
+        "client_id",
+        "product_id",
+        "product_category",
+        "quantity",
+        "threshold",
+        "current_stock"
+      ]
+    },
+    "direct_stock_edit_rejected": {
+      "classification": "mandatory",
+      "description": "User attempted to modify stock directly and the system rejected it.",
+      "sensitive": false,
+      "propertyAllowlist": [
+        "warehouse",
+        "client_id",
+        "product_id",
+        "product_category",
+        "quantity",
+        "attempted_delta",
+        "reason"
+      ]
+    },
+    "inventory_discrepancy_detected": {
+      "classification": "mandatory",
+      "description": "Physical count/audit differs from system stock.",
+      "sensitive": false,
+      "propertyAllowlist": [
+        "warehouse",
+        "client_id",
+        "product_id",
+        "product_category",
+        "quantity",
+        "system_quantity",
+        "counted_quantity",
+        "delta"
+      ]
+    },
+    "inbound_order_validation_failed": {
+      "classification": "identified_opportunity",
+      "description": "Inbound order payload failed validation before creation.",
+      "sensitive": false,
+      "propertyAllowlist": [
+        "warehouse",
+        "client_id",
+        "product_id",
+        "product_category",
+        "quantity",
+        "failure_reason"
+      ]
+    },
+    "user_login_succeeded": {
+      "classification": "identified_opportunity",
+      "description": "Operator successfully authenticated to the backoffice.",
+      "sensitive": false,
+      "sanitisation": "No credentials; userId is internal staff id only.",
+      "propertyAllowlist": ["method"]
+    },
+    "user_login_failed": {
+      "classification": "identified_opportunity",
+      "description": "Operator authentication failed.",
+      "sensitive": true,
+      "sanitisation": "Never emit password or email; only failure_code.",
+      "propertyAllowlist": ["failure_code"]
+    },
+    "session_expired": {
+      "classification": "identified_opportunity",
+      "description": "Operator session expired.",
+      "sensitive": false,
+      "propertyAllowlist": ["path"]
+    },
+    "page_viewed": {
+      "classification": "identified_opportunity",
+      "description": "Operator navigated to a backoffice section.",
+      "sensitive": false,
+      "propertyAllowlist": ["path", "title"]
+    },
+    "page_load_recorded": {
+      "classification": "identified_opportunity",
+      "description": "Page load duration for a backoffice section.",
+      "sensitive": false,
+      "propertyAllowlist": ["path", "duration_ms"]
+    },
+    "api_latency_recorded": {
+      "classification": "identified_opportunity",
+      "description": "Latency of a relevant inventory or telemetry API call.",
+      "sensitive": false,
+      "propertyAllowlist": ["endpoint", "method", "status_code", "duration_ms"]
+    },
+    "frontend_error_uncaught": {
+      "classification": "identified_opportunity",
+      "description": "Uncaught frontend error or unhandled promise rejection.",
+      "sensitive": false,
+      "sanitisation": "Truncate message; omit stack frames with secrets.",
+      "propertyAllowlist": ["message", "path", "source"]
+    },
+    "picking_duration_recorded": {
+      "classification": "identified_opportunity",
+      "description": "Time from outbound pick start to dispatch completion.",
+      "sensitive": false,
+      "propertyAllowlist": [
+        "warehouse",
+        "client_id",
+        "product_id",
+        "product_category",
+        "quantity",
+        "duration_ms",
+        "order_id"
+      ]
+    },
+    "flow_abandoned": {
+      "classification": "identified_opportunity",
+      "description": "Operator abandoned a multi-step inventory flow.",
+      "sensitive": false,
+      "propertyAllowlist": ["flow_name", "step", "path"]
+    }
+  }
+}
