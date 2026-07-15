@@ -12,6 +12,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from inventory.router import router as inventory_router
+from reporting.router import router as reporting_router
 from telemetry.router import router as telemetry_router
 
 load_dotenv()
@@ -48,6 +49,7 @@ app.add_middleware(
 
 app.include_router(telemetry_router)
 app.include_router(inventory_router)
+app.include_router(reporting_router)
 
 
 @app.get("/health")
