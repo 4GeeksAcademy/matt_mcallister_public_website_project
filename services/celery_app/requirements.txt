@@ -1,0 +1,2 @@
+# TrackFlow background workers share the API dependency set.
+-r ../api/requirements.txt
