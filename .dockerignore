@@ -1,0 +1,7 @@
+.venv
+.git
+uis
+apps
+node_modules
+**/__pycache__
+**/*.pyc
