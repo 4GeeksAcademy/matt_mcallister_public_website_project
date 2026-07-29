@@ -12,3 +12,5 @@
 - Define and implement reusable agent skills.
 
 -5/31/26 In milestone 4, I went through the "What We Will Evauate" section and made sure each criteria was met.
+
+-7/29/26 Milestone 4 runtime fix: forced Webpack (`next dev --webpack` / `next build --webpack`) in `uis/website` and `uis/backoffice` so Windows graders avoid Turbopack MAX_PATH failures during output generation. Both apps build successfully with Webpack.
