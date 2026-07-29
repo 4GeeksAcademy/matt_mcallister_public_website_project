@@ -1,0 +1,120 @@
+{
+  "data_path": "/Users/match/Documents/4Geeks/GitHub Repos/eval_regression_milestone_project_trackflow_getmystatsup/data/raw/incidents_train.csv",
+  "n_rows": 800,
+  "features": [
+    "country",
+    "customer_type",
+    "carrier",
+    "category",
+    "month",
+    "day_of_week"
+  ],
+  "target": "satisfaction_score",
+  "cross_validation": {
+    "n_splits": 5,
+    "primary_metric": "MAE",
+    "folds": [
+      {
+        "fold": 0,
+        "train_mae": 0.42938977156954583,
+        "train_rmse": 0.5371088002366646,
+        "val_mae": 0.6558807225870501,
+        "val_rmse": 0.8075092653821968,
+        "n_train": 135,
+        "n_val": 133,
+        "max_train_idx": 134,
+        "min_val_idx": 135
+      },
+      {
+        "fold": 1,
+        "train_mae": 0.4766834342144374,
+        "train_rmse": 0.6103003641500718,
+        "val_mae": 0.523166603557862,
+        "val_rmse": 0.6593455119043635,
+        "n_train": 268,
+        "n_val": 133,
+        "max_train_idx": 267,
+        "min_val_idx": 268
+      },
+      {
+        "fold": 2,
+        "train_mae": 0.49267359826693197,
+        "train_rmse": 0.6242608483308548,
+        "val_mae": 0.5045054033409093,
+        "val_rmse": 0.6176368110081351,
+        "n_train": 401,
+        "n_val": 133,
+        "max_train_idx": 400,
+        "min_val_idx": 401
+      },
+      {
+        "fold": 3,
+        "train_mae": 0.49307177833280974,
+        "train_rmse": 0.6200714225549502,
+        "val_mae": 0.5791609906099078,
+        "val_rmse": 0.7100471931294782,
+        "n_train": 534,
+        "n_val": 133,
+        "max_train_idx": 533,
+        "min_val_idx": 534
+      },
+      {
+        "fold": 4,
+        "train_mae": 0.5087128261717934,
+        "train_rmse": 0.6360760860668585,
+        "val_mae": 0.592128968092789,
+        "val_rmse": 0.7221866063796658,
+        "n_train": 667,
+        "n_val": 133,
+        "max_train_idx": 666,
+        "min_val_idx": 667
+      }
+    ],
+    "summary": {
+      "val_mae_mean": 0.5709685376377036,
+      "val_mae_std": 0.06005691545930731,
+      "val_rmse_mean": 0.7033450775607679,
+      "val_rmse_std": 0.0716449026784827,
+      "train_mae_mean": 0.48010628171110364,
+      "train_mae_std": 0.030529724122432954,
+      "train_rmse_mean": 0.60556350426788,
+      "train_rmse_std": 0.039368681593424396,
+      "primary_mean_pm_std": "0.5710 \u00b1 0.0601"
+    }
+  },
+  "learning_curve": {
+    "train_sizes": [
+      27,
+      42,
+      57,
+      73,
+      88,
+      104,
+      119,
+      135
+    ],
+    "train_mae_mean": [
+      0.24532014709393019,
+      0.2936864164982217,
+      0.35490453021982626,
+      0.3748932387728816,
+      0.4031678675392934,
+      0.41128230198787474,
+      0.43797389251650803,
+      0.4293897715695458
+    ],
+    "val_mae_mean": [
+      0.6191945164152705,
+      0.6309116631745721,
+      1.5846382439077675,
+      0.8864883216938185,
+      0.8204577659047956,
+      0.5707645928218275,
+      0.6459223525529827,
+      0.64152002592303
+    ],
+    "final_train_mae": 0.4293897715695458,
+    "final_val_mae": 0.64152002592303,
+    "final_gap": 0.21213025435348426
+  }
+}

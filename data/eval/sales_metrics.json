@@ -1,0 +1,37 @@
+{
+  "model": "RandomForestRegressor",
+  "n_train_rows": 84,
+  "n_test_rows": 24,
+  "train_years": "2016-2023",
+  "test_years": "2024-2025",
+  "mse": {
+    "mse_eur2": 4945994319.934529,
+    "rmse_eur": 70327.76350727023,
+    "avg_monthly_revenue_eur": 888875.4570833333,
+    "mse_as_pct_of_avg_revenue_squared": 0.6259963245608242,
+    "rmse_as_pct_of_avg_revenue": 7.9119929509626346
+  },
+  "psi_us_shipment_share": {
+    "value": 1.310396170032269,
+    "interpretation": "significant shift \u2014 possible expansion/contraction in one country"
+  },
+  "psi_shipments_processed": {
+    "value": 7.77699041354357,
+    "interpretation": "significant shift \u2014 possible expansion/contraction in one country"
+  },
+  "gini": 0.7499300072933244,
+  "k2_score_ks": 0.5,
+  "features": [
+    "month_num",
+    "year",
+    "month_sin",
+    "month_cos",
+    "revenue_lag_1",
+    "revenue_lag_12",
+    "revenue_roll_3",
+    "shipments_lag_1",
+    "shipments_lag_12",
+    "us_shipment_share",
+    "spain_shipment_share"
+  ]
+}
