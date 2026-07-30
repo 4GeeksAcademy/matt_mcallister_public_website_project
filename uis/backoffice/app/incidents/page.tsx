@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   asIncident,
   asIncidentList,
+  branchLabel,
   getFriendlyError,
   incidentBranches,
   incidentOrigins,
@@ -173,7 +174,7 @@ export default function IncidentsPage() {
             <option value="">All branches</option>
             {incidentBranches.map((branch) => (
               <option key={branch} value={branch}>
-                {branch}
+                {branchLabel(branch)}
               </option>
             ))}
           </select>
@@ -218,7 +219,7 @@ export default function IncidentsPage() {
                   <td className="px-4 py-3">{incident.title}</td>
                   <td className="px-4 py-3">{incident.category}</td>
                   <td className="px-4 py-3">{incident.origin}</td>
-                  <td className="px-4 py-3">{incident.branch}</td>
+                  <td className="px-4 py-3">{branchLabel(incident.branch)}</td>
                   <td className="px-4 py-3">
                     <select
                       value={incident.status}

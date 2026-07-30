@@ -8,6 +8,7 @@ import {
   IncidentOrigin,
   IncidentStatus,
   IncidentSummary,
+  branchLabel,
 } from "../../../packages/shared/types";
 
 export type ApiFieldError = {
@@ -25,6 +26,7 @@ export const incidentStatuses = INCIDENT_STATUSES as IncidentStatus[];
 export const incidentOrigins = INCIDENT_ORIGINS as IncidentOrigin[];
 export const incidentCategories = INCIDENT_CATEGORIES as IncidentCategory[];
 export const incidentBranches = INCIDENT_BRANCHES as string[];
+export { branchLabel };
 
 export const getFriendlyError = (payload: unknown, fallback: string): string => {
   if (!payload || typeof payload !== "object") {

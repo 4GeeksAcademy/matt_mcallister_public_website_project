@@ -3,6 +3,7 @@
 import { FormEvent, useMemo, useState } from "react";
 import {
   ApiFieldError,
+  branchLabel,
   incidentBranches,
   incidentCategories,
   incidentOrigins,
@@ -56,6 +57,24 @@ export default function RegisterIncidentPage() {
     setIsSubmitting(true);
     setStatusMessage(null);
     setErrors({});
+
+    const clientErrors: Record<string, string> = {};
+    if (!data.title.trim()) clientErrors.title = "Title is required.";
+    if (!data.description.trim()) clientErrors.description = "Description is required.";
+    if (!data.category.trim()) clientErrors.category = "Category is required.";
+    if (!data.status.trim()) clientErrors.status = "Status is required.";
+    if (!data.origin.trim()) clientErrors.origin = "Origin is required.";
+    if (!data.branch.trim()) clientErrors.branch = "Branch is required.";
+
+    if (Object.keys(clientErrors).length > 0) {
+      setErrors(clientErrors);
+      setStatusMessage({
+        kind: "error",
+        message: "Please complete the required fields before submitting.",
+      });
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
       const response = await fetch("/api/incidents", {
@@ -217,7 +236,7 @@ export default function RegisterIncidentPage() {
             >
               {incidentBranches.map((option) => (
                 <option key={option} value={option}>
-                  {option}
+                  {branchLabel(option)}
                 </option>
               ))}
             </select>

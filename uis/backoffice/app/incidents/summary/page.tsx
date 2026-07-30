@@ -1,22 +1,24 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { asSummary, getFriendlyError } from "@/components/incidentDomain";
+import { asSummary, branchLabel, getFriendlyError } from "@/components/incidentDomain";
 import { IncidentSummary } from "../../../../../packages/shared/types";
 
 const SummaryCard = ({
   title,
   values,
+  labelFn,
 }: {
   title: string;
   values: Record<string, number>;
+  labelFn?: (key: string) => string;
 }) => (
   <article className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
     <h2 className="text-lg font-semibold text-cyan-200">{title}</h2>
     <ul className="mt-3 space-y-2 text-sm text-slate-200">
       {Object.entries(values).map(([key, value]) => (
         <li key={key} className="flex items-center justify-between">
-          <span>{key}</span>
+          <span>{labelFn ? labelFn(key) : key}</span>
           <span className="font-semibold">{value}</span>
         </li>
       ))}
@@ -89,7 +91,7 @@ export default function IncidentSummaryPage() {
           <SummaryCard title="By Status" values={summary.by_status} />
           <SummaryCard title="By Category" values={summary.by_category} />
           <SummaryCard title="By Origin" values={summary.by_origin} />
-          <SummaryCard title="By Branch" values={summary.by_branch} />
+          <SummaryCard title="By Branch" values={summary.by_branch} labelFn={branchLabel} />
         </section>
       ) : null}
     </main>

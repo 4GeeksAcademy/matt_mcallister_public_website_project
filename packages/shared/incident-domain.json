@@ -3,15 +3,49 @@
   "origins": ["customer", "branch", "internal"],
   "categories": [
     "lost_parcel",
-    "failed_delivery",
-    "wrong_address",
-    "inventory_discrepancy"
+    "delivery_failure",
+    "inventory_discrepancy",
+    "carrier_issue",
+    "returns_issue",
+    "warehouse_incident",
+    "system_failure",
+    "client_complaint",
+    "other"
   ],
-  "branches": ["Los Angeles", "Zaragoza", "Central"],
+  "branches": [
+    "central",
+    "la_warehouse",
+    "la_office",
+    "zaragoza_warehouse",
+    "zaragoza_office"
+  ],
+  "branch_labels": {
+    "central": "Central",
+    "la_warehouse": "Los Angeles — Warehouse",
+    "la_office": "Los Angeles — Office",
+    "zaragoza_warehouse": "Zaragoza — Warehouse",
+    "zaragoza_office": "Zaragoza — Office"
+  },
   "lifecycle": {
     "open": ["in_progress", "discarded"],
     "in_progress": ["resolved", "discarded"],
     "resolved": [],
     "discarded": []
+  },
+  "csv_status_map": {
+    "OPEN": "open",
+    "CLOSED": "resolved",
+    "DISCARDED": "discarded"
+  },
+  "csv_category_map": {
+    "LOST_PARCEL": "lost_parcel",
+    "DELAYED_DELIVERY": "carrier_issue",
+    "WRONG_ADDRESS": "delivery_failure",
+    "RETURN_REQUEST": "returns_issue",
+    "DAMAGE": "carrier_issue"
+  },
+  "csv_country_map": {
+    "US": "la_office",
+    "ES": "zaragoza_office"
   }
 }

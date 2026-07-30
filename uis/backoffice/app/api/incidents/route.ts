@@ -1,48 +1,46 @@
-import { NextResponse } from "next/server";
-import {
-  createIncident,
-  getApiErrorBody,
-  listIncidents,
-  parseIncidentFilters,
-  validateCreateInput,
-} from "@/lib/incidents";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(request: Request) {
+const upstreamBase = (
+  process.env.INCIDENTS_API_URL ||
+  process.env.NEXT_PUBLIC_INCIDENTS_API_URL ||
+  "http://localhost:8001"
+).replace(/\/$/, "");
+
+async function proxy(request: NextRequest, upstreamPath: string): Promise<NextResponse> {
   try {
-    const body = await request.json();
-    const validation = validateCreateInput(body);
+    const url = new URL(upstreamPath, `${upstreamBase}/`);
+    request.nextUrl.searchParams.forEach((value, key) => {
+      url.searchParams.set(key, value);
+    });
 
-    if (validation.errors.length > 0 || !validation.data) {
-      return NextResponse.json(getApiErrorBody(validation.errors[0]), { status: 400 });
+    const init: RequestInit = {
+      method: request.method,
+      headers: { "Content-Type": "application/json" },
+      cache: "no-store",
+    };
+
+    if (request.method !== "GET" && request.method !== "HEAD") {
+      init.body = await request.text();
     }
 
-    const incident = createIncident(validation.data);
-
-    return NextResponse.json({ data: incident }, { status: 201 });
+    const response = await fetch(url, init);
+    const text = await response.text();
+    return new NextResponse(text, {
+      status: response.status,
+      headers: { "Content-Type": response.headers.get("Content-Type") || "application/json" },
+    });
   } catch {
     return NextResponse.json(
-      { message: "Something went wrong while creating the incident." },
-      { status: 500 },
+      { message: "Incident service is temporarily unavailable. Please try again." },
+      { status: 502 },
     );
   }
 }
 
-export async function GET(request: Request) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const parsed = parseIncidentFilters(searchParams);
+export async function GET(request: NextRequest) {
+  return proxy(request, "/api/incidents");
+}
 
-    if (parsed.errors.length > 0 || !parsed.filters) {
-      return NextResponse.json(getApiErrorBody(parsed.errors[0]), { status: 400 });
-    }
-
-    const incidents = listIncidents(parsed.filters);
-
-    return NextResponse.json({ data: incidents }, { status: 200 });
-  } catch {
-    return NextResponse.json(
-      { message: "Something went wrong while listing incidents." },
-      { status: 500 },
-    );
-  }
+export async function POST(request: NextRequest) {
+  return proxy(request, "/api/incidents");
 }

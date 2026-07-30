@@ -4,6 +4,7 @@ export const INCIDENT_STATUSES = incidentDomain.statuses as readonly string[];
 export const INCIDENT_ORIGINS = incidentDomain.origins as readonly string[];
 export const INCIDENT_CATEGORIES = incidentDomain.categories as readonly string[];
 export const INCIDENT_BRANCHES = incidentDomain.branches as readonly string[];
+export const INCIDENT_BRANCH_LABELS = incidentDomain.branch_labels as Record<string, string>;
 
 export type IncidentStatus = (typeof INCIDENT_STATUSES)[number];
 export type IncidentOrigin = (typeof INCIDENT_ORIGINS)[number];
@@ -45,4 +46,8 @@ export const isValidLifecycleTransition = (
   nextStatus: IncidentStatus,
 ): boolean => {
   return lifecycle[currentStatus]?.includes(nextStatus) ?? false;
+};
+
+export const branchLabel = (branch: string): string => {
+  return INCIDENT_BRANCH_LABELS[branch] ?? branch;
 };

@@ -1,26 +1,29 @@
-import { NextResponse } from "next/server";
-import { getIncidentById } from "@/lib/incidents";
+import { NextRequest, NextResponse } from "next/server";
+
+const upstreamBase = (
+  process.env.INCIDENTS_API_URL ||
+  process.env.NEXT_PUBLIC_INCIDENTS_API_URL ||
+  "http://localhost:8001"
+).replace(/\/$/, "");
 
 export async function GET(
-  _request: Request,
-  { params }: { params: Promise<{ id: string }> },
+  _request: NextRequest,
+  context: { params: Promise<{ id: string }> },
 ) {
   try {
-    const { id } = await params;
-    const incident = getIncidentById(id);
-
-    if (!incident) {
-      return NextResponse.json(
-        { message: "Incident not found." },
-        { status: 404 },
-      );
-    }
-
-    return NextResponse.json({ data: incident }, { status: 200 });
+    const { id } = await context.params;
+    const response = await fetch(`${upstreamBase}/api/incidents/${id}`, {
+      cache: "no-store",
+    });
+    const text = await response.text();
+    return new NextResponse(text, {
+      status: response.status,
+      headers: { "Content-Type": "application/json" },
+    });
   } catch {
     return NextResponse.json(
-      { message: "Something went wrong while fetching the incident." },
-      { status: 500 },
+      { message: "Incident service is temporarily unavailable. Please try again." },
+      { status: 502 },
     );
   }
 }
