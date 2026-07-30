@@ -1,0 +1,52 @@
+[
+  {
+    "id": "q1",
+    "question": "What is the standard domestic ground delivery SLA?",
+    "expected_source_document": "sla-delivery"
+  },
+  {
+    "id": "q2",
+    "question": "Can we promise the usual 3 to 5 day delivery SLA during Black Friday?",
+    "expected_source_document": "sla-delivery"
+  },
+  {
+    "id": "q3",
+    "question": "What is the standard return window for eligible products?",
+    "expected_source_document": "returns-policy"
+  },
+  {
+    "id": "q4",
+    "question": "Are international returns automatic?",
+    "expected_source_document": "returns-policy"
+  },
+  {
+    "id": "q5",
+    "question": "Which carrier best covers rural Aragón?",
+    "expected_source_document": "carrier-coverage"
+  },
+  {
+    "id": "q6",
+    "question": "What US carriers does TrackFlow work with?",
+    "expected_source_document": "carrier-coverage"
+  },
+  {
+    "id": "q7",
+    "question": "How much does a pallet location cost per month in Zaragoza?",
+    "expected_source_document": "storage-pricing"
+  },
+  {
+    "id": "q8",
+    "question": "Can I offer a custom storage discount to a prospect this week?",
+    "expected_source_document": "storage-pricing"
+  },
+  {
+    "id": "q9",
+    "question": "What happens to delivery SLAs during Cyber Monday and major Sales peaks?",
+    "expected_source_document": "sla-delivery"
+  },
+  {
+    "id": "q10",
+    "question": "What is the restocking fee for domestic returns without original packaging?",
+    "expected_source_document": "returns-policy"
+  }
+]

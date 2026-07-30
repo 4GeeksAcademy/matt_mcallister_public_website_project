@@ -10,21 +10,28 @@ from fastapi.responses import JSONResponse, PlainTextResponse
 
 from app.analysis_bridge import export_result_csv, run_analysis
 
-# Repo root so `services.celery_app` imports resolve when uvicorn runs from services/api.
+# Repo root so `services.celery_app` and `data.*` imports resolve when uvicorn runs from services/api.
 _REPO_ROOT = Path(__file__).resolve().parents[3]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
+from app.knowledge_bridge import (  # noqa: E402
+    KnowledgeQueryRequest,
+    KnowledgeQueryResponse,
+    run_knowledge_query,
+)
 from services.celery_app.celery import app as celery_app  # noqa: E402
 from services.celery_app.tasks import analyze_incident  # noqa: E402
 
-app = FastAPI(title="TrackFlow Incident Analysis API", version="0.1.0")
+app = FastAPI(title="TrackFlow API", version="0.2.0")
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000",
         "http://127.0.0.1:3000",
+        "http://localhost:3001",
+        "http://127.0.0.1:3001",
         "http://localhost:3002",
         "http://127.0.0.1:3002",
     ],
@@ -81,6 +88,19 @@ def get_task(task_id: str) -> dict:
     elif result.failed():
         payload["result"] = str(result.result)
     return payload
+
+
+@app.post("/knowledge/query", response_model=KnowledgeQueryResponse)
+def knowledge_query(body: KnowledgeQueryRequest) -> KnowledgeQueryResponse:
+    """Answer commercial knowledge questions via the RAG pipeline."""
+    try:
+        result = run_knowledge_query(body.question.strip())
+    except Exception as exc:  # noqa: BLE001 — surface as 502 for client UX
+        raise HTTPException(
+            status_code=502,
+            detail="Knowledge query failed. Please try again shortly.",
+        ) from exc
+    return KnowledgeQueryResponse(answer=result["answer"])
 
 
 @app.post("/export")

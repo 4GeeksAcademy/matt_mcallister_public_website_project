@@ -11,6 +11,8 @@ RUN pip install --no-cache-dir -r /app/services/api/requirements.txt
 
 COPY scripts /app/scripts
 COPY services /app/services
+COPY data /app/data
+COPY docs/company-knowledge-base /app/docs/company-knowledge-base
 
 ENV PYTHONPATH=/app:/app/services/api
 ENV UPLOAD_DIR=/data/uploads

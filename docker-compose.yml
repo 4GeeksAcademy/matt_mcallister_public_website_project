@@ -7,6 +7,16 @@ services:
     networks:
       - trackflow_network
 
+  qdrant:
+    image: qdrant/qdrant:v1.12.5
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    networks:
+      - trackflow_network
+
   postgres:
     image: postgres:16-alpine
     environment:
@@ -38,11 +48,19 @@ services:
       REDIS_URL: redis://redis:6379/0
       DATABASE_URL: postgresql://trackflow:trackflow@postgres:5432/trackflow
       UPLOAD_DIR: /data/uploads
+      QDRANT_URL: http://qdrant:6333
+      QDRANT_COLLECTION: trackflow_knowledge
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-https://api.openai.com/v1}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-text-embedding-3-small}
+      GENERATION_MODEL: ${GENERATION_MODEL:-gpt-4o-mini}
+      RAG_MIN_SCORE: ${RAG_MIN_SCORE:-0.55}
     volumes:
       - uploads_data:/data/uploads
     depends_on:
       - redis
       - postgres
+      - qdrant
     networks:
       - trackflow_network
 
@@ -101,6 +119,7 @@ services:
 volumes:
   uploads_data:
   postgres_data:
+  qdrant_data:
 
 networks:
   trackflow_network:
