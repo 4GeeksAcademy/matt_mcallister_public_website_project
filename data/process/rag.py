@@ -15,7 +15,7 @@ from qdrant_client.http import models as qmodels
 COLLECTION_NAME = os.environ.get("QDRANT_COLLECTION", "trackflow_knowledge")
 COMPANY = "trackflow"
 LANGUAGE = "en"
-VECTOR_SIZE = 1536
+VECTOR_SIZE = int(os.environ.get("EMBEDDING_VECTOR_SIZE", "1536"))
 EMBEDDING_MODEL = os.environ.get("EMBEDDING_MODEL", "text-embedding-3-small")
 DEFAULT_MIN_SCORE = float(os.environ.get("RAG_MIN_SCORE", "0.55"))
 

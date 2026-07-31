@@ -1,1 +1,7 @@
 .venv
+.env
+node_modules/
+.next/
+next-env.d.ts
+data/process/incidents.db
+results.csv
