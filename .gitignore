@@ -1,0 +1,25 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+
+# Local / generated
+results.csv
+*.db
+.env
+.env.*
+
+# Node / Next
+node_modules/
+.next/
+out/
+dist/
+build/
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/

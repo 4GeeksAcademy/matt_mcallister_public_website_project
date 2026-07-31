@@ -1,8 +1,29 @@
 # `scripts` folder
 
-This folder contains **helper scripts** for the monorepo: development automation, maintenance utilities, repetitive tasks (setup, lint, migrations, data generation, etc.), and internal tooling.
+Helper scripts for the monorepo.
 
-- **Main purpose**: group support tools that do not belong to a specific app, agent, or pipeline but make the team’s work easier.
-- **Recommendation**: document each script (what it does, parameters, requirements, usage examples) and keep them reproducible (and safe) across environments.
+## Incident analysis (TrackFlow)
+
+Shared validation and metrics (used by the CLI and `services/api`):
+
+- `stats.py` — validate rows + aggregate metrics
+- `export.py` — write one-row-per-metric CSV
+- `analyze.py` — CLI report + optional `results.csv` export
+
+```bash
+# from repo root
+python scripts/analyze.py data/raw/incidents-trackflow.csv
+
+# or from scripts/
+cd scripts
+python analyze.py ../data/raw/incidents-trackflow.csv
+```
+
+Expected CONTEXT values for `incidents-trackflow.csv` are documented in
+`incident_file_analyzer/incident_analyzer_context.md`.
+
+```bash
+python -m pytest scripts/test_analyze_context.py -q
+```
 
 > _Spanish version: [README.es.md](./README.es.md)._
