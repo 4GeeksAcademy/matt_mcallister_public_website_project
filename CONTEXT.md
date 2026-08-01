@@ -129,6 +129,13 @@ The AI challenges at TrackFlow include image-based product condition classificat
 
 ---
 
+## Sales forecasting data
+
+Historical monthly sales for ML forecasting live at `data/raw/trackflow_sales.csv`.  
+Column schema, seasonality, and growth rules are defined in [`data/raw/CONTEXT-company.md`](data/raw/CONTEXT-company.md). Do not alter that dataset in ways that break those patterns.
+
+---
+
 _Internal document — 4Geeks Academy · AI Engineering Track_
 _For exclusive use in programme project generation_
 
