@@ -1,8 +1,4 @@
 .env
-.venv/
 __pycache__/
 *.pyc
-trackflow_auth.json
-services/inventory-api/.env
-services/inventory-api/trackflow_auth.json
-services/inventory-api/.venv/
+*.db
