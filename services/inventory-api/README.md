@@ -26,3 +26,7 @@ uvicorn app.main:app --reload --port 3001
 - `GET/POST /inventory/products` — product catalog with computed stock
 - `POST /inventory/orders/inbound`, `POST /inventory/orders/outbound` — stock movements (auth required)
 - `GET /inventory/orders` — all orders with product data
+- `GET /pipeline/runs/latest` — latest warehouse telemetry ETL run metadata (auth required)
+- `POST /pipeline/runs` — manually trigger `trackflow_warehouse_telemetry_etl` (auth required)
+
+Pipeline logic lives in `data/pipelines/pipeline.py` and is imported by the API — it is not duplicated here.

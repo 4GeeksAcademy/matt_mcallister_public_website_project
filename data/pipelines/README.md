@@ -2,9 +2,27 @@
 
 This folder groups **all data pipelines in the monorepo** related to the company: ingestion, ETL/ELT, cleaning, transformation, and loading into analytical or production systems.
 
-Each subfolder or file under `data/pipelines/` should represent **one pipeline or job set** (for example `sales-etl`, `telemetry-stream`, `customer-segmentation`) and include the required configuration (scripts, orchestration, connectors, schemas, etc.).
+## TrackFlow warehouse telemetry ETL
 
-- **Main purpose**: consolidate in one place the data movement and transformation logic that powers the company’s applications and analytics.
-- **Recommendation**: document pipelines as you add them—their goal, data sources and sinks, dependencies, and how to run them in development, testing, and production.
+| File | Role |
+|------|------|
+| [`PIPELINE_DESIGN.md`](./PIPELINE_DESIGN.md) | Design: current state, flow, idempotency, Prefect mapping |
+| [`pipeline.py`](./pipeline.py) | Prefect main flow + subflows + tasks (CLI entrypoint) |
+| [`requirements.txt`](./requirements.txt) | Python deps (`prefect`, `pandas`, …) |
+| [`telemetry-stream/`](./telemetry-stream/) | Event JSON Schema + sample envelope |
+
+**Run:**
+
+```bash
+python -m venv .venv && source .venv/bin/activate
+pip install -r data/pipelines/requirements.txt
+python data/pipelines/pipeline.py
+```
+
+**Tests:**
+
+```bash
+python -m pytest tests/pipelines/test_pipeline.py
+```
 
 > _Spanish version: [README.es.md](./README.es.md)._
