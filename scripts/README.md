@@ -1,12 +1,29 @@
 ## `seed_incidents.py`
 
-Loads historical incidents from the analyzer CSV into the SQLite DB used by
-`services/api`.
+Helper scripts for the monorepo.
+
+## Incident analysis (TrackFlow)
+
+Shared validation and metrics (used by the CLI and `services/api`):
+
+- `stats.py` — validate rows + aggregate metrics
+- `export.py` — write one-row-per-metric CSV
+- `analyze.py` — CLI report + optional `results.csv` export
 
 ```bash
-export INCIDENTS_DB_PATH="$(pwd)/data/process/incidents.db"
-PYTHONPATH=. python3 scripts/seed_incidents.py \
-  --csv-path data/raw/incidents-trackflow.csv
+# from repo root
+python scripts/analyze.py data/raw/incidents-trackflow.csv
+
+# or from scripts/
+cd scripts
+python analyze.py ../data/raw/incidents-trackflow.csv
+```
+
+Expected CONTEXT values for `incidents-trackflow.csv` are documented in
+`incident_file_analyzer/incident_analyzer_context.md`.
+
+```bash
+python -m pytest scripts/test_analyze_context.py -q
 ```
 
 - Applies analyzer invalid-row rules, then CONTEXT transforms
