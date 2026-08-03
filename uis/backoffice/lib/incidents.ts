@@ -224,7 +224,12 @@ export const updateIncidentStatus = (
   const targetIndex = incidents.findIndex((incident) => incident.id === id);
 
   if (targetIndex === -1) {
-    return;
+    return {
+      error: {
+        field: "id",
+        message: "Incident not found.",
+      },
+    };
   }
 
   const current = incidents[targetIndex];

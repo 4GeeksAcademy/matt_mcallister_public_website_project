@@ -7,7 +7,7 @@ import { initTelemetry, track } from "@/src/services/telemetry";
 const LINKS = [
   { href: "/", label: "Executive" },
   { href: "/reporting", label: "Reporting" },
-  { href: "/login", label: "Login" },
+  { href: "/telemetry/login", label: "Telemetry login" },
   { href: "/inventory", label: "Inventory" },
   { href: "/telemetry", label: "Telemetry" },
 ];

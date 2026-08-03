@@ -1,7 +1,23 @@
-.venv
+# Local environment and credentials
 .env
+.env.local
+.env.*.local
+.venv/
+venv/
+
+# JavaScript and frontend build output
 node_modules/
 .next/
+dist/
+coverage/
 next-env.d.ts
-data/process/incidents.db
+
+# Python caches and local databases
+__pycache__/
+*.py[cod]
+*.db
+*.sqlite
+*.sqlite3
+
+# Local run output
 results.csv

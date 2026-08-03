@@ -15,4 +15,6 @@
 
 -7/29/26 Milestone 4 runtime fix: forced Webpack (`next dev --webpack` / `next build --webpack`) in `uis/website` and `uis/backoffice` so Windows graders avoid Turbopack MAX_PATH failures during output generation. Both apps build successfully with Webpack.
 
+-8/3/26 Repository consolidation: audited every remote branch and integrated all unique project lines into `master`. Removed tracked dependency folders, Python caches, a local database, and `.env.local`; expanded ignore rules; removed an empty Windows-incompatible filename; and separated the telemetry demo login from the primary authentication route. See `BRANCH_AUDIT.md` for the branch-by-branch record.
+
 -7/31/26 Milestone 7 cleanup: excluded dependencies, Next.js build output, local databases, generated CSV results, and environment secrets from Git; made the RAG embedding vector size configurable and corrected local API CORS handling.
