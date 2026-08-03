@@ -1,0 +1,4 @@
+incident_id,date,country,customer_type,tracking_number,carrier,category,description,status,customer_email,satisfaction_score
+TRF-000001,2024-01-15,US,B2C,TRACKING1,UPS,DELAYED_DELIVERY,Package arrived late by two days,CLOSED,user1@example.com,4
+TRF-000002,2024-01-16,ES,B2B,TRACKING2,MRW,LOST_PARCEL,Parcel never arrived at warehouse,OPEN,user2@example.com,
+TRF-000003,2024-01-17,US,B2C,SHORT,FEDEX,DAMAGE,Box crushed in transit damage,CLOSED,user3@example.com,2

@@ -1,34 +1,106 @@
 services:
-  ui:
-    build: ./uis
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--maxmemory-policy", "noeviction"]
     ports:
-      - "3000:3000"
-      - "3001:3001"
-    volumes:
-      - .:/monorepo
-      - /monorepo/uis/website/node_modules
-      - /monorepo/uis/backoffice/node_modules
-    env_file:
-      - .env.example
-      - path: .env
-        required: false
+      - "6379:6379"
     networks:
       - trackflow_network
 
-  backend:
-    build: ./services
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: trackflow
+      POSTGRES_PASSWORD: trackflow
+      POSTGRES_DB: trackflow
     ports:
-      - "8000:8000"
+      - "5432:5432"
     volumes:
-      - ./services/inventory-api:/app
-    env_file:
-      - .env.example
-      - path: .env
-        required: false
-    command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+      - postgres_data:/var/lib/postgresql/data
+      - ./services/celery_app/migrations/001_task_failures.sql:/docker-entrypoint-initdb.d/001_task_failures.sql:ro
     networks:
       - trackflow_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U trackflow -d trackflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: services/Dockerfile
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8001"]
+    working_dir: /app/services/api
+    ports:
+      - "8001:8001"
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      DATABASE_URL: postgresql://trackflow:trackflow@postgres:5432/trackflow
+      UPLOAD_DIR: /data/uploads
+    volumes:
+      - uploads_data:/data/uploads
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - trackflow_network
+
+  worker:
+    build:
+      context: .
+      dockerfile: services/Dockerfile
+    command:
+      [
+        "celery",
+        "-A",
+        "services.celery_app.celery",
+        "worker",
+        "--loglevel=info",
+      ]
+    working_dir: /app
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      DATABASE_URL: postgresql://trackflow:trackflow@postgres:5432/trackflow
+      UPLOAD_DIR: /data/uploads
+    volumes:
+      - uploads_data:/data/uploads
+    depends_on:
+      redis:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+    networks:
+      - trackflow_network
+
+  flower:
+    build:
+      context: .
+      dockerfile: services/Dockerfile
+    command:
+      [
+        "celery",
+        "-A",
+        "services.celery_app.celery",
+        "flower",
+        "--port=5555",
+      ]
+    working_dir: /app
+    ports:
+      - "5555:5555"
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      DATABASE_URL: postgresql://trackflow:trackflow@postgres:5432/trackflow
+      UPLOAD_DIR: /data/uploads
+    depends_on:
+      - redis
+      - worker
+    networks:
+      - trackflow_network
+
+volumes:
+  uploads_data:
+  postgres_data:
 
 networks:
   trackflow_network:
-    name: trackflow_network

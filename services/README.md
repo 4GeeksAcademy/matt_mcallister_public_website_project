@@ -1,23 +1,27 @@
-# `services` folder
+# TrackFlow services
 
-Backend services and shared server-side modules for TrackFlow.
-
-## Layout
+Backend services for the TrackFlow monorepo.
 
 | Path | Role |
-| ---- | ---- |
-| `api/migrations/` | SQL schema migrations (Postgres) |
-| `job_runner/` | Create / update / query `job_runs` for orchestration jobs |
+|------|------|
+| [`api/`](api/) | FastAPI incident analysis API (`POST /analyze`, `GET /tasks/{task_id}`, `POST /export`) |
+| [`celery_app/`](celery_app/) | Celery worker tasks, Redis broker client, and DLQ (`task_failures`) |
 
-## `job_runner`
+## Docker (Redis + Celery + API)
 
-Used by `scripts/nightly_export.py` for idempotency and status tracking. Requires `DATABASE_URL` and the migrations in `api/migrations/`.
+From the repo root:
 
-## Tracking layers (do not merge)
+```bash
+docker compose up --build
+```
 
-| Table | Owner | Tracks |
-| ----- | ----- | ------ |
-| `job_runs` | `services/job_runner` + `scripts/nightly_export.py` | Orchestration script executions |
-| `pipeline_runs` | `data/pipelines/tracking.py` + pipeline modules | Individual pipeline executions (e.g. `telemetry_kpi_daily`) |
+| Service | URL / port |
+|---------|------------|
+| API | http://127.0.0.1:8001 |
+| Flower | http://127.0.0.1:5555 |
+| Redis | `localhost:6379` |
+| Postgres (DLQ) | `localhost:5432` |
 
-They coexist with separate responsibilities so each layer can fail, retry, and report independently.
+See [`celery_app/README.md`](celery_app/README.md) for local (non-Docker) worker commands.
+
+> Nightly export / `job_runner` / `job_runs` are a separate orchestration path and are not used by these per-request Celery tasks.

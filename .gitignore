@@ -1,2 +1,1 @@
-# Ignore generated nightly telemetry CSV audit snapshots
-data/raw/telemetry_*.csv
+.venv
