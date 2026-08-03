@@ -1,0 +1,8 @@
+Hi,
+I've reviewed the state of the repo and we're accumulating code without any supporting structure. If I drop an agent on this right now it's going to make mistakes that will cost us triple the time to fix.
+I need the repository to have clear, persistent context before we keep adding features: what the company is, what we're building, what the project rules are. That goes into the memory bank. The agent has to read it before touching anything — and it has to include both business context and technical context, not just one of the two.
+I also want an AGENTS.md that defines how any agent operates in this repo — what workflow it has to follow before making a commit. No agents writing code without going through the delivery process.
+For more specific rules we'll use the .agents/ folder. Think about what conventions the agent needs to know to not break what we already have, and document them there with the correct scope.
+Finally, I want us to formalise at least one skill that captures a recurring task in our workflow — something the agent can execute consistently and that we can reuse in upcoming milestones. It needs explicit acceptance criteria: if it can't be verified, it doesn't count.
+As for the app, the public website needs to live in ./uis/website as a Next.js app — not as a copy, but as an improved version with reusable components. In parallel, create ./uis/backoffice to host all internal company logic with its own layout and entry view, and integrate the TypeScript script from the business logic module (Milestone 2) there so we have something visible from day one. Any APIs must be created under /services.
+When you're done, open a PR and let me know.

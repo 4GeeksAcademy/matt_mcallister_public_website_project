@@ -1,0 +1,28 @@
+[project]
+name = "supplier-api"
+version = "0.1.0"
+description = "TrackFlow supplier management API"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.116.0",
+  "tinydb>=4.8.2",
+  "uvicorn>=0.35.0"
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.4.0",
+  "httpx>=0.28.0"
+]
+
+[project.scripts]
+seed = "seed:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
