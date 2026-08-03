@@ -1,3 +1,11 @@
 fastapi==0.115.0
 uvicorn[standard]==0.30.6
 python-multipart==0.0.9
+celery[redis]==5.4.0
+redis==5.0.8
+flower==2.0.1
+psycopg[binary]>=3.1,<4
+qdrant-client==1.12.1
+openai==1.59.3
+pytest==8.3.4
+httpx==0.28.1

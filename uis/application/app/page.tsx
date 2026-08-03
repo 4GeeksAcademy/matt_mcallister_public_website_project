@@ -18,6 +18,14 @@ export default function Home() {
             Values below are produced by the shared Milestone 2 business-logic
             module imported from the monorepo.
           </p>
+          <p>
+            <a
+              href="/knowledge"
+              className="text-sm text-cyan-300 underline-offset-4 hover:underline"
+            >
+              Open commercial knowledge assistant
+            </a>
+          </p>
         </header>
 
         <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">

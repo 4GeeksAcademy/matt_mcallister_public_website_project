@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "TrackFlow Backoffice",
-  description: "Operational backoffice for incident and logistics management.",
+  description: "TrackFlow operations snapshot and commercial knowledge assistant",
 };
 
 export default function RootLayout({
