@@ -17,5 +17,6 @@ Every telemetry event includes:
 
 Components must call `track(eventType, properties)` only — never send envelope fields manually.
 
-Full per-event property allowlists: [`../event-schemas.json`](../event-schemas.json).
+Full per-event property allowlists:
+[`../data/pipelines/telemetry-stream/event-schemas.json`](../data/pipelines/telemetry-stream/event-schemas.json).
 Delivery modes and exclusions: [`DELIVERY_STRATEGY.md`](DELIVERY_STRATEGY.md).

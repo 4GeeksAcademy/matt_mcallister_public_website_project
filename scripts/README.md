@@ -4,7 +4,7 @@ Helper scripts for the monorepo.
 
 ## Incident analysis (TrackFlow)
 
-Shared validation and metrics (used by the CLI and `services/api`):
+Shared validation and metrics (used by the CLI and `services/incident-api`):
 
 - `stats.py` — validate rows + aggregate metrics
 - `export.py` — write one-row-per-metric CSV

@@ -80,7 +80,11 @@ def put_user(
     return UserRead.model_validate(updated)
 
 
-@router.put("/{user_id}/change-password", status_code=status.HTTP_204_NO_CONTENT)
+@router.put(
+    "/{user_id}/change-password",
+    status_code=status.HTTP_204_NO_CONTENT,
+    response_model=None,
+)
 def update_password(
     user_id: int,
     payload: ChangePasswordRequest,
@@ -101,7 +105,11 @@ def update_password(
     change_password(db, user, payload.currentPassword, payload.newPassword)
 
 
-@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{user_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    response_model=None,
+)
 def remove_user(
     user_id: int,
     db: TinyDB = Depends(get_tinydb),

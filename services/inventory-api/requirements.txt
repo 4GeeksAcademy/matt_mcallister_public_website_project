@@ -1,3 +1,5 @@
+-r ../../data/pipelines/requirements.txt
+
 fastapi
 uvicorn[standard]
 sqlmodel

@@ -2,20 +2,15 @@ services:
   redis:
     image: redis:7-alpine
     command: ["redis-server", "--maxmemory-policy", "noeviction"]
-    ports:
-      - "6379:6379"
-    networks:
-      - trackflow_network
+    ports: ["6379:6379"]
+    networks: [trackflow_network]
 
   qdrant:
     image: qdrant/qdrant:v1.12.5
-    ports:
-      - "6333:6333"
-      - "6334:6334"
+    ports: ["6333:6333", "6334:6334"]
     volumes:
       - qdrant_data:/qdrant/storage
-    networks:
-      - trackflow_network
+    networks: [trackflow_network]
 
   postgres:
     image: postgres:16-alpine
@@ -23,27 +18,58 @@ services:
       POSTGRES_USER: trackflow
       POSTGRES_PASSWORD: trackflow
       POSTGRES_DB: trackflow
-    ports:
-      - "5432:5432"
+    ports: ["5432:5432"]
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./services/celery_app/migrations/001_task_failures.sql:/docker-entrypoint-initdb.d/001_task_failures.sql:ro
-    networks:
-      - trackflow_network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U trackflow -d trackflow"]
       interval: 5s
       timeout: 5s
       retries: 10
+    networks: [trackflow_network]
 
-  api:
+  leads-api:
+    build:
+      context: ./services/leads-api
+    environment:
+      PORT: 4000
+    ports: ["4000:4000"]
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:4000/health').then(r=>{if(!r.ok)process.exit(1)})"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [trackflow_network]
+
+  auth-api:
+    build:
+      context: .
+      dockerfile: services/PythonService.Dockerfile
+      args:
+        SERVICE_PATH: apps/trackflow-api
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    environment:
+      SECRET_KEY: ${SECRET_KEY:-local-development-secret-change-me}
+      ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: 30
+      DATABASE_PATH: /data/auth.json
+    ports: ["8000:8000"]
+    volumes:
+      - auth_data:/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [trackflow_network]
+
+  incident-api:
     build:
       context: .
       dockerfile: services/Dockerfile
     command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8001"]
-    working_dir: /app/services/api
-    ports:
-      - "8001:8001"
+    working_dir: /app/services/incident-api
     environment:
       REDIS_URL: redis://redis:6379/0
       DATABASE_URL: postgresql://trackflow:trackflow@postgres:5432/trackflow
@@ -55,27 +81,109 @@ services:
       EMBEDDING_MODEL: ${EMBEDDING_MODEL:-text-embedding-3-small}
       GENERATION_MODEL: ${GENERATION_MODEL:-gpt-4o-mini}
       RAG_MIN_SCORE: ${RAG_MIN_SCORE:-0.55}
+    ports: ["8001:8001"]
     volumes:
       - uploads_data:/data/uploads
     depends_on:
-      - redis
-      - postgres
-      - qdrant
-    networks:
-      - trackflow_network
+      redis:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [trackflow_network]
+
+  supplier-api:
+    build:
+      context: .
+      dockerfile: services/PythonService.Dockerfile
+      args:
+        SERVICE_PATH: services/supplier-api
+    command: ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8002"]
+    environment:
+      SUPPLIERS_DB_PATH: /data/suppliers.json
+    ports: ["8002:8002"]
+    volumes:
+      - supplier_data:/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8002/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [trackflow_network]
+
+  inventory-api:
+    build:
+      context: .
+      dockerfile: services/PythonService.Dockerfile
+      args:
+        SERVICE_PATH: services/inventory-api
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8003"]
+    environment:
+      DATABASE_URL: sqlite:////data/inventory.db
+      TINYDB_PATH: /data/inventory-auth.json
+      SECRET_KEY: ${SECRET_KEY:-local-development-secret-change-me}
+    ports: ["8003:8003"]
+    volumes:
+      - inventory_data:/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8003/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [trackflow_network]
+
+  talent-api:
+    build:
+      context: .
+      dockerfile: services/PythonService.Dockerfile
+      args:
+        SERVICE_PATH: services/talent-api
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8004"]
+    environment:
+      TALENT_DB_PATH: /data/talent.json
+    ports: ["8004:8004"]
+    volumes:
+      - talent_data:/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8004/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [trackflow_network]
+
+  operations-api:
+    build:
+      context: .
+      dockerfile: services/PythonService.Dockerfile
+      args:
+        SERVICE_PATH: services
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8005"]
+    environment:
+      API_BASE: http://operations-api:8005
+      TELEMETRY_ENDPOINT: http://operations-api:8005/telemetry/events
+      DATABASE_URL: postgresql://trackflow:trackflow@postgres:5432/trackflow
+    ports: ["8005:8005"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8005/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [trackflow_network]
 
   worker:
     build:
       context: .
       dockerfile: services/Dockerfile
-    command:
-      [
-        "celery",
-        "-A",
-        "services.celery_app.celery",
-        "worker",
-        "--loglevel=info",
-      ]
+    command: ["celery", "-A", "services.celery_app.celery", "worker", "--loglevel=info"]
     working_dir: /app
     environment:
       REDIS_URL: redis://redis:6379/0
@@ -88,38 +196,105 @@ services:
         condition: service_started
       postgres:
         condition: service_healthy
-    networks:
-      - trackflow_network
+    networks: [trackflow_network]
 
   flower:
     build:
       context: .
       dockerfile: services/Dockerfile
-    command:
-      [
-        "celery",
-        "-A",
-        "services.celery_app.celery",
-        "flower",
-        "--port=5555",
-      ]
+    command: ["celery", "-A", "services.celery_app.celery", "flower", "--port=5555"]
     working_dir: /app
-    ports:
-      - "5555:5555"
     environment:
       REDIS_URL: redis://redis:6379/0
       DATABASE_URL: postgresql://trackflow:trackflow@postgres:5432/trackflow
       UPLOAD_DIR: /data/uploads
+    ports: ["5555:5555"]
     depends_on:
-      - redis
-      - worker
-    networks:
-      - trackflow_network
+      redis:
+        condition: service_started
+      worker:
+        condition: service_started
+    networks: [trackflow_network]
+
+  website:
+    build:
+      context: .
+      dockerfile: uis/App.Dockerfile
+      args:
+        APP_PATH: uis/website
+    command: ["npm", "run", "dev", "--", "--hostname", "0.0.0.0", "--port", "3000"]
+    environment:
+      NEXT_PUBLIC_WEBSITE_API_URL: http://localhost:4000
+    ports: ["3000:3000"]
+    depends_on:
+      leads-api:
+        condition: service_healthy
+    networks: [trackflow_network]
+
+  backoffice:
+    build:
+      context: .
+      dockerfile: uis/App.Dockerfile
+      args:
+        APP_PATH: uis/backoffice
+    command: ["npm", "run", "dev", "--", "--hostname", "0.0.0.0", "--port", "3001"]
+    environment:
+      NEXT_PUBLIC_WEBSITE_API_URL: http://localhost:4000
+      NEXT_PUBLIC_AUTH_API_URL: http://localhost:8000
+      NEXT_PUBLIC_INCIDENTS_API_URL: http://localhost:8001
+      NEXT_PUBLIC_OPERATIONS_API_URL: http://localhost:8005
+      NEXT_PUBLIC_TELEMETRY_ENDPOINT: http://localhost:8005/telemetry/events
+      SUPPLIER_API_URL: http://supplier-api:8002
+    ports: ["3001:3001"]
+    depends_on:
+      auth-api:
+        condition: service_healthy
+      incident-api:
+        condition: service_healthy
+      operations-api:
+        condition: service_healthy
+      supplier-api:
+        condition: service_healthy
+    networks: [trackflow_network]
+
+  supplier-ui:
+    build:
+      context: .
+      dockerfile: uis/App.Dockerfile
+      args:
+        APP_PATH: uis/application
+    command: ["npm", "run", "dev", "--", "--hostname", "0.0.0.0", "--port", "3002"]
+    environment:
+      SUPPLIER_API_URL: http://supplier-api:8002
+    ports: ["3002:3002"]
+    depends_on:
+      supplier-api:
+        condition: service_healthy
+    networks: [trackflow_network]
+
+  talent-ui:
+    build:
+      context: .
+      dockerfile: uis/App.Dockerfile
+      args:
+        APP_PATH: uis/talent-pipeline-nextjs
+    command: ["npm", "run", "dev", "--", "--hostname", "0.0.0.0", "--port", "3003"]
+    environment:
+      NEXT_PUBLIC_TALENT_API_URL: http://localhost:8004/tracker/api/v1
+    ports: ["3003:3003"]
+    depends_on:
+      talent-api:
+        condition: service_healthy
+    networks: [trackflow_network]
 
 volumes:
-  uploads_data:
+  auth_data:
+  inventory_data:
   postgres_data:
   qdrant_data:
+  supplier_data:
+  talent_data:
+  uploads_data:
 
 networks:
   trackflow_network:

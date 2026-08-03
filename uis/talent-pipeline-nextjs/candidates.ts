@@ -2,6 +2,7 @@ import { apiFetch } from './api';
 import type {
   GetRecordsParams,
   NoteCreate,
+  NoteOut,
   RecordsPageOut,
   RecordCreate,
   RecordOut,
@@ -129,8 +130,8 @@ export async function deleteCandidate(id: string): Promise<void> {
 /**
  * GET /records/:id/notes
  */
-export async function getNotes(candidateId: string): Promise<unknown[]> {
-  return apiFetch<unknown[]>(`/records/${candidateId}/notes`);
+export async function getNotes(candidateId: string): Promise<NoteOut[]> {
+  return apiFetch<NoteOut[]>(`/records/${candidateId}/notes`);
 }
 
 /**
@@ -140,8 +141,8 @@ export async function getNotes(candidateId: string): Promise<unknown[]> {
 export async function addNote(
   candidateId: string,
   body: NoteCreate
-): Promise<unknown> {
-  return apiFetch<unknown>(`/records/${candidateId}/notes`, {
+): Promise<NoteOut> {
+  return apiFetch<NoteOut>(`/records/${candidateId}/notes`, {
     method: 'POST',
     body: JSON.stringify(body),
   });

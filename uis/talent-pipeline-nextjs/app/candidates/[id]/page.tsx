@@ -1,9 +1,14 @@
 
 "use client";
 import React, { useState } from 'react';
-import { getCandidate } from '../../../candidates';
+import {
+  addNote,
+  deleteNote,
+  getCandidate,
+  getNotes,
+} from '../../../candidates';
 import Link from 'next/link';
-import type { RecordOut } from '../../../types';
+import type { NoteOut, RecordOut } from '../../../types';
 import styles from './page.module.css';
 
 export const dynamic = 'force-dynamic';
@@ -13,31 +18,42 @@ interface CandidateDetailPageProps {
 }
 
 export default function CandidateDetailPage({ params }: CandidateDetailPageProps) {
-  // For demo: use local state for notes. In real app, fetch/save notes from backend.
-  const [notes, setNotes] = useState<string[]>([]);
+  const [notes, setNotes] = useState<NoteOut[]>([]);
   const [noteInput, setNoteInput] = useState('');
   const [candidate, setCandidate] = useState<RecordOut | null>(null);
   const [error, setError] = useState('');
 
-  // Fetch candidate on mount
   React.useEffect(() => {
     params.then(({ id }) => {
-      getCandidate(id)
-        .then(setCandidate)
+      Promise.all([getCandidate(id), getNotes(id)])
+        .then(([nextCandidate, nextNotes]) => {
+          setCandidate(nextCandidate);
+          setNotes(nextNotes);
+        })
         .catch((e) => setError(String(e)));
     });
   }, [params]);
 
-  function handleAddNote(e: React.FormEvent) {
+  async function handleAddNote(e: React.FormEvent) {
     e.preventDefault();
-    if (noteInput.trim()) {
-      setNotes((prev) => [noteInput.trim(), ...prev]);
+    const content = noteInput.trim();
+    if (content && candidate) {
+      const created = await addNote(candidate.id, { content });
+      setNotes((prev) => [created, ...prev]);
+      setCandidate((prev) =>
+        prev ? { ...prev, notes_count: prev.notes_count + 1 } : prev
+      );
       setNoteInput('');
     }
   }
 
-  function handleDeleteNote(idx: number) {
-    setNotes((prev) => prev.filter((_, i) => i !== idx));
+  async function handleDeleteNote(noteId: string) {
+    if (!candidate) return;
+    await deleteNote(candidate.id, noteId);
+    setNotes((prev) => prev.filter((note) => note.id !== noteId));
+    setCandidate((prev) =>
+      prev ? { ...prev, notes_count: Math.max(0, prev.notes_count - 1) } : prev
+    );
   }
 
   if (error) {
@@ -115,12 +131,12 @@ export default function CandidateDetailPage({ params }: CandidateDetailPageProps
         </form>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
           {notes.length === 0 && <li style={{ color: '#64748b' }}>No notes yet.</li>}
-          {notes.map((note, idx) => (
-            <li key={idx} style={{ display: 'flex', alignItems: 'center', marginBottom: 8, background: '#f8fafc', borderRadius: 8, padding: '0.5rem 0.8rem' }}>
-              <span style={{ flex: 1 }}>{note}</span>
+          {notes.map((note) => (
+            <li key={note.id} style={{ display: 'flex', alignItems: 'center', marginBottom: 8, background: '#f8fafc', borderRadius: 8, padding: '0.5rem 0.8rem' }}>
+              <span style={{ flex: 1 }}>{note.content}</span>
               <button
                 type="button"
-                onClick={() => handleDeleteNote(idx)}
+                onClick={() => void handleDeleteNote(note.id)}
                 style={{ marginLeft: 8, background: '#fee2e2', color: '#b91c1c', border: 'none', borderRadius: 6, padding: '0.2rem 0.7rem', cursor: 'pointer' }}
                 aria-label="Delete note"
               >

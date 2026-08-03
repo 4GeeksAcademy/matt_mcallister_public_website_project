@@ -20,7 +20,7 @@ if str(_PIPELINES_DIR) not in sys.path:
 
 from pipeline import (  # noqa: E402
     get_latest_pipeline_run,
-    trackflow_warehouse_telemetry_etl,
+    weekly_warehouse_client_performance_etl,
 )
 
 
@@ -76,15 +76,15 @@ def trigger_pipeline_run(
     payload: Optional[TriggerPipelineRequest] = None,
     current_user: User = Depends(get_current_user),
 ) -> PipelineRunResponse:
-    """Manually trigger trackflow_warehouse_telemetry_etl (imports from data/pipelines/)."""
+    """Manually trigger the canonical weekly warehouse performance ETL."""
     _ = current_user
     options = payload or TriggerPipelineRequest()
-    result: Dict[str, Any] = trackflow_warehouse_telemetry_etl(
+    result: Dict[str, Any] = weekly_warehouse_client_performance_etl(
         force_notify_failure=options.force_notify_failure
     )
     return PipelineRunResponse(
         status=result.get("status", "Unknown"),
-        flow_run_id=result.get("flow_run_id"),
+        flow_run_id=result.get("flow_run_id") or result.get("run_id"),
         records_processed=result.get("records_processed"),
         notify_status=result.get("notify_status"),
         error=result.get("error"),

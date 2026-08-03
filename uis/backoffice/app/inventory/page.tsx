@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { flushNow, track, timedFetch } from "@/src/services/telemetry";
 
 const API =
-  process.env.NEXT_PUBLIC_API_BASE || "http://127.0.0.1:8000";
+  process.env.NEXT_PUBLIC_OPERATIONS_API_URL || "http://127.0.0.1:8005";
 
 type Product = {
   product_id: string;
@@ -44,7 +44,8 @@ export default function InventoryPage() {
   }
 
   useEffect(() => {
-    void refresh();
+    const timeout = window.setTimeout(() => void refresh(), 0);
+    return () => window.clearTimeout(timeout);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

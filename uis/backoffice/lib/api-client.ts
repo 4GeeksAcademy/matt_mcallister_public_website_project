@@ -22,7 +22,8 @@ type User = {
   email: string;
 };
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_AUTH_API_URL ?? "http://localhost:8000";
 const LOGIN_ENDPOINT = process.env.NEXT_PUBLIC_LOGIN_ENDPOINT ?? "/auth/login";
 const REGISTER_ENDPOINT = process.env.NEXT_PUBLIC_REGISTER_ENDPOINT ?? "/auth/register";
 const ME_ENDPOINT = process.env.NEXT_PUBLIC_ME_ENDPOINT ?? "/users/me";
@@ -118,7 +119,7 @@ const handleUnauthorized = () => {
   clearToken();
 
   if (typeof window !== "undefined") {
-    window.location.assign("/login");
+    window.location.replace("/login");
   }
 };
 

@@ -24,8 +24,8 @@ export default function NewCandidatePage() {
     try {
       await createCandidate(form);
       router.push('/candidates');
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : String(err));
     }
   }
 

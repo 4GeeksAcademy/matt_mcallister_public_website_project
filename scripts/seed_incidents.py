@@ -24,7 +24,7 @@ from packages.shared.incident_validation import (  # noqa: E402
     validate_incident_fields,
 )
 
-_API_DIR = _REPO_ROOT / "services" / "api"
+_API_DIR = _REPO_ROOT / "services" / "incident-api"
 if str(_API_DIR) not in sys.path:
     sys.path.insert(0, str(_API_DIR))
 

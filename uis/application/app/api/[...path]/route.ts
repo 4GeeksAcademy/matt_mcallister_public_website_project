@@ -1,5 +1,5 @@
 const BACKEND_BASE_URL =
-  process.env.SUPPLIER_API_URL ?? "http://127.0.0.1:8000";
+  process.env.SUPPLIER_API_URL ?? "http://127.0.0.1:8002";
 
 function buildTargetUrl(requestUrl: string, path: string[]): URL {
   const incomingUrl = new URL(requestUrl);

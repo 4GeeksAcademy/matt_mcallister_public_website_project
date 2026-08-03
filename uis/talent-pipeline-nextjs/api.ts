@@ -1,30 +1,12 @@
-const API_PREFIX = '/tracker/api/v1';
-
 function trimTrailingSlash(url: string): string {
   return url.replace(/\/$/, '');
 }
 
 function getBaseUrl(): string {
-  const fullApiUrl = process.env.NEXT_PUBLIC_API_URL;
-  if (fullApiUrl) {
-    return trimTrailingSlash(fullApiUrl);
-  }
-
-  const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-  if (apiBaseUrl) {
-    return `${trimTrailingSlash(apiBaseUrl)}${API_PREFIX}`;
-  }
-
-  // Node's fetch requires an absolute URL. In the browser we can keep a relative path.
-  if (typeof window === 'undefined') {
-    const appUrl =
-      process.env.NEXT_PUBLIC_APP_URL ??
-      process.env.APP_URL ??
-      'http://localhost:3000';
-    return `${trimTrailingSlash(appUrl)}${API_PREFIX}`;
-  }
-
-  return API_PREFIX;
+  return trimTrailingSlash(
+    process.env.NEXT_PUBLIC_TALENT_API_URL ??
+      'http://localhost:8004/tracker/api/v1'
+  );
 }
 
 export async function apiFetch<T>(

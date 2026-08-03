@@ -84,6 +84,6 @@ export const logout = () => {
   clearToken();
 
   if (typeof window !== "undefined") {
-    window.location.assign("/login");
+    window.location.replace("/login");
   }
 };

@@ -17,7 +17,7 @@ Code layout (course split):
 |---|---|
 | Chunking + indexing (`setup`, `embed`) | `data/process/rag.py` |
 | Retrieval + generation (`retrieve`, `query`) | `data/pipelines/rag.py` |
-| HTTP | `POST /knowledge/query` in `services/api` |
+| HTTP | `POST /knowledge/query` in `services/incident-api` |
 | UI | `uis/backoffice/app/knowledge` |
 
 ---
@@ -120,6 +120,6 @@ The HTTP response returns **only** `{ "answer": "<generated string>" }`. Chunk l
 1. Start Qdrant (and optional API stack): `docker compose up -d qdrant`
 2. Export `OPENAI_API_KEY` (and optional `OPENAI_BASE_URL`)
 3. Index: `PYTHONPATH=. python -m data.process.rag`
-4. API: run uvicorn for `services/api` with repo root on `PYTHONPATH`
+4. API: run uvicorn for `services/incident-api` with repo root on `PYTHONPATH`
 5. UI: `uis/backoffice` → `/knowledge`
 6. Tests: `python -m pytest tests/pipelines/test_rag.py`

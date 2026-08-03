@@ -1,0 +1,59 @@
+name: TrackFlow CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  repository-integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Validate Git integrity
+        run: bash scripts/validate-git.sh
+      - name: Validate Docker Compose
+        run: docker compose config --quiet
+
+  javascript:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            uis/website/package-lock.json
+            uis/backoffice/package-lock.json
+            uis/application/package-lock.json
+            uis/talent-pipeline-nextjs/package-lock.json
+            services/leads-api/package-lock.json
+            packages/trackflow-core/package-lock.json
+      - name: Install canonical JavaScript projects
+        run: npm run install:js
+      - name: Lint
+        run: npm run lint
+      - name: Test and typecheck
+        run: npm run test:ts
+      - name: Build
+        run: npm run build
+      - name: Audit production dependencies
+        run: npm run audit:prod
+
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.11"
+          enable-cache: true
+      - name: Test canonical Python services
+        run: bash scripts/test-python.sh

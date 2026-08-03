@@ -8,6 +8,7 @@ const links = [
   { href: "/incidents/register", label: "Register Incident" },
   { href: "/incidents", label: "Incidents" },
   { href: "/incidents/summary", label: "Summary" },
+  { href: "/incidents/analyze", label: "Analyze CSV" },
 ];
 
 export default function IncidentNav() {

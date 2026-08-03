@@ -14,8 +14,8 @@ from services.celery_app.dlq import record_failure
 
 logger = logging.getLogger(__name__)
 
-# Ensure analysis_bridge imports resolve (services/api on path, scripts via bridge).
-_API_DIR = Path(__file__).resolve().parents[1] / "api"
+# Ensure incident API imports resolve (scripts are loaded through analysis_bridge).
+_API_DIR = Path(__file__).resolve().parents[1] / "incident-api"
 if str(_API_DIR) not in sys.path:
     sys.path.insert(0, str(_API_DIR))
 

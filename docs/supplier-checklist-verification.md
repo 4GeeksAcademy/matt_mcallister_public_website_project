@@ -47,12 +47,12 @@ This report verifies the Supplier Directory implementation against the milestone
 
 | Area | Criterion | Result | Evidence |
 |---|---|---|---|
-| Model | Supplier status accepts only allowed values | Pass | services/api/models.py:9 |
-| Model | Rate must be > 0 and rejected before DB write | Pass | services/api/models.py:18, services/api/models.py:62 |
-| Model | Input/response separation with system-generated timestamp | Pass | services/api/models.py:54 |
-| Model | Context-aligned categories/countries/currency constraints | Pass | services/api/models.py:34, services/api/models.py:41, services/api/constants.py:1 |
+| Model | Supplier status accepts only allowed values | Pass | services/supplier-api/api/models.py:9 |
+| Model | Rate must be > 0 and rejected before DB write | Pass | services/supplier-api/api/models.py:18, services/supplier-api/api/models.py:62 |
+| Model | Input/response separation with system-generated timestamp | Pass | services/supplier-api/api/models.py:54 |
+| Model | Context-aligned categories/countries/currency constraints | Pass | services/supplier-api/api/models.py:34, services/supplier-api/api/models.py:41, services/supplier-api/api/constants.py:1 |
 | Seeder | Seeder script exists and loads CONTEXT suppliers | Pass | services/seed.py:6 |
-| Seeder | Seeder avoids duplicates when re-run | Pass | services/api/database.py:85 |
+| Seeder | Seeder avoids duplicates when re-run | Pass | services/supplier-api/api/database.py:85 |
 | Seeder | Console confirms inserted count | Pass | services/seed.py:15 |
 | Seeder | uv script wiring for `uv run seed` | Pass* | services/pyproject.toml:19 |
 | Endpoint | POST /suppliers returns created object with ID | Pass | services/routes/suppliers.py:23 |
@@ -60,7 +60,7 @@ This report verifies the Supplier Directory implementation against the milestone
 | Endpoint | GET /suppliers/{id} returns 404 when missing | Pass | services/routes/suppliers.py:44 |
 | Endpoint | PATCH /suppliers/{id}/rate updates timestamp and validates rate | Pass | services/routes/suppliers.py:52 |
 | Endpoint | PATCH /suppliers/{id}/status validates status | Pass | services/routes/suppliers.py:67 |
-| Endpoint | DELETE /suppliers/{id} returns 404 when missing | Pass | services/routes/suppliers.py:78, services/api/database.py:74 |
+| Endpoint | DELETE /suppliers/{id} returns 404 when missing | Pass | services/supplier-api/api/routes/suppliers.py:78, services/supplier-api/api/database.py:74 |
 | Frontend | Suppliers page accessible from app menu | Pass | uis/application/app/page.tsx:18 |
 | Frontend | List shows required supplier fields and actions | Pass | uis/application/app/suppliers/page.tsx:383 |
 | Frontend | Country and category filters update list without reload | Pass | uis/application/app/suppliers/page.tsx:62 |
@@ -75,7 +75,7 @@ This report verifies the Supplier Directory implementation against the milestone
 
 ## Fixes Applied During Verification
 - Fixed missing-delete behavior to prevent 500 on unknown IDs:
-  - services/api/database.py:74
+  - services/supplier-api/api/database.py:74
 - Stabilized duplicate implementation seed test with isolated DB fixture:
   - apps/supplier-api/tests/test_seed.py:6
 

@@ -13,13 +13,16 @@ export default function KnowledgePage() {
   const [theme, setTheme] = useState<Theme>("light");
 
   useEffect(() => {
-    const stored = window.localStorage.getItem("trackflow-theme");
-    if (stored === "light" || stored === "dark") {
-      setTheme(stored);
-      return;
-    }
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    setTheme(prefersDark ? "dark" : "light");
+    const timeout = window.setTimeout(() => {
+      const stored = window.localStorage.getItem("trackflow-theme");
+      if (stored === "light" || stored === "dark") {
+        setTheme(stored);
+        return;
+      }
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      setTheme(prefersDark ? "dark" : "light");
+    }, 0);
+    return () => window.clearTimeout(timeout);
   }, []);
 
   useEffect(() => {
@@ -37,7 +40,7 @@ export default function KnowledgePage() {
     setAnswer(null);
 
     const apiBase =
-      process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ||
+      process.env.NEXT_PUBLIC_INCIDENTS_API_URL?.replace(/\/$/, "") ||
       "http://localhost:8001";
 
     try {

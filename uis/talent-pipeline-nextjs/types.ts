@@ -54,6 +54,13 @@ export interface NoteCreate {
   content: string;
 }
 
+export interface NoteOut {
+  id: string;
+  candidate_id: string;
+  content: string;
+  created_at: string;
+}
+
 // ─── Query Params ─────────────────────────────────────────────────────────────
 
 export interface GetRecordsParams {

@@ -12,7 +12,7 @@ Produce the **Weekly Warehouse & Client Performance Report** for Thomas (CEO) an
 
 | Asset | Location | Notes |
 |-------|----------|--------|
-| Telemetry envelope + event schemas | [`event-schemas.json`](../../event-schemas.json), [`telemetry_full_plan/`](../../telemetry_full_plan/) | schemaVersion `1.0.0`; inventory props: `warehouse`, `client_id`, `product_id`, `product_category`, `quantity` |
+| Telemetry envelope + event schemas | [`telemetry-stream/event-schemas.json`](telemetry-stream/event-schemas.json), [`telemetry_full_plan/`](../../telemetry_full_plan/) | schemaVersion `1.0.0`; inventory props: `warehouse`, `client_id`, `product_id`, `product_category`, `quantity` |
 | Event store | `public.telemetry_events` (Supabase) | Envelope columns + domain fields in `tags` JSONB; immutable (no UPDATE/DELETE) |
 | Ingest + engineering report | [`services/telemetry/`](../../services/telemetry/) | `POST /telemetry/events`, `GET /telemetry/report` (Pandas technical metrics) |
 | Inventory demo API | [`services/inventory/`](../../services/inventory/) | In-memory seed stock; not the reporting source |

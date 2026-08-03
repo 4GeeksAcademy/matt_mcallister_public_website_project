@@ -22,9 +22,9 @@ logger = logging.getLogger("trackflow")
 
 TELEMETRY_ENDPOINT = os.getenv(
     "TELEMETRY_ENDPOINT",
-    "http://127.0.0.1:8000/telemetry/events",
+    "http://127.0.0.1:8005/telemetry/events",
 )
-API_BASE = os.getenv("API_BASE", "http://127.0.0.1:8000")
+API_BASE = os.getenv("API_BASE", "http://127.0.0.1:8005")
 
 
 @asynccontextmanager
@@ -43,6 +43,10 @@ app.add_middleware(
         "http://127.0.0.1:3000",
         "http://localhost:3001",
         "http://127.0.0.1:3001",
+        "http://localhost:3002",
+        "http://127.0.0.1:3002",
+        "http://localhost:3003",
+        "http://127.0.0.1:3003",
     ],
     allow_credentials=True,
     allow_methods=["*"],

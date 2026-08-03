@@ -22,7 +22,7 @@ export type TelemetryEnvelope = {
   properties: Properties;
 };
 
-let queue: TelemetryEnvelope[] = [];
+const queue: TelemetryEnvelope[] = [];
 let flushTimer: ReturnType<typeof setInterval> | null = null;
 let sessionId = "sess_anonymous";
 let userId = "anonymous";
@@ -45,7 +45,7 @@ function uuid(): string {
 function endpoint(): string {
   return (
     process.env.NEXT_PUBLIC_TELEMETRY_ENDPOINT ||
-    "http://127.0.0.1:8000/telemetry/events"
+    "http://127.0.0.1:8005/telemetry/events"
   );
 }
 

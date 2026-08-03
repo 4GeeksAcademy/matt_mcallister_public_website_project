@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   asIncident,
   asIncidentList,
@@ -42,7 +42,7 @@ export default function IncidentsPage() {
     return query ? `?${query}` : "";
   }, [filters]);
 
-  const loadIncidents = async () => {
+  const loadIncidents = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
@@ -64,11 +64,12 @@ export default function IncidentsPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [queryString]);
 
   useEffect(() => {
-    void loadIncidents();
-  }, [queryString]);
+    const timeout = window.setTimeout(() => void loadIncidents(), 0);
+    return () => window.clearTimeout(timeout);
+  }, [loadIncidents]);
 
   const onStatusChange = async (incident: Incident, nextStatus: string) => {
     const previous = incident.status;

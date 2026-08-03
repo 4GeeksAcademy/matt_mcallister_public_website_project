@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-const API = process.env.NEXT_PUBLIC_API_BASE || "http://127.0.0.1:8000";
+const API =
+  process.env.NEXT_PUBLIC_OPERATIONS_API_URL || "http://127.0.0.1:8005";
 
 type WeeklyEntry = {
   warehouse: string;
@@ -67,7 +68,8 @@ export default function ReportingPage() {
   }, []);
 
   useEffect(() => {
-    void load();
+    const timeout = window.setTimeout(() => void load(), 0);
+    return () => window.clearTimeout(timeout);
   }, [load]);
 
   async function triggerRun() {

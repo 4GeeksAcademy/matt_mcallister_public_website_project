@@ -4,6 +4,8 @@
 .env.*.local
 .venv/
 venv/
+.uv-python/
+.uv-cache/
 
 # JavaScript and frontend build output
 node_modules/

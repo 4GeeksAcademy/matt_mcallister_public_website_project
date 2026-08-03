@@ -62,7 +62,8 @@ export default function IncidentSummaryPage() {
   };
 
   useEffect(() => {
-    void loadSummary();
+    const timeout = window.setTimeout(() => void loadSummary(), 0);
+    return () => window.clearTimeout(timeout);
   }, []);
 
   return (
