@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { AppShell } from "@/src/components/AppShell";
+import IncidentNav from "@/components/IncidentNav";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "TrackFlow Backoffice",
-  description: "Warehouse operations and telemetry",
+  description: "Operational backoffice for incident and logistics management.",
 };
 
 export default function RootLayout({
@@ -28,8 +28,9 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col">
-        <AppShell>{children}</AppShell>
+      <body className="min-h-full flex flex-col">
+        <IncidentNav />
+        {children}
       </body>
     </html>
   );

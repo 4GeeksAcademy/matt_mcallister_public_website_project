@@ -11,5 +11,4 @@ export interface BaseEntity {
   updatedAt?: string;
 }
 
-export * from "./telemetry";
-
+export * from "./incidents";
