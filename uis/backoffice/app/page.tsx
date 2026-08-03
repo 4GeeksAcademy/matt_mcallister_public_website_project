@@ -2,7 +2,6 @@ import {
   buildExecutiveSnapshot,
   milestone2SampleInput,
 } from "@/lib/milestone2";
-import Link from "next/link";
 
 export default function Home() {
   const snapshot = buildExecutiveSnapshot(milestone2SampleInput);

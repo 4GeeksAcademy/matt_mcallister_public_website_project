@@ -16,6 +16,34 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Password Reset Configuration
+
+This app uses **Resend** for transactional password reset emails.
+
+Set these environment variables before testing AUTH-03:
+
+```bash
+RESET_TOKEN_SECRET=replace-with-a-long-random-secret
+RESET_TOKEN_EXPIRY_MINUTES=30
+RESEND_API_KEY=re_xxxxxxxxxxxxxxxxx
+RESEND_FROM_EMAIL=onboarding@resend.dev
+APP_BASE_URL=http://localhost:3000
+AUTH_STORE_FILE=.data/auth-store.json
+```
+
+Optional local demo auth user values:
+
+```bash
+AUTH_DEMO_USER_EMAIL=demo@trackflow.local
+AUTH_DEMO_USER_PASSWORD=ChangeMe123!
+```
+
+Notes:
+- `RESET_TOKEN_EXPIRY_MINUTES` is clamped to 15-60 minutes.
+- `RESEND_API_KEY` must come from your environment; never hardcode it.
+- `RESEND_API_KEY` is required for actual password reset email delivery.
+- `AUTH_STORE_FILE` lets you persist users and reset tokens across app restarts.
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.

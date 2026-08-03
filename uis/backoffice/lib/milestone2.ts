@@ -49,14 +49,11 @@ export const buildExecutiveSnapshot = (
   data: CountryKpiInput[],
 ): ExecutiveSnapshot => {
   const globalShipmentVolume = data.reduce((sum, row) => sum + row.shipments, 0);
-
   const totalOnTimeDeliveries = data.reduce(
     (sum, row) => sum + row.onTimeDeliveries,
     0,
   );
-
   const totalReturns = data.reduce((sum, row) => sum + row.returnedOrders, 0);
-
   const totalOperatingCostUsd = data.reduce(
     (sum, row) => sum + row.operatingCostUsd,
     0,
