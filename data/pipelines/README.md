@@ -21,4 +21,16 @@ python -m pytest tests/pipelines/test_pipeline.py
 
 Schedule: Mondays ~07:00 UTC (see design doc).
 
+## Pipelines
+
+### `telemetry_kpi_daily`
+
+Stub pipeline triggered by `scripts/nightly_export.py`. Reads `telemetry_events` from Postgres (`DATABASE_URL`); does **not** read CSV snapshots under `data/raw/`. Each execution writes a row to `pipeline_runs` (pipeline layer), while `nightly_export` writes to `job_runs` (orchestration layer).
+
+```bash
+python -m data.pipelines.telemetry_kpi_daily.run --no-prefect
+# Optional:
+python -m data.pipelines.telemetry_kpi_daily.run --no-prefect --target-date 2025-01-15
+```
+
 > _Spanish version: [README.es.md](./README.es.md)._

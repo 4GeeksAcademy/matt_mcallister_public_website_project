@@ -1,11 +1,2 @@
-.venv/
-.prefect/
-__pycache__/
-*.py[cod]
-*.egg-info/
-.pytest_cache/
-.DS_Store
-data/process/*.db
-*.db
-.env
-node_modules/
+# Ignore generated nightly telemetry CSV audit snapshots
+data/raw/telemetry_*.csv
