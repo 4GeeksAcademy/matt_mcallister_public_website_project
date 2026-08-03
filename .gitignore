@@ -1,6 +1,8 @@
-node_modules/
-.next/
-dist/
-build/
-coverage/
-.DS_Store
+.env
+.venv/
+__pycache__/
+*.pyc
+trackflow_auth.json
+services/inventory-api/.env
+services/inventory-api/trackflow_auth.json
+services/inventory-api/.venv/

@@ -1,22 +1,8 @@
-# Supplier API
+# `services` folder
 
-FastAPI + TinyDB supplier directory service for TrackFlow.
+This folder contains all the backend services (APIs and background workers) related to the company for the cross-functional AI Engineering project.
 
-## Run
+Each subfolder inside `services/` must correspond to one specific service (for example: `admin-api`, `data-processor-worker`) and include its own technical and functional documentation.
 
-```bash
-uv sync
-uv run uvicorn api.main:app --reload
-```
-
-## Seed
-
-```bash
-uv run seed
-```
-
-## Test
-
-```bash
-uv run pytest
-```
+- **Main purpose**: to centralize all the backend logic, APIs, and queue consumers that support the company's use cases.
+- **Recommendation**: document in this file (or in sub-READMEs) the services you add, their objective, the technology used, and how to run them.
