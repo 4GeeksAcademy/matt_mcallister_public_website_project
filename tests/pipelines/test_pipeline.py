@@ -1,5 +1,5 @@
 """
-Unit tests for TrackFlow warehouse telemetry transform tasks.
+Unit tests for TrackFlow weekly warehouse/client KPI transform tasks.
 
 Run from monorepo root:
     python -m pytest tests/pipelines/test_pipeline.py
@@ -15,203 +15,222 @@ import pytest
 PIPELINES_DIR = Path(__file__).resolve().parents[2] / "data" / "pipelines"
 sys.path.insert(0, str(PIPELINES_DIR))
 
-from pipeline import transform_warehouse_shipment_kpis  # noqa: E402
+from pipeline import (  # noqa: E402
+    assemble_weekly_warehouse_client_rows,
+    compute_discrepancy_rate,
+    compute_inbound_units_count,
+    compute_outbound_orders_count,
+    compute_stockout_events_count,
+    normalize_event,
+)
 
 
-def _outbound(
+def _event(
     *,
-    event_id: str,
-    timestamp: str,
+    event_type: str,
     warehouse: str,
-    brand: str,
-    quantity: int,
-    sku: str = "TF-LA-EB-001",
+    client_id: str,
+    quantity: float = 1,
+    timestamp: str = "2026-07-08T12:00:00.000Z",
 ) -> dict:
-    return {
-        "eventId": event_id,
+    raw = {
+        "eventId": "test-id",
         "timestamp": timestamp,
         "sessionId": "sess-test",
         "userId": "usr_test",
-        "event_type": "outbound_order_created",
+        "event_type": event_type,
         "schemaVersion": "1.0.0",
-        "requestId": f"req-{event_id}",
+        "requestId": "req-test",
         "properties": {
-            "order_id": 1,
-            "product_id": 1,
-            "sku": sku,
+            "warehouse": warehouse,
+            "client_id": client_id,
+            "product_id": "sku-1",
+            "product_category": "fashion",
             "quantity": quantity,
-            "warehouse_location": warehouse,
-            "client_brand": brand,
+        },
+    }
+    normalized = normalize_event(raw)
+    assert normalized is not None
+    return normalized
+
+
+def test_compute_inbound_units_count_sums_quantities_per_client():
+    events = [
+        _event(
+            event_type="inbound_order_created",
+            warehouse="los_angeles",
+            client_id="fashion-co",
+            quantity=2000,
+        ),
+        _event(
+            event_type="inbound_order_created",
+            warehouse="los_angeles",
+            client_id="fashion-co",
+            quantity=2200,
+        ),
+        _event(
+            event_type="inbound_order_created",
+            warehouse="zaragoza",
+            client_id="electronics-es",
+            quantity=800,
+        ),
+        _event(
+            event_type="outbound_order_created",
+            warehouse="los_angeles",
+            client_id="fashion-co",
+            quantity=10,
+        ),
+    ]
+
+    result = compute_inbound_units_count.fn(events)
+
+    assert result["los_angeles::fashion-co"] == 4200
+    assert result["zaragoza::electronics-es"] == 800
+    assert "los_angeles::fashion-co" in result
+
+
+def test_compute_outbound_orders_count_counts_events_not_units():
+    events = [
+        _event(
+            event_type="outbound_order_created",
+            warehouse="los_angeles",
+            client_id="fashion-co",
+            quantity=10,
+        ),
+        _event(
+            event_type="outbound_order_created",
+            warehouse="los_angeles",
+            client_id="fashion-co",
+            quantity=12,
+        ),
+        _event(
+            event_type="outbound_order_created",
+            warehouse="zaragoza",
+            client_id="electronics-es",
+            quantity=5,
+        ),
+    ]
+
+    result = compute_outbound_orders_count.fn(events)
+
+    assert result["los_angeles::fashion-co"] == 2
+    assert result["zaragoza::electronics-es"] == 1
+
+
+def test_compute_stockout_events_count_per_warehouse_client():
+    events = [
+        _event(
+            event_type="stock_threshold_triggered",
+            warehouse="los_angeles",
+            client_id="fashion-co",
+            quantity=4,
+        ),
+        _event(
+            event_type="stock_threshold_triggered",
+            warehouse="los_angeles",
+            client_id="fashion-co",
+            quantity=2,
+        ),
+        _event(
+            event_type="inbound_order_created",
+            warehouse="los_angeles",
+            client_id="fashion-co",
+            quantity=100,
+        ),
+    ]
+
+    result = compute_stockout_events_count.fn(events)
+
+    assert result["los_angeles::fashion-co"] == 2
+
+
+def test_discrepancy_rate_matches_hand_calculated_definition():
+    """Hand-calc: 1 discrepancy / 2 outbound orders => 0.5 for fashion-co."""
+    events = [
+        _event(
+            event_type="outbound_order_created",
+            warehouse="los_angeles",
+            client_id="fashion-co",
+        ),
+        _event(
+            event_type="outbound_order_created",
+            warehouse="los_angeles",
+            client_id="fashion-co",
+        ),
+        _event(
+            event_type="inventory_discrepancy_detected",
+            warehouse="los_angeles",
+            client_id="fashion-co",
+        ),
+        # zaragoza: discrepancy with zero outbound => rate 0
+        _event(
+            event_type="inventory_discrepancy_detected",
+            warehouse="zaragoza",
+            client_id="electronics-es",
+        ),
+    ]
+    outbound = compute_outbound_orders_count.fn(events)
+    result = compute_discrepancy_rate.fn(events, outbound)
+
+    assert outbound["los_angeles::fashion-co"] == 2
+    assert result["los_angeles::fashion-co"]["discrepancy_events_count"] == 1
+    assert result["los_angeles::fashion-co"]["discrepancy_rate"] == pytest.approx(0.5)
+    assert result["zaragoza::electronics-es"]["discrepancy_events_count"] == 1
+    assert result["zaragoza::electronics-es"]["discrepancy_rate"] == 0.0
+
+
+def test_compute_inbound_units_count_defensive_against_malformed_input():
+    """Null / wrong-type inputs must not raise; invalid rows are skipped."""
+    events = [
+        None,
+        "not-a-dict",
+        {"event_type": "inbound_order_created"},  # missing warehouse/client
+        {
+            "event_type": "inbound_order_created",
+            "warehouse": "los_angeles",
+            "client_id": "fashion-co",
+            "quantity": "not-a-number",
+        },
+        _event(
+            event_type="inbound_order_created",
+            warehouse="los_angeles",
+            client_id="fashion-co",
+            quantity=100,
+        ),
+    ]
+
+    result = compute_inbound_units_count.fn(events)
+
+    assert result == {"los_angeles::fashion-co": 100}
+
+
+def test_assemble_weekly_warehouse_client_rows_never_crosses_clients():
+    inbound = {"los_angeles::fashion-co": 4200, "zaragoza::electronics-es": 800}
+    outbound = {"los_angeles::fashion-co": 2, "zaragoza::electronics-es": 2}
+    stockouts = {"los_angeles::fashion-co": 2}
+    discrepancies = {
+        "los_angeles::fashion-co": {
+            "discrepancy_events_count": 1,
+            "discrepancy_rate": 0.5,
+        },
+        "zaragoza::electronics-es": {
+            "discrepancy_events_count": 1,
+            "discrepancy_rate": 0.5,
         },
     }
 
-
-def test_transform_aggregates_outbound_by_warehouse_and_brand():
-    events = [
-        _outbound(
-            event_id="a",
-            timestamp="2026-07-10T10:00:00.000Z",
-            warehouse="los_angeles",
-            brand="AcmeApparel",
-            quantity=10,
-        ),
-        _outbound(
-            event_id="b",
-            timestamp="2026-07-10T12:00:00.000Z",
-            warehouse="los_angeles",
-            brand="AcmeApparel",
-            quantity=5,
-        ),
-        _outbound(
-            event_id="c",
-            timestamp="2026-07-10T14:00:00.000Z",
-            warehouse="zaragoza",
-            brand="IberiaCosmetics",
-            quantity=20,
-        ),
-    ]
-
-    result = transform_warehouse_shipment_kpis.fn(events)
-
-    assert len(result) == 2
-    la = next(r for r in result if r["warehouse_location"] == "los_angeles")
-    zg = next(r for r in result if r["warehouse_location"] == "zaragoza")
-    assert la["outbound_order_count"] == 2
-    assert la["outbound_unit_quantity"] == 15
-    assert la["client_brand"] == "AcmeApparel"
-    assert zg["outbound_order_count"] == 1
-    assert zg["outbound_unit_quantity"] == 20
-
-
-def test_transform_includes_inbound_and_product_created_counts():
-    events = [
-        {
-            "eventId": "in-1",
-            "timestamp": "2026-07-10T08:00:00.000Z",
-            "event_type": "inbound_order_created",
-            "properties": {
-                "order_id": 1,
-                "product_id": 1,
-                "sku": "TF-ZG-CS-010",
-                "quantity": 50,
-                "warehouse_location": "zaragoza",
-                "client_brand": "IberiaCosmetics",
-            },
-        },
-        {
-            "eventId": "prod-1",
-            "timestamp": "2026-07-10T09:00:00.000Z",
-            "event_type": "product_created",
-            "properties": {
-                "product_id": 1,
-                "sku": "TF-ZG-CS-010",
-                "warehouse_location": "zaragoza",
-                "client_brand": "IberiaCosmetics",
-                "low_stock_threshold": 10,
-            },
-        },
-        _outbound(
-            event_id="out-1",
-            timestamp="2026-07-10T11:00:00.000Z",
-            warehouse="zaragoza",
-            brand="IberiaCosmetics",
-            quantity=3,
-            sku="TF-ZG-CS-010",
-        ),
-    ]
-
-    result = transform_warehouse_shipment_kpis.fn(events)
-    assert len(result) == 1
-    row = result[0]
-    assert row["inbound_order_count"] == 1
-    assert row["inbound_unit_quantity"] == 50
-    assert row["product_created_count"] == 1
-    assert row["outbound_order_count"] == 1
-    assert row["outbound_unit_quantity"] == 3
-
-
-def test_transform_splits_metrics_by_business_date():
-    events = [
-        _outbound(
-            event_id="d1",
-            timestamp="2026-07-10T23:00:00.000Z",
-            warehouse="los_angeles",
-            brand="NovaElectronics",
-            quantity=2,
-        ),
-        _outbound(
-            event_id="d2",
-            timestamp="2026-07-11T01:00:00.000Z",
-            warehouse="los_angeles",
-            brand="NovaElectronics",
-            quantity=4,
-        ),
-    ]
-
-    result = transform_warehouse_shipment_kpis.fn(events)
-    assert {r["metric_date"] for r in result} == {"2026-07-10", "2026-07-11"}
-    by_date = {r["metric_date"]: r for r in result}
-    assert by_date["2026-07-10"]["outbound_unit_quantity"] == 2
-    assert by_date["2026-07-11"]["outbound_unit_quantity"] == 4
-
-
-@pytest.mark.parametrize(
-    "bad_event",
-    [
-        # null properties where a dict is expected
-        {
-            "eventId": "bad-null-props",
-            "timestamp": "2026-07-10T10:00:00.000Z",
-            "event_type": "outbound_order_created",
-            "properties": None,
-        },
-        # incorrect warehouse type / value
-        {
-            "eventId": "bad-warehouse",
-            "timestamp": "2026-07-10T10:00:00.000Z",
-            "event_type": "outbound_order_created",
-            "properties": {
-                "quantity": 1,
-                "warehouse_location": "miami",
-                "client_brand": "AcmeApparel",
-            },
-        },
-        # incorrect quantity type
-        {
-            "eventId": "bad-qty",
-            "timestamp": "2026-07-10T10:00:00.000Z",
-            "event_type": "outbound_order_created",
-            "properties": {
-                "quantity": "twelve",
-                "warehouse_location": "los_angeles",
-                "client_brand": "AcmeApparel",
-            },
-        },
-        # missing timestamp
-        {
-            "eventId": "bad-ts",
-            "timestamp": None,
-            "event_type": "outbound_order_created",
-            "properties": {
-                "quantity": 1,
-                "warehouse_location": "los_angeles",
-                "client_brand": "AcmeApparel",
-            },
-        },
-    ],
-)
-def test_transform_skips_malformed_events(bad_event):
-    good = _outbound(
-        event_id="good",
-        timestamp="2026-07-10T10:00:00.000Z",
-        warehouse="los_angeles",
-        brand="AcmeApparel",
-        quantity=7,
+    rows = assemble_weekly_warehouse_client_rows.fn(
+        "2026-07-07",
+        inbound,
+        outbound,
+        stockouts,
+        discrepancies,
     )
-    result = transform_warehouse_shipment_kpis.fn([bad_event, good])
-    assert len(result) == 1
-    assert result[0]["outbound_unit_quantity"] == 7
 
-
-def test_transform_empty_input_returns_empty_list():
-    assert transform_warehouse_shipment_kpis.fn([]) == []
+    assert len(rows) == 2
+    fashion = next(r for r in rows if r["client_id"] == "fashion-co")
+    electronics = next(r for r in rows if r["client_id"] == "electronics-es")
+    assert fashion["inbound_units_count"] == 4200
+    assert fashion["warehouse"] == "los_angeles"
+    assert electronics["inbound_units_count"] == 800
+    assert electronics["warehouse"] == "zaragoza"

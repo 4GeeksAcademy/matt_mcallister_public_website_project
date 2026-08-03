@@ -1,68 +1,73 @@
 "use client";
 
-import Link from "next/link";
-import { Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { FormEvent, useState } from "react";
+import {
+  flushNow,
+  setTelemetryIdentity,
+  track,
+  timedFetch,
+} from "@/src/services/telemetry";
 
-function LoginPageContent() {
-  const searchParams = useSearchParams();
-  const resetStatus = searchParams.get("reset");
-
-  return (
-    <main className="min-h-screen bg-slate-950 px-4 py-12 text-slate-100">
-      <div className="mx-auto w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-xl">
-        <h1 className="text-2xl font-semibold">Log in</h1>
-        <p className="mt-2 text-sm text-slate-300">Use your credentials to access TrackFlow backoffice.</p>
-
-        {resetStatus === "success" ? (
-          <div className="mt-4 rounded-lg border border-emerald-400/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200">
-            Your password was reset successfully. You can now sign in.
-          </div>
-        ) : null}
-
-        <form className="mt-6 space-y-4" onSubmit={(event) => event.preventDefault()}>
-          <label className="block text-sm">
-            <span className="mb-1 block text-slate-300">Email</span>
-            <input
-              type="email"
-              required
-              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-slate-100 outline-none ring-cyan-400 transition focus:ring-2"
-              placeholder="you@example.com"
-            />
-          </label>
-
-          <label className="block text-sm">
-            <span className="mb-1 block text-slate-300">Password</span>
-            <input
-              type="password"
-              required
-              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-slate-100 outline-none ring-cyan-400 transition focus:ring-2"
-              placeholder="••••••••"
-            />
-          </label>
-
-          <button
-            type="submit"
-            className="w-full rounded-lg bg-cyan-500 px-4 py-2 font-medium text-slate-950 transition hover:bg-cyan-400"
-          >
-            Sign in
-          </button>
-        </form>
-
-        <p className="mt-4 text-sm text-slate-300">
-          <Link href="/forgot-password" className="font-medium text-cyan-300 hover:text-cyan-200">
-            Forgot your password?
-          </Link>
-        </p>
-      </div>
-    </main>
-  );
-}
+const API =
+  process.env.NEXT_PUBLIC_API_BASE || "http://127.0.0.1:8000";
 
 export default function LoginPage() {
+  const [username, setUsername] = useState("ana");
+  const [password, setPassword] = useState("trackflow");
+  const [message, setMessage] = useState("");
+
+  async function onSubmit(e: FormEvent) {
+    e.preventDefault();
+    const res = await timedFetch(`${API}/inventory/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    });
+    const data = await res.json();
+    if (!data.ok) {
+      track("user_login_failed", { failure_code: data.failure_code || "unknown" });
+      await flushNow();
+      setMessage(`Login failed: ${data.failure_code}`);
+      return;
+    }
+    setTelemetryIdentity(data.userId, data.sessionId);
+    track("user_login_succeeded", { method: "password" });
+    await flushNow();
+    setMessage(`Logged in as ${data.userId}`);
+  }
+
   return (
-    <Suspense fallback={null}>
-      <LoginPageContent />
-    </Suspense>
+    <main className="mx-auto max-w-md px-6 py-10">
+      <h1 className="text-2xl font-semibold">Operator login</h1>
+      <p className="mt-2 text-sm text-slate-400">
+        Demo password: <code>trackflow</code>
+      </p>
+      <form onSubmit={onSubmit} className="mt-6 space-y-4">
+        <label className="block text-sm">
+          Username
+          <input
+            className="mt-1 w-full rounded border border-slate-700 bg-slate-900 px-3 py-2"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+        </label>
+        <label className="block text-sm">
+          Password
+          <input
+            type="password"
+            className="mt-1 w-full rounded border border-slate-700 bg-slate-900 px-3 py-2"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </label>
+        <button
+          type="submit"
+          className="rounded bg-cyan-600 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-500"
+        >
+          Sign in
+        </button>
+      </form>
+      {message && <p className="mt-4 text-sm text-slate-300">{message}</p>}
+    </main>
   );
 }

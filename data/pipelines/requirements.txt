@@ -1,5 +1,5 @@
 prefect>=2.14,<3
 pandas>=2.0
+python-dotenv>=1.0.0
 pydantic>=2.0,<2.10
-sqlalchemy>=2.0
 pytest>=7.0

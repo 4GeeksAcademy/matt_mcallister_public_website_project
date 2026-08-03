@@ -1,129 +1,151 @@
-# TrackFlow Warehouse Telemetry ETL — Pipeline Design
+# TrackFlow — Weekly Warehouse & Client Performance Pipeline Design
 
 ## Purpose
 
-Nightly ETL turns warehouse fulfillment telemetry (`outbound_order_created`, `inbound_order_created`, `product_created`) into idempotent daily KPIs for Los Angeles and Zaragoza so executives stop assembling Monday reports by hand.
+Produce the **Weekly Warehouse & Client Performance Report** for Thomas (CEO) and Ana (Head of Warehouse Operations): a Monday-morning rollup of **Inbound Volume**, **Outbound Throughput**, **Stockout Frequency**, and **Discrepancy Rate** per warehouse (`los_angeles` / `zaragoza`) and `client_id`, built from mandatory telemetry events `inbound_order_created`, `outbound_order_created`, `stock_threshold_triggered`, and `inventory_discrepancy_detected`.
 
 ---
 
-## Current State Analysis
+## Current State
 
-### Telemetry events already defined
-
-TrackFlow’s telemetry schema (`schemaVersion` `1.0.0`) lives under [`telemetry-stream/event-schemas.json`](./telemetry-stream/event-schemas.json) and is documented in [`docs/telemetry/telemetry-plan.md`](../../docs/telemetry/telemetry-plan.md).
-
-**Envelope fields:** `eventId`, `timestamp`, `sessionId`, `userId`, `event_type`, `schemaVersion`, `requestId`, `properties`.
-
-**`event_type` catalog:**
-
-| Category | Types |
-|----------|--------|
-| Auth / session | `session_started`, `credential_failed`, `session_expired` |
-| Catalog | `product_created`, `product_create_rejected` |
-| Fulfillment | `inbound_order_created`, `outbound_order_created`, `outbound_order_rejected` |
-| Stock alerts | `stock_threshold_triggered` |
-| UX | `page_viewed`, `form_abandoned` |
-
-Fulfillment event properties include: `order_id`, `product_id`, `sku`, `quantity`, `warehouse_location` (`los_angeles` \| `zaragoza`), `client_brand`.
-
-### Where data lives today
+### What we already have
 
 | Asset | Location | Notes |
 |-------|----------|--------|
-| Event schemas + sample | `data/pipelines/telemetry-stream/` | Design + validation only |
-| Seed batch for this pipeline | `data/raw/telemetry_events.jsonl` | Local JSONL source for nightly extract |
-| Inventory ORM / API | `services/inventory-api/` | Products, inbound/outbound orders (Supabase or SQLite) |
-| KPI business logic (TS) | `packages/shared/business-logic/milestone2.ts` | Computes shipment volume / rates — country enums still need US/Spain alignment |
+| Telemetry envelope + event schemas | [`event-schemas.json`](../../event-schemas.json), [`telemetry_full_plan/`](../../telemetry_full_plan/) | schemaVersion `1.0.0`; inventory props: `warehouse`, `client_id`, `product_id`, `product_category`, `quantity` |
+| Event store | `public.telemetry_events` (Supabase) | Envelope columns + domain fields in `tags` JSONB; immutable (no UPDATE/DELETE) |
+| Ingest + engineering report | [`services/telemetry/`](../../services/telemetry/) | `POST /telemetry/events`, `GET /telemetry/report` (Pandas technical metrics) |
+| Inventory demo API | [`services/inventory/`](../../services/inventory/) | In-memory seed stock; not the reporting source |
 
-There is not yet a live centralized event store; this pipeline treats `data/raw/telemetry_events.jsonl` as the batch extraction source (standing in for a future Supabase `telemetry_events` table).
+### Gap
 
-### Reports already generated with Pandas
+`GET /telemetry/report` answers **engineering** questions (events per day, error rates, volume by warehouse). It does **not** produce the executive deliverable: a **per-warehouse, per-client, ISO-week** rollup of inbound units, outbound orders, stockouts, and discrepancy rate that directors currently assemble by hand every Sunday night.
 
-There is no production Pandas report in the monorepo yet. The only Pandas script is a generic cleaning skill at `skills/data-analysis/scripts/pandas_clean.py`. Milestone 2 executive KPI math exists in TypeScript, not as a Python pipeline. **Limitation:** a mid-run script crash leaves no run log, and re-running ad-hoc scripts can double-count without upsert keys.
+That unanswered business question is what this pipeline closes — without modifying `services/telemetry/analysis.py` or `GET /telemetry/report`.
 
 ---
 
-## Pipeline Design
-
-### Extraction format
+## Extraction format
 
 | Item | Detail |
 |------|--------|
-| Source | File `data/raw/telemetry_events.jsonl` (one JSON envelope per line) |
-| Optional future source | Supabase / Postgres `telemetry_events` via `DATABASE_URL` Prefect block |
-| Format | JSON telemetry envelopes matching schema `1.0.0` |
-| Cadence | **Nightly** after both warehouses close (planned ~06:00 UTC, covering prior LA + Zaragoza business day) |
-| Filtered types | `outbound_order_created` (primary), plus `inbound_order_created` and `product_created` for context metrics |
+| Source | `public.telemetry_events` (read-only). Local fallback: `data/raw/telemetry_events.jsonl` when Supabase credentials are absent |
+| Format | Rows with `event_type`, `timestamp`, and `tags` (or `properties`) holding `warehouse`, `client_id`, `quantity` |
+| Filter | `event_type` IN (`inbound_order_created`, `outbound_order_created`, `stock_threshold_triggered`, `inventory_discrepancy_detected`) |
+| Cadence | **Weekly** — intended schedule Monday ~07:00 (UTC Monday morning), covering the prior ISO week; also runnable on demand via CLI / API |
+| How source updates | Telemetry is append-only (REVOKE UPDATE/DELETE). Re-runs re-aggregate the same week window and upsert destinations — no source rewrite hazards |
 
-### Data flow
+---
+
+## Data flow
 
 ```mermaid
 flowchart LR
-  rawJsonl[data/raw/telemetry_events.jsonl]
-  extractSub[extract_warehouse_telemetry_subflow]
-  transformSub[transform_warehouse_kpi_subflow]
-  loadSub[load_executive_kpi_subflow]
-  notifySub[notify_pipeline_status_subflow]
-  kpiTable[daily_warehouse_kpis]
-  runLog[pipeline_run_log]
-  rawJsonl --> extractSub --> transformSub --> loadSub
-  loadSub --> kpiTable
+  source[telemetry_events_read_only]
+  extractSub[extract_weekly_warehouse_events_subflow]
+  transformSub[transform_weekly_warehouse_client_kpis_subflow]
+  loadSub[load_weekly_warehouse_client_performance_subflow]
+  notifySub[notify_weekly_pipeline_status_subflow]
+  dest[reporting.weekly_warehouse_client_performance]
+  runLog[reporting.pipeline_runs]
+  source --> extractSub --> transformSub --> loadSub
+  loadSub --> dest
   loadSub --> runLog
   loadSub --> notifySub
 ```
 
-### Handling updates to existing records
+Three separated stages:
 
-Source systems may rewrite an outbound order quantity after the fact. Strategy for TrackFlow:
+1. **Extract** — pull filtered warehouse/client events for the target ISO week (or seed JSONL offline).
+2. **Transform** — aggregate to grain `(warehouse, client_id, week_start)` and compute the four KPI fields.
+3. **Load** — upsert into `reporting.weekly_warehouse_client_performance` and append `reporting.pipeline_runs`.
 
-1. Extract events for a **business-date window** (UTC date derived from `timestamp`).
-2. Re-aggregate KPIs for that window by natural key `(metric_date, warehouse_location, client_brand)`.
-3. **Upsert** into `daily_warehouse_kpis` on that key so corrections replace the snapshot instead of inserting duplicates.
-
-If the same `eventId` appears twice in the source file, extract de-duplicates by `eventId` before transform.
-
-### Idempotency strategy
-
-If the pipeline fails during load and is re-run:
-
-- KPI rows use SQLite/`INSERT OR REPLACE` (or SQL upsert) on `(metric_date, warehouse_location, client_brand)`.
-- Re-running the same window produces **identical** KPI rows after both runs.
-- Each attempt writes a new `pipeline_run_log` row (audit trail), not a second KPI row for the same key.
-
-### Execution log (minimum fields)
-
-| Field | Why |
-|-------|-----|
-| `started_at` | Audit when the run began |
-| `finished_at` | Measure duration and confirm completion |
-| `records_processed` | Volume / cost monitoring |
-| `status` | `Completed` / `Failed` for ops dashboards |
-| `error_message` | Debug production failures |
-| `flow_run_id` | Correlate with Prefect UI / API triggers |
+Optional **notify** is invoked with `return_state=True` so a notify failure does not fail the ETL.
 
 ---
 
-## Mapping to Prefect
+## Handling updates / duplicate avoidance
 
-| Concept | TrackFlow mapping |
-|---------|-------------------|
-| **Main flow** | `trackflow_warehouse_telemetry_etl` |
-| **Subflows** | `extract_warehouse_telemetry_subflow`, `transform_warehouse_kpi_subflow`, `load_executive_kpi_subflow`, `notify_pipeline_status_subflow` |
-| **Tasks** | `extract_outbound_order_events`, `transform_warehouse_shipment_kpis`, `load_executive_kpi_snapshot`, `notify_pipeline_status` |
-| **States** | `Running` while stages execute; `Completed` on successful load + log; `Failed` on extract/load hard failures. Notify uses `return_state=True` so a notify `Failed` does not fail the main flow. |
-| **Blocks** | Supabase / `DATABASE_URL` connection string (or local SQLite path for homework); optional Slack/webhook for notify |
+Even though `telemetry_events` is append-only, operators may re-run the pipeline for the same week. Strategy:
+
+1. Recompute the full week grain from source events.
+2. Upsert destination rows keyed by `unique (warehouse, client_id, week_start)`.
+3. Result after two identical runs is byte-identical KPI values (idempotent load).
+
+---
+
+## Destination tables (`reporting` schema)
+
+### `reporting.weekly_warehouse_client_performance`
+
+Grain: one row per warehouse × client × ISO week (`week_start` = Monday UTC).
+
+| Column | KPI |
+|--------|-----|
+| `inbound_units_count` | Inbound Volume — sum of quantities from `inbound_order_created` |
+| `outbound_orders_count` | Outbound Throughput — count of `outbound_order_created` |
+| `stockout_events_count` | Stockout Frequency — count of `stock_threshold_triggered` |
+| `discrepancy_events_count` | Supporting count of `inventory_discrepancy_detected` |
+| `discrepancy_rate` | `discrepancy_events_count / outbound_orders_count` (0 if no orders) |
+
+### `reporting.pipeline_runs` (execution log)
+
+| Field | Why |
+|-------|-----|
+| `id` | Stable run identity for API lookups |
+| `started_at` / `finished_at` | Duration and schedule auditing |
+| `records_processed` | Volume signal for capacity/cost |
+| `status` | Running / Completed / Failed |
+| `error_message` | Production diagnosis without Prefect UI |
+| `week_start` | Which ISO week the run targeted |
+
+---
+
+## Idempotency strategy
+
+Load uses **upsert** on `unique (warehouse, client_id, week_start)`. If the load phase fails mid-write and is re-run:
+
+- Already-inserted rows for that week are overwritten with the same recomputed values.
+- No duplicate rows can exist under the unique constraint.
+- Run log always inserts a **new** row per attempt (append-only audit trail).
+
+Local offline mode mirrors the same unique key in SQLite.
+
+---
+
+## Prefect mapping
+
+| Concept | TrackFlow name |
+|---------|----------------|
+| Main flow | `weekly_warehouse_client_performance_etl` |
+| Subflows | `extract_weekly_warehouse_events_subflow`, `transform_weekly_warehouse_client_kpis_subflow`, `load_weekly_warehouse_client_performance_subflow`, `notify_weekly_pipeline_status_subflow` |
+| Tasks | `extract_weekly_warehouse_events`, `compute_inbound_units_count`, `compute_outbound_orders_count`, `compute_stockout_events_count`, `compute_discrepancy_rate`, `assemble_weekly_warehouse_client_rows`, `load_weekly_warehouse_client_performance`, `record_pipeline_run`, `notify_weekly_pipeline_status` |
+| Relevant states | Running → Completed \| Failed (notify may Complete/Failed independently via `return_state=True`) |
+| Blocks / credentials | Supabase URL + service role key via env (`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` / `SUPABASE_KEY`); production would store these as a Prefect Secret/JSON block named e.g. `trackflow-supabase` |
+
+---
+
+## Application integration (design)
+
+New module [`services/reporting/`](../../services/reporting/) — separate from `services/telemetry/`:
+
+| Endpoint | Calls |
+|----------|--------|
+| `GET /reporting/weekly-warehouse-client-performance` | Reads destination table (no ETL in services) |
+| `GET /reporting/pipeline-runs/latest` | `get_latest_pipeline_run()` from `data/pipelines/pipeline.py` |
+| `POST /reporting/pipeline-runs` | Invokes `weekly_warehouse_client_performance_etl` from `data/pipelines/pipeline.py` |
+
+No ETL logic lives in `services/`.
 
 ---
 
 ## Schedule and run command
 
-- **Intended schedule:** nightly batch (~06:00 UTC), aligned with the telemetry plan’s nightly mode for `outbound_order_created` / `inbound_order_created` / `product_created`.
-- **CLI:**
+- **Schedule:** Mondays at ~07:00 (UTC Monday morning) so leadership opens the weekly report with prior-week data.
+- **CLI:** from monorepo root:
 
 ```bash
-# from monorepo root (with data/pipelines requirements installed)
 python data/pipelines/pipeline.py
 ```
 
-- **API (manual trigger):** `POST /pipeline/runs` on the inventory API (authenticated).
-- **Latest run metadata:** `GET /pipeline/runs/latest`.
+Optional week override: `WEEK_START=2026-07-06 python data/pipelines/pipeline.py`
