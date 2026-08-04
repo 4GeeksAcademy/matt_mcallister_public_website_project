@@ -36,7 +36,7 @@ Code layout (course split):
         -> retrieve(): embed(question) + Qdrant top-k + min_score filter
         -> prompt assembly (salesperson system prompt + retrieved text)
         -> generation LLM (chat/completions)
-        -> answer string only ({"answer": "..."})
+        -> {"answer": "<generated string>", "sources": [{source_document, section, language}]}
 ```
 
 ```mermaid
@@ -49,8 +49,8 @@ flowchart LR
   Query --> Retrieve[pipelines.retrieve]
   Retrieve --> Embed
   Retrieve --> Qdrant
-  Query --> LLM[gpt-4o-mini]
-  LLM --> Answer[answer string]
+  Query --> LLM[GENERATION_MODEL]
+  LLM --> Answer[answer + sources]
 ```
 
 ---
@@ -73,17 +73,21 @@ Each Markdown H1–H3 section becomes one chunk. The section title is kept with 
 
 ## Embedding practices
 
-| Role | Model ID | Notes |
-|---|---|---|
-| Embeddings | `text-embedding-3-small` | Used by `embed()` at index **and** query time |
-| Generation | `gpt-4o-mini` | Chat/completions only; never used for vectors |
+Models are configured through environment variables (see `.env.example`). Local development uses the [4Geeks LiteLLM gateway](https://llm.4geeks.ai) as an OpenAI-compatible API.
 
-Both models are consumed through an OpenAI-compatible client (`OPENAI_BASE_URL` / `OPENAI_API_KEY`), suitable for 4Geeks-provided student gateways.
+| Role | Env var | Default (local) | Notes |
+|---|---|---|---|
+| Embeddings | `EMBEDDING_MODEL` | `downtown-miami/openrouter/perplexity/pplx-embed-v1-0.6b` | Used by `embed()` at index **and** query time |
+| Generation | `GENERATION_MODEL` | `downtown-miami/groq/llama-3.1-8b-instant` | Chat/completions only; never used for vectors |
+| Gateway | `OPENAI_BASE_URL` | `https://llm.4geeks.ai/v1` | OpenAI-compatible client base URL |
+| Auth | `OPENAI_API_KEY` | (secret) | 4Geeks LiteLLM team token |
+
+Use the **team-scoped model IDs** returned by the gateway (for example `downtown-miami/...`). Do not prefix model names with `litellm/` — the gateway rejects that path.
 
 **Qdrant configuration**
 
-- Collection: `trackflow_knowledge`
-- Vector size: **1536**
+- Collection: `trackflow_knowledge` (`QDRANT_COLLECTION`)
+- Vector size: **1024** (`EMBEDDING_VECTOR_SIZE`) — matches `pplx-embed-v1-0.6b` default output dimensions
 - Distance: **Cosine**
 
 **Preprocessing before embed:** normalize newlines, collapse repeated whitespace, strip ends. No stemming or aggressive rewriting (preserves commercial numbers).
@@ -111,15 +115,54 @@ Both models are consumed through an OpenAI-compatible client (`OPENAI_BASE_URL` 
 - Describes international returns as manual (never automatic)
 - Requires Miguel Torres approval language for storage discounts
 
-The HTTP response returns **only** `{ "answer": "<generated string>" }`. Chunk lists and scores stay in server logs.
+The HTTP response returns a **generated answer** plus **public citation metadata** — never raw chunk text or similarity scores:
+
+```json
+{
+  "answer": "<generated string>",
+  "sources": [
+    {
+      "source_document": "returns-policy",
+      "section": "Standard return window",
+      "language": "en"
+    }
+  ]
+}
+```
+
+Chunk bodies and `_score` values stay in server logs only.
 
 ---
 
 ## How to run locally
 
-1. Start Qdrant (and optional API stack): `docker compose up -d qdrant`
-2. Export `OPENAI_API_KEY` (and optional `OPENAI_BASE_URL`)
-3. Index: `PYTHONPATH=. python -m data.process.rag`
-4. API: run uvicorn for `services/incident-api` with repo root on `PYTHONPATH`
-5. UI: `uis/backoffice` → `/knowledge`
-6. Tests: `python -m pytest tests/pipelines/test_rag.py`
+1. Copy `.env.example` to `.env` and set `OPENAI_API_KEY` to your 4Geeks LiteLLM token.
+2. Start Qdrant and the incident API: `docker compose up -d qdrant incident-api`
+3. Index the knowledge base (inside the API container or from repo root with env loaded):
+
+   ```bash
+   PYTHONPATH=. python -c "from data.process.rag import setup; print(setup())"
+   ```
+
+4. Open the UI: `uis/backoffice` → `/knowledge` (Compose: http://localhost:3001/knowledge)
+5. Or call the API directly:
+
+   ```bash
+   curl -X POST http://localhost:8001/knowledge/query \
+     -H 'Content-Type: application/json' \
+     -d '{"question":"What is the standard return window?"}'
+   ```
+
+6. Tests:
+
+   ```bash
+   python -m pytest tests/pipelines/test_rag.py
+   PYTHONPATH=. python scripts/run_rag_eval.py --local-index
+   ```
+
+**Compose note:** If shell exports override `.env` (for example `OPENAI_BASE_URL=https://api.openai.com/v1`), recreate services with those variables unset so Compose reads `.env` instead:
+
+```bash
+env -u OPENAI_API_KEY -u OPENAI_BASE_URL -u EMBEDDING_MODEL -u GENERATION_MODEL \
+  docker compose up -d --force-recreate incident-api
+```
