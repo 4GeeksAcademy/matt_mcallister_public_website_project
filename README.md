@@ -37,6 +37,39 @@ after their unique behavior has been covered.
 | Qdrant | Docker Compose | 6333 |
 | Redis | Docker Compose | 6379 |
 
+## Requirements source map
+
+The documents below are the acceptance source for each supported component.
+When an older design or archived document conflicts with this map, this map and
+the listed source take precedence.
+
+| Component | Authoritative context |
+| --- | --- |
+| Public website and lead capture | `webfundamentals.md` |
+| Shared carrier and inventory logic | `typescript.md` |
+| Talent pipeline | `milestone_3_ref_file.md` |
+| Authentication | `archive/context/securing-api/context.md` |
+| Supplier directory | `archive/context/supplier/context` and `archive/context/supplier/additional_info` |
+| Incident manager | `CONTEXT-incidents.md` |
+| Incident CSV analyzer | `incident_file_analyzer/incident_analyzer_context.md` |
+| Commercial knowledge assistant | `CONTEXT-company.md` |
+| Weekly warehouse/client reporting | `data/pipelines/PIPELINE_DESIGN.md` |
+| Telemetry runtime | `telemetry_full_plan/DELIVERY_STRATEGY.md`, normalized by the decisions below |
+| Canonical architecture and validation | This README and `docker-compose.yml` |
+
+### Canonical contract decisions
+
+- Runtime telemetry names and properties are authoritative: `warehouse`,
+  `client_id`, and `user_login_*`. Schemas, shared types, pipelines, and
+  documentation must use this vocabulary.
+- `packages/trackflow-core` is the canonical Milestone 2 implementation.
+  Other modules formerly named `milestone2` are legacy until renamed or
+  removed.
+- Empty archived context files are historical placeholders, not acceptance
+  specifications.
+- `docs/architecture_proposal.md` is historical; the supported architecture is
+  the service map above.
+
 ## Local configuration
 
 Copy `.env.example` to `.env` and replace placeholder credentials. Frontends
@@ -57,10 +90,10 @@ files, coverage data, or generated evaluation output.
 
 ## Development workflow
 
-Each project currently owns its dependency lockfile and commands. Install and
-run commands from the relevant project directory. The root validation command
-and complete Docker Compose stack are being added as part of the consolidation
-work.
+Each project owns its dependency lockfile and commands. Install and run commands
+from the relevant project directory. Use `npm run validate` at the repository
+root for the canonical validation matrix, and `docker compose up --build` for
+the complete local stack.
 
 Before opening a pull request:
 

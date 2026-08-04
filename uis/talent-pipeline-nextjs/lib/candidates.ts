@@ -1,4 +1,4 @@
-import { apiFetch } from './api';
+import { apiFetch } from '@/lib/api';
 import type {
   GetRecordsParams,
   NoteCreate,
@@ -7,7 +7,7 @@ import type {
   RecordCreate,
   RecordOut,
   RecordPatch,
-} from './types';
+} from '@/types';
 
 interface RecordsPayload {
   total?: number;

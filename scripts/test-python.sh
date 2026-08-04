@@ -25,7 +25,14 @@ PYTHONPATH=services/supplier-api \
 PYTHONPATH=services/incident-api \
   "$UV_BIN" run --no-project --python 3.11 \
   --with-requirements services/incident-api/requirements.txt \
+  --with-requirements data/pipelines/requirements.txt \
   python -m pytest services/incident-api/tests tests/pipelines scripts/test_analyze_context.py
+
+PYTHONPATH=. \
+  "$UV_BIN" run --no-project --python 3.11 \
+  --with-requirements services/incident-api/requirements.txt \
+  --with-requirements data/pipelines/requirements.txt \
+  python scripts/run_rag_eval.py --local-index
 
 PYTHONPATH=services/inventory-api \
   "$UV_BIN" run --no-project --python 3.11 \
@@ -37,6 +44,18 @@ PYTHONPATH=services/talent-api \
   "$UV_BIN" run --no-project --python 3.11 \
   --with-requirements services/talent-api/requirements.txt \
   python -m pytest services/talent-api/tests
+
+PYTHONPATH=services \
+  "$UV_BIN" run --no-project --python 3.11 \
+  --with-requirements services/requirements.txt \
+  --with pytest \
+  python -m pytest services/telemetry/tests
+
+PYTHONPATH=. \
+  "$UV_BIN" run --no-project --python 3.11 \
+  --with-requirements data/pipelines/requirements.txt \
+  --with "psycopg[binary]>=3.1,<4" \
+  python -m pytest tests/pipelines/test_telemetry_kpi_daily.py
 
 PYTHONPATH=services \
   "$UV_BIN" run --no-project --python 3.11 \

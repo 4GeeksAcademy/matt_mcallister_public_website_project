@@ -1,10 +1,27 @@
 # TrackFlow Telemetry Plan
 
-Design document for centralized telemetry across the TrackFlow monorepo. This plan is aligned with [CONTEXT.md](../../CONTEXT.md) and maps instrumentation to the milestone 5 inventory API (`services/inventory-api/` on `origin/milestone_5_backoffice_inventory_interface`).
+Design document for centralized telemetry across the TrackFlow monorepo. Early
+drafts mapped instrumentation onto the milestone 5 inventory API
+(`services/inventory-api/`); that server-side emission path was not adopted.
 
-**Scope:** Design only — no runtime emitters in this milestone. Schemas are exported to [data/pipelines/telemetry-stream/event-schemas.json](../../data/pipelines/telemetry-stream/event-schemas.json).
+**Current contract (authoritative):** Runtime telemetry vocabulary is
+`warehouse`, `client_id`, and `user_login_*` as documented in the root README
+and implemented in `packages/shared/types/telemetry.ts`,
+`data/pipelines/telemetry-stream/event-schemas.json`, and
+`uis/backoffice/src/services/telemetry.ts`. The backoffice client emits events
+through `track()` into the operations API (`services/main.py`
+`POST /telemetry/events`). Inventory mutations still call authenticated
+`inventory-api` endpoints on port 8003 for business data only — telemetry is not
+emitted from `inventory-api`. Sections below that mention
+`warehouse_location` / `client_brand` / `session_started` or inventory-api
+emitters are historical design notes and must not override the runtime contract.
 
-**Identifier rule:** All KPIs, entities, and identifiers match CONTEXT.md — warehouses `los_angeles` and `zaragoza`, SKU-level inventory, `client_brand`, and `user_uuid`.
+**Scope (historical note):** Early drafts were design-only. Schemas now live in
+[data/pipelines/telemetry-stream/event-schemas.json](../../data/pipelines/telemetry-stream/event-schemas.json).
+
+**Identifier rule:** Warehouses are `los_angeles` and `zaragoza`. Telemetry
+properties use `warehouse` and `client_id` (not `warehouse_location` /
+`client_brand`).
 
 ---
 
@@ -379,7 +396,7 @@ High-frequency events require volume management to control cost and processing l
 
 ## Implementation Notes
 
-- **Prerequisite for emitters:** Merge `origin/milestone_5_backoffice_inventory_interface` before wiring event emission in `services/inventory-api/` and `uis/backoffice/`.
+- **Emitters (canonical):** Client-side `track()` in `uis/backoffice/src/services/telemetry.ts` posts to operations `POST /telemetry/events`. Do not add inventory-api emitters.
 - **Schema export:** [data/pipelines/telemetry-stream/event-schemas.json](../../data/pipelines/telemetry-stream/event-schemas.json)
 - **TypeScript types:** [packages/shared/types/telemetry.ts](../../packages/shared/types/telemetry.ts)
 - **Validation:** See [data/pipelines/telemetry-stream/README.md](../../data/pipelines/telemetry-stream/README.md)

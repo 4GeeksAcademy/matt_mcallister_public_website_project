@@ -57,3 +57,9 @@ jobs:
           enable-cache: true
       - name: Test canonical Python services
         run: bash scripts/test-python.sh
+      - name: Recall@3 local-index gate
+        run: |
+          UV_BIN=uv PYTHONPATH=. uv run --no-project --python 3.11 \
+            --with-requirements services/incident-api/requirements.txt \
+            --with-requirements data/pipelines/requirements.txt \
+            python scripts/run_rag_eval.py --local-index

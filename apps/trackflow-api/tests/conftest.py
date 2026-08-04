@@ -35,8 +35,13 @@ def client(tinydb: TinyDB) -> TestClient:
     app.dependency_overrides.clear()
 
 
-def register_user(client, email: str, password: str = "strongpass"):
-    return client.post("/auth/register", json={"email": email, "password": password})
+def register_user(
+    client, email: str, password: str = "strongpass", name: str = "Test User"
+):
+    return client.post(
+        "/auth/register",
+        json={"name": name, "email": email, "password": password},
+    )
 
 
 def login_token(client, email: str, password: str = "strongpass") -> str:

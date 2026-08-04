@@ -27,7 +27,7 @@ export default function LoginPage() {
 
     try {
       const response = await authApi.login(email, password);
-      setToken(response.token);
+      setToken(response.access_token);
       router.replace("/");
     } catch (err) {
       const fallback = "Login failed. Please verify your credentials and try again.";

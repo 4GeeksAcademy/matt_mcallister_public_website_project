@@ -175,6 +175,8 @@ def error_rate_by_type(
         "frontend_error_uncaught",
         "user_login_failed",
         "inbound_order_validation_failed",
+        "outbound_order_rejected",
+        "direct_stock_edit_rejected",
     ]
     daily_total = df.groupby("day").size().rename("total")
     daily_err = (
@@ -188,3 +190,32 @@ def error_rate_by_type(
     merged = daily_err.merge(daily_total, on="day", how="left")
     merged["rate"] = merged["count"] / merged["total"]
     return merged.to_dict(orient="records")
+
+
+def api_latency_by_endpoint(
+    rows: list[dict[str, Any]],
+    start_date: datetime,
+    end_date: datetime,
+) -> list[dict[str, Any]]:
+    """Request count and mean duration by API endpoint and HTTP method."""
+    _ = (start_date, end_date)
+    df = _to_frame(rows)
+    if df.empty:
+        return []
+    latency = df[df["event_type"] == "api_latency_recorded"].copy()
+    if latency.empty:
+        return []
+    tags = latency["tags"].apply(lambda value: value if isinstance(value, dict) else {})
+    latency["endpoint"] = tags.apply(lambda value: value.get("endpoint"))
+    latency["method"] = tags.apply(lambda value: value.get("method"))
+    latency["duration_ms"] = pd.to_numeric(
+        tags.apply(lambda value: value.get("duration_ms")), errors="coerce"
+    )
+    grouped = (
+        latency.dropna(subset=["endpoint", "method", "duration_ms"])
+        .groupby(["endpoint", "method"], dropna=False)["duration_ms"]
+        .agg(request_count="count", mean_duration_ms="mean")
+        .reset_index()
+        .sort_values(["endpoint", "method"])
+    )
+    return grouped.to_dict(orient="records")

@@ -11,6 +11,7 @@ os.environ["SECRET_KEY"] = "test-secret-key"
 os.environ["TINYDB_PATH"] = tempfile.mktemp(suffix=".json")
 
 from app.core.config import get_settings  # noqa: E402
+from app.core.security import create_access_token  # noqa: E402
 from app.database import get_engine, init_db  # noqa: E402
 from app.main import app  # noqa: E402
 
@@ -90,7 +91,7 @@ def test_inventory_flow(client: TestClient, auth_headers: dict):
     )
     assert inbound.status_code == 201
 
-    detail = client.get(f"/inventory/products/{product_id}")
+    detail = client.get(f"/inventory/products/{product_id}", headers=auth_headers)
     assert detail.status_code == 200
     assert detail.json()["current_stock"] == 20
 
@@ -100,7 +101,12 @@ def test_inventory_flow(client: TestClient, auth_headers: dict):
         json={"product_id": product_id, "quantity": 8},
     )
     assert outbound.status_code == 201
-    assert client.get(f"/inventory/products/{product_id}").json()["current_stock"] == 12
+    assert (
+        client.get(f"/inventory/products/{product_id}", headers=auth_headers).json()[
+            "current_stock"
+        ]
+        == 12
+    )
 
     rejected = client.post(
         "/inventory/orders/outbound",
@@ -110,7 +116,21 @@ def test_inventory_flow(client: TestClient, auth_headers: dict):
     assert rejected.status_code == 400
     assert "Insufficient stock" in rejected.json()["detail"]
 
-    orders = client.get("/inventory/orders")
+    orders = client.get("/inventory/orders", headers=auth_headers)
     assert orders.status_code == 200
     assert len(orders.json()) == 2
-    assert all("user_uuid" in order for order in orders.json())
+    assert all(order["user_uuid"] == "ana@example.com" for order in orders.json())
+
+
+def test_inventory_reads_require_jwt(client: TestClient):
+    assert client.get("/inventory/products").status_code == 401
+    assert client.get("/inventory/orders").status_code == 401
+
+
+def test_inventory_accepts_shared_auth_jwt_without_local_user(client: TestClient):
+    token = create_access_token("canonical-user@example.com")
+    response = client.get(
+        "/inventory/products",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 200

@@ -4,7 +4,7 @@ Real-time and batch telemetry pipeline for TrackFlow warehouse operations and ba
 
 ## Purpose
 
-This folder holds the schema definitions and (future) ingestion configuration for TrackFlow's centralized telemetry system. Events are emitted from `services/inventory-api/` and `uis/backoffice/` and flow through stream or batch processors as defined in [docs/telemetry/telemetry-plan.md](../../../docs/telemetry/telemetry-plan.md).
+This folder holds the schema definitions and (future) ingestion configuration for TrackFlow's centralized telemetry system. Events are emitted client-side from `uis/backoffice/` (inventory and telemetry pages) via `track()` into the operations API at `POST /telemetry/events` (`services/main.py`). They are not emitted from `services/inventory-api`. See [docs/telemetry/telemetry-plan.md](../../../docs/telemetry/telemetry-plan.md).
 
 ## Contents
 
@@ -17,13 +17,13 @@ This folder holds the schema definitions and (future) ingestion configuration fo
 
 All events share a standard envelope (`eventId`, `timestamp`, `sessionId`, `userId`, `event_type`, `schemaVersion`, `requestId`, `properties`) and follow the `entity_action` naming taxonomy.
 
-Supported `event_type` values:
+Supported `event_type` values match the backoffice runtime:
 
-- `session_started`, `credential_failed`, `session_expired`
-- `product_created`, `product_create_rejected`
-- `inbound_order_created`, `outbound_order_created`, `outbound_order_rejected`
-- `stock_threshold_triggered`
-- `page_viewed`, `form_abandoned`
+- Inventory: `inbound_order_created`, `outbound_order_created`, `outbound_order_rejected`, `stock_threshold_triggered`, `direct_stock_edit_rejected`, `inventory_discrepancy_detected`, `inbound_order_validation_failed`, `picking_duration_recorded`
+- Authentication: `user_login_succeeded`, `user_login_failed`, `session_expired`
+- Technical/navigation: `page_viewed`, `page_load_recorded`, `api_latency_recorded`, `frontend_error_uncaught`, `flow_abandoned`
+
+Inventory properties use the canonical runtime identifiers `warehouse`, `client_id`, `product_id`, `product_category`, and `quantity`.
 
 ## Validating events
 
@@ -52,12 +52,12 @@ npx ajv-cli validate \
   "schemaVersion": "1.0.0",
   "requestId": "req_9e8d7c6b",
   "properties": {
-    "order_id": 42,
-    "product_id": 7,
-    "sku": "TF-SHOE-001",
+    "warehouse": "los_angeles",
+    "client_id": "client_fashion_co",
+    "product_id": "SKU-F-001",
+    "product_category": "fashion",
     "quantity": 50,
-    "warehouse_location": "los_angeles",
-    "client_brand": "AcmeApparel"
+    "order_id": "IN-42"
   }
 }
 ```
@@ -66,9 +66,9 @@ npx ajv-cli validate \
 
 | Mode | Events | Sink (future) |
 |------|--------|---------------|
-| Stream | `stock_threshold_triggered`, `outbound_order_rejected`, `credential_failed`, `session_started` | Real-time alert bus |
-| Batch (hourly) | `session_expired`, `product_create_rejected`, `form_abandoned` | Data warehouse staging |
-| Batch (nightly) | `inbound_order_created`, `outbound_order_created`, `product_created`, `page_viewed` | Executive dashboard ETL |
+| Stream | `stock_threshold_triggered`, `outbound_order_rejected`, `direct_stock_edit_rejected`, `user_login_failed`, `frontend_error_uncaught` | Real-time alert bus |
+| Batch (hourly) | `session_expired`, `inbound_order_validation_failed`, `flow_abandoned` | Data warehouse staging |
+| Batch (nightly) | Inventory success/discrepancy events, performance events, `user_login_succeeded`, `page_viewed` | Reporting and dashboard ETL |
 
 See Phase 3 in the telemetry plan for business-urgency justifications.
 

@@ -14,24 +14,31 @@ from app.services.user_service import get_user_by_email
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 
-def get_current_user(
-    token: str = Depends(oauth2_scheme), db: TinyDB = Depends(get_tinydb)
-) -> User:
+def get_token_subject(token: str = Depends(oauth2_scheme)) -> str:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = decode_token(token)
-        subject = payload.get("sub")
-        if subject is None:
-            raise credentials_exception
+        subject = decode_token(token).get("sub")
     except JWTError:
         raise credentials_exception
+    if not isinstance(subject, str) or not subject:
+        raise credentials_exception
+    return subject
 
+
+def get_current_user(
+    subject: str = Depends(get_token_subject), db: TinyDB = Depends(get_tinydb)
+) -> User:
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
     user = get_user_by_email(db, subject)
-    if user is None:
+    if user is None or not user.is_active:
         raise credentials_exception
 
     return user

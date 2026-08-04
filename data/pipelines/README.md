@@ -25,7 +25,22 @@ Schedule: Mondays ~07:00 UTC (see design doc).
 
 ### `telemetry_kpi_daily`
 
-Stub pipeline triggered by `scripts/nightly_export.py`. Reads `telemetry_events` from Postgres (`DATABASE_URL`); does **not** read CSV snapshots under `data/raw/`. Each execution writes a row to `pipeline_runs` (pipeline layer), while `nightly_export` writes to `job_runs` (orchestration layer).
+Nightly pipeline triggered by `scripts/nightly_export.py`. It reads the target
+UTC day directly from Postgres `telemetry_events` (`DATABASE_URL`), never from
+CSV snapshots, and idempotently upserts one row into
+`reporting.telemetry_kpi_daily`.
+
+The daily reporting row contains:
+
+- `event_count`: total events, useful for traffic and ingestion-volume trends
+- `unique_user_count`: distinct non-null telemetry users
+- `event_type_counts`: JSON object containing the event mix by `event_type`
+- `computed_at`: the latest successful calculation time
+
+`target_date` is the primary key, so retrying a date refreshes its aggregates
+without creating duplicate reporting rows. Each execution also writes a
+`pipeline_runs` row (pipeline layer), while `nightly_export` writes to
+`job_runs` (orchestration layer).
 
 ```bash
 python -m data.pipelines.telemetry_kpi_daily.run --no-prefect

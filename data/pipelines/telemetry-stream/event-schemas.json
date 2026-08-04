@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://trackflow.internal/schemas/telemetry/event-schemas.json",
   "title": "TrackFlow Telemetry Event Schemas",
-  "description": "JSON Schema draft-07 definitions for all TrackFlow telemetry events. See docs/telemetry/telemetry-plan.md for rationale and delivery strategy.",
+  "description": "Strict schemas for the event vocabulary emitted by the TrackFlow backoffice runtime.",
   "definitions": {
     "envelopeBase": {
       "type": "object",
@@ -20,436 +20,1032 @@
       "properties": {
         "eventId": {
           "type": "string",
-          "format": "uuid",
-          "description": "Unique identifier for this event instance (UUID v4)."
+          "minLength": 1
         },
         "timestamp": {
           "type": "string",
-          "format": "date-time",
-          "description": "UTC emission time in ISO 8601 format."
+          "format": "date-time"
         },
         "sessionId": {
           "type": "string",
-          "format": "uuid",
-          "description": "Browser session identifier (UUID v4)."
+          "minLength": 1
         },
         "userId": {
           "type": "string",
-          "description": "Pseudonymous user UUID from JWT claims, or 'anonymous'."
+          "minLength": 1
         },
         "event_type": {
-          "type": "string",
-          "description": "Entity-action taxonomy event name."
+          "type": "string"
         },
         "schemaVersion": {
-          "type": "string",
-          "pattern": "^\\d+\\.\\d+\\.\\d+$",
-          "description": "Semantic version of the event schema."
+          "const": "1.0.0"
         },
         "requestId": {
           "type": "string",
-          "description": "Correlation ID from X-Request-ID header."
+          "minLength": 1
         },
         "properties": {
-          "type": "object",
-          "description": "Event-specific payload. Keys must match the event allowlist."
+          "type": "object"
         }
       }
     },
-    "warehouseLocation": {
-      "type": "string",
-      "enum": ["los_angeles", "zaragoza"]
-    },
-    "sessionStartedProperties": {
-      "type": "object",
-      "required": ["auth_method"],
+    "InboundOrderCreatedProperties": {
       "additionalProperties": false,
       "properties": {
-        "auth_method": {
-          "type": "string",
-          "enum": ["password"]
+        "warehouse": {
+          "enum": [
+            "los_angeles",
+            "zaragoza"
+          ],
+          "title": "Warehouse",
+          "type": "string"
         },
-        "is_admin": {
-          "type": "boolean"
+        "client_id": {
+          "minLength": 1,
+          "title": "Client Id",
+          "type": "string"
+        },
+        "product_id": {
+          "minLength": 1,
+          "title": "Product Id",
+          "type": "string"
+        },
+        "product_category": {
+          "enum": [
+            "fashion",
+            "electronics",
+            "cosmetics"
+          ],
+          "title": "Product Category",
+          "type": "string"
+        },
+        "quantity": {
+          "title": "Quantity",
+          "type": "integer"
+        },
+        "order_id": {
+          "minLength": 1,
+          "title": "Order Id",
+          "type": "string"
         }
-      }
+      },
+      "required": [
+        "warehouse",
+        "client_id",
+        "product_id",
+        "product_category",
+        "quantity",
+        "order_id"
+      ],
+      "title": "InboundOrderCreatedProperties",
+      "type": "object"
     },
-    "credentialFailedProperties": {
-      "type": "object",
-      "required": ["email_hash", "failure_reason"],
+    "InboundOrderCreatedEvent": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/envelopeBase"
+        },
+        {
+          "properties": {
+            "event_type": {
+              "const": "inbound_order_created"
+            },
+            "schemaVersion": {
+              "const": "1.0.0"
+            },
+            "properties": {
+              "$ref": "#/definitions/InboundOrderCreatedProperties"
+            }
+          }
+        }
+      ]
+    },
+    "OutboundOrderCreatedProperties": {
       "additionalProperties": false,
       "properties": {
-        "email_hash": {
-          "type": "string",
-          "description": "SHA-256 hash of attempted email."
+        "warehouse": {
+          "enum": [
+            "los_angeles",
+            "zaragoza"
+          ],
+          "title": "Warehouse",
+          "type": "string"
+        },
+        "client_id": {
+          "minLength": 1,
+          "title": "Client Id",
+          "type": "string"
+        },
+        "product_id": {
+          "minLength": 1,
+          "title": "Product Id",
+          "type": "string"
+        },
+        "product_category": {
+          "enum": [
+            "fashion",
+            "electronics",
+            "cosmetics"
+          ],
+          "title": "Product Category",
+          "type": "string"
+        },
+        "quantity": {
+          "title": "Quantity",
+          "type": "integer"
+        },
+        "order_id": {
+          "minLength": 1,
+          "title": "Order Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "warehouse",
+        "client_id",
+        "product_id",
+        "product_category",
+        "quantity",
+        "order_id"
+      ],
+      "title": "OutboundOrderCreatedProperties",
+      "type": "object"
+    },
+    "OutboundOrderCreatedEvent": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/envelopeBase"
+        },
+        {
+          "properties": {
+            "event_type": {
+              "const": "outbound_order_created"
+            },
+            "schemaVersion": {
+              "const": "1.0.0"
+            },
+            "properties": {
+              "$ref": "#/definitions/OutboundOrderCreatedProperties"
+            }
+          }
+        }
+      ]
+    },
+    "OutboundOrderRejectedProperties": {
+      "additionalProperties": false,
+      "properties": {
+        "warehouse": {
+          "enum": [
+            "los_angeles",
+            "zaragoza"
+          ],
+          "title": "Warehouse",
+          "type": "string"
+        },
+        "client_id": {
+          "minLength": 1,
+          "title": "Client Id",
+          "type": "string"
+        },
+        "product_id": {
+          "minLength": 1,
+          "title": "Product Id",
+          "type": "string"
+        },
+        "product_category": {
+          "enum": [
+            "fashion",
+            "electronics",
+            "cosmetics"
+          ],
+          "title": "Product Category",
+          "type": "string"
+        },
+        "quantity": {
+          "title": "Quantity",
+          "type": "integer"
         },
         "failure_reason": {
-          "type": "string",
-          "enum": ["invalid_credentials", "account_inactive"]
+          "minLength": 1,
+          "title": "Failure Reason",
+          "type": "string"
         }
-      }
+      },
+      "required": [
+        "warehouse",
+        "client_id",
+        "product_id",
+        "product_category",
+        "quantity",
+        "failure_reason"
+      ],
+      "title": "OutboundOrderRejectedProperties",
+      "type": "object"
     },
-    "sessionExpiredProperties": {
-      "type": "object",
-      "required": ["last_page", "session_duration_seconds"],
+    "OutboundOrderRejectedEvent": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/envelopeBase"
+        },
+        {
+          "properties": {
+            "event_type": {
+              "const": "outbound_order_rejected"
+            },
+            "schemaVersion": {
+              "const": "1.0.0"
+            },
+            "properties": {
+              "$ref": "#/definitions/OutboundOrderRejectedProperties"
+            }
+          }
+        }
+      ]
+    },
+    "StockThresholdTriggeredProperties": {
+      "additionalProperties": false,
+      "properties": {
+        "warehouse": {
+          "enum": [
+            "los_angeles",
+            "zaragoza"
+          ],
+          "title": "Warehouse",
+          "type": "string"
+        },
+        "client_id": {
+          "minLength": 1,
+          "title": "Client Id",
+          "type": "string"
+        },
+        "product_id": {
+          "minLength": 1,
+          "title": "Product Id",
+          "type": "string"
+        },
+        "product_category": {
+          "enum": [
+            "fashion",
+            "electronics",
+            "cosmetics"
+          ],
+          "title": "Product Category",
+          "type": "string"
+        },
+        "quantity": {
+          "title": "Quantity",
+          "type": "integer"
+        },
+        "threshold": {
+          "minimum": 0,
+          "title": "Threshold",
+          "type": "integer"
+        },
+        "current_stock": {
+          "minimum": 0,
+          "title": "Current Stock",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "warehouse",
+        "client_id",
+        "product_id",
+        "product_category",
+        "quantity",
+        "threshold",
+        "current_stock"
+      ],
+      "title": "StockThresholdTriggeredProperties",
+      "type": "object"
+    },
+    "StockThresholdTriggeredEvent": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/envelopeBase"
+        },
+        {
+          "properties": {
+            "event_type": {
+              "const": "stock_threshold_triggered"
+            },
+            "schemaVersion": {
+              "const": "1.0.0"
+            },
+            "properties": {
+              "$ref": "#/definitions/StockThresholdTriggeredProperties"
+            }
+          }
+        }
+      ]
+    },
+    "DirectStockEditRejectedProperties": {
+      "additionalProperties": false,
+      "properties": {
+        "warehouse": {
+          "enum": [
+            "los_angeles",
+            "zaragoza"
+          ],
+          "title": "Warehouse",
+          "type": "string"
+        },
+        "client_id": {
+          "minLength": 1,
+          "title": "Client Id",
+          "type": "string"
+        },
+        "product_id": {
+          "minLength": 1,
+          "title": "Product Id",
+          "type": "string"
+        },
+        "product_category": {
+          "enum": [
+            "fashion",
+            "electronics",
+            "cosmetics"
+          ],
+          "title": "Product Category",
+          "type": "string"
+        },
+        "quantity": {
+          "title": "Quantity",
+          "type": "integer"
+        },
+        "attempted_delta": {
+          "title": "Attempted Delta",
+          "type": "integer"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "warehouse",
+        "client_id",
+        "product_id",
+        "product_category",
+        "quantity",
+        "attempted_delta",
+        "reason"
+      ],
+      "title": "DirectStockEditRejectedProperties",
+      "type": "object"
+    },
+    "DirectStockEditRejectedEvent": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/envelopeBase"
+        },
+        {
+          "properties": {
+            "event_type": {
+              "const": "direct_stock_edit_rejected"
+            },
+            "schemaVersion": {
+              "const": "1.0.0"
+            },
+            "properties": {
+              "$ref": "#/definitions/DirectStockEditRejectedProperties"
+            }
+          }
+        }
+      ]
+    },
+    "InventoryDiscrepancyDetectedProperties": {
+      "additionalProperties": false,
+      "properties": {
+        "warehouse": {
+          "enum": [
+            "los_angeles",
+            "zaragoza"
+          ],
+          "title": "Warehouse",
+          "type": "string"
+        },
+        "client_id": {
+          "minLength": 1,
+          "title": "Client Id",
+          "type": "string"
+        },
+        "product_id": {
+          "minLength": 1,
+          "title": "Product Id",
+          "type": "string"
+        },
+        "product_category": {
+          "enum": [
+            "fashion",
+            "electronics",
+            "cosmetics"
+          ],
+          "title": "Product Category",
+          "type": "string"
+        },
+        "quantity": {
+          "title": "Quantity",
+          "type": "integer"
+        },
+        "system_quantity": {
+          "minimum": 0,
+          "title": "System Quantity",
+          "type": "integer"
+        },
+        "counted_quantity": {
+          "minimum": 0,
+          "title": "Counted Quantity",
+          "type": "integer"
+        },
+        "delta": {
+          "title": "Delta",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "warehouse",
+        "client_id",
+        "product_id",
+        "product_category",
+        "quantity",
+        "system_quantity",
+        "counted_quantity",
+        "delta"
+      ],
+      "title": "InventoryDiscrepancyDetectedProperties",
+      "type": "object"
+    },
+    "InventoryDiscrepancyDetectedEvent": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/envelopeBase"
+        },
+        {
+          "properties": {
+            "event_type": {
+              "const": "inventory_discrepancy_detected"
+            },
+            "schemaVersion": {
+              "const": "1.0.0"
+            },
+            "properties": {
+              "$ref": "#/definitions/InventoryDiscrepancyDetectedProperties"
+            }
+          }
+        }
+      ]
+    },
+    "InboundOrderValidationFailedProperties": {
+      "additionalProperties": false,
+      "properties": {
+        "warehouse": {
+          "enum": [
+            "los_angeles",
+            "zaragoza"
+          ],
+          "title": "Warehouse",
+          "type": "string"
+        },
+        "client_id": {
+          "minLength": 1,
+          "title": "Client Id",
+          "type": "string"
+        },
+        "product_id": {
+          "minLength": 1,
+          "title": "Product Id",
+          "type": "string"
+        },
+        "product_category": {
+          "enum": [
+            "fashion",
+            "electronics",
+            "cosmetics"
+          ],
+          "title": "Product Category",
+          "type": "string"
+        },
+        "quantity": {
+          "title": "Quantity",
+          "type": "integer"
+        },
+        "failure_reason": {
+          "minLength": 1,
+          "title": "Failure Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "warehouse",
+        "client_id",
+        "product_id",
+        "product_category",
+        "quantity",
+        "failure_reason"
+      ],
+      "title": "InboundOrderValidationFailedProperties",
+      "type": "object"
+    },
+    "InboundOrderValidationFailedEvent": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/envelopeBase"
+        },
+        {
+          "properties": {
+            "event_type": {
+              "const": "inbound_order_validation_failed"
+            },
+            "schemaVersion": {
+              "const": "1.0.0"
+            },
+            "properties": {
+              "$ref": "#/definitions/InboundOrderValidationFailedProperties"
+            }
+          }
+        }
+      ]
+    },
+    "UserLoginSucceededProperties": {
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "const": "password",
+          "title": "Method",
+          "type": "string"
+        }
+      },
+      "required": [
+        "method"
+      ],
+      "title": "UserLoginSucceededProperties",
+      "type": "object"
+    },
+    "UserLoginSucceededEvent": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/envelopeBase"
+        },
+        {
+          "properties": {
+            "event_type": {
+              "const": "user_login_succeeded"
+            },
+            "schemaVersion": {
+              "const": "1.0.0"
+            },
+            "properties": {
+              "$ref": "#/definitions/UserLoginSucceededProperties"
+            }
+          }
+        }
+      ]
+    },
+    "UserLoginFailedProperties": {
+      "additionalProperties": false,
+      "properties": {
+        "failure_code": {
+          "minLength": 1,
+          "title": "Failure Code",
+          "type": "string"
+        }
+      },
+      "required": [
+        "failure_code"
+      ],
+      "title": "UserLoginFailedProperties",
+      "type": "object"
+    },
+    "UserLoginFailedEvent": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/envelopeBase"
+        },
+        {
+          "properties": {
+            "event_type": {
+              "const": "user_login_failed"
+            },
+            "schemaVersion": {
+              "const": "1.0.0"
+            },
+            "properties": {
+              "$ref": "#/definitions/UserLoginFailedProperties"
+            }
+          }
+        }
+      ]
+    },
+    "SessionExpiredProperties": {
       "additionalProperties": false,
       "properties": {
         "last_page": {
+          "minLength": 1,
+          "title": "Last Page",
           "type": "string"
         },
         "session_duration_seconds": {
-          "type": "integer",
-          "minimum": 0
-        }
-      }
-    },
-    "productCreatedProperties": {
-      "type": "object",
-      "required": ["product_id", "sku", "warehouse_location", "client_brand"],
-      "additionalProperties": false,
-      "properties": {
-        "product_id": {
-          "type": "integer"
-        },
-        "sku": {
-          "type": "string"
-        },
-        "warehouse_location": {
-          "$ref": "#/definitions/warehouseLocation"
-        },
-        "client_brand": {
-          "type": "string"
-        },
-        "low_stock_threshold": {
-          "type": "integer",
-          "minimum": 0
-        }
-      }
-    },
-    "productCreateRejectedProperties": {
-      "type": "object",
-      "required": ["sku", "rejection_reason"],
-      "additionalProperties": false,
-      "properties": {
-        "sku": {
-          "type": "string"
-        },
-        "rejection_reason": {
-          "type": "string",
-          "enum": ["duplicate_sku"]
-        },
-        "existing_product_id": {
+          "minimum": 0,
+          "title": "Session Duration Seconds",
           "type": "integer"
         }
-      }
-    },
-    "inboundOrderCreatedProperties": {
-      "type": "object",
+      },
       "required": [
-        "order_id",
-        "product_id",
-        "sku",
-        "quantity",
-        "warehouse_location",
-        "client_brand"
+        "last_page",
+        "session_duration_seconds"
       ],
+      "title": "SessionExpiredProperties",
+      "type": "object"
+    },
+    "SessionExpiredEvent": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/envelopeBase"
+        },
+        {
+          "properties": {
+            "event_type": {
+              "const": "session_expired"
+            },
+            "schemaVersion": {
+              "const": "1.0.0"
+            },
+            "properties": {
+              "$ref": "#/definitions/SessionExpiredProperties"
+            }
+          }
+        }
+      ]
+    },
+    "PageViewedProperties": {
       "additionalProperties": false,
       "properties": {
-        "order_id": {
+        "path": {
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "title"
+      ],
+      "title": "PageViewedProperties",
+      "type": "object"
+    },
+    "PageViewedEvent": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/envelopeBase"
+        },
+        {
+          "properties": {
+            "event_type": {
+              "const": "page_viewed"
+            },
+            "schemaVersion": {
+              "const": "1.0.0"
+            },
+            "properties": {
+              "$ref": "#/definitions/PageViewedProperties"
+            }
+          }
+        }
+      ]
+    },
+    "PageLoadRecordedProperties": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "duration_ms": {
+          "minimum": 0,
+          "title": "Duration Ms",
           "type": "integer"
+        }
+      },
+      "required": [
+        "path",
+        "duration_ms"
+      ],
+      "title": "PageLoadRecordedProperties",
+      "type": "object"
+    },
+    "PageLoadRecordedEvent": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/envelopeBase"
+        },
+        {
+          "properties": {
+            "event_type": {
+              "const": "page_load_recorded"
+            },
+            "schemaVersion": {
+              "const": "1.0.0"
+            },
+            "properties": {
+              "$ref": "#/definitions/PageLoadRecordedProperties"
+            }
+          }
+        }
+      ]
+    },
+    "ApiLatencyRecordedProperties": {
+      "additionalProperties": false,
+      "properties": {
+        "endpoint": {
+          "minLength": 1,
+          "title": "Endpoint",
+          "type": "string"
+        },
+        "method": {
+          "minLength": 1,
+          "title": "Method",
+          "type": "string"
+        },
+        "status_code": {
+          "maximum": 599,
+          "minimum": 0,
+          "title": "Status Code",
+          "type": "integer"
+        },
+        "duration_ms": {
+          "minimum": 0,
+          "title": "Duration Ms",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "endpoint",
+        "method",
+        "status_code",
+        "duration_ms"
+      ],
+      "title": "ApiLatencyRecordedProperties",
+      "type": "object"
+    },
+    "ApiLatencyRecordedEvent": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/envelopeBase"
+        },
+        {
+          "properties": {
+            "event_type": {
+              "const": "api_latency_recorded"
+            },
+            "schemaVersion": {
+              "const": "1.0.0"
+            },
+            "properties": {
+              "$ref": "#/definitions/ApiLatencyRecordedProperties"
+            }
+          }
+        }
+      ]
+    },
+    "FrontendErrorUncaughtProperties": {
+      "additionalProperties": false,
+      "properties": {
+        "message": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        },
+        "path": {
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "source": {
+          "minLength": 1,
+          "title": "Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "message",
+        "path",
+        "source"
+      ],
+      "title": "FrontendErrorUncaughtProperties",
+      "type": "object"
+    },
+    "FrontendErrorUncaughtEvent": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/envelopeBase"
+        },
+        {
+          "properties": {
+            "event_type": {
+              "const": "frontend_error_uncaught"
+            },
+            "schemaVersion": {
+              "const": "1.0.0"
+            },
+            "properties": {
+              "$ref": "#/definitions/FrontendErrorUncaughtProperties"
+            }
+          }
+        }
+      ]
+    },
+    "PickingDurationRecordedProperties": {
+      "additionalProperties": false,
+      "properties": {
+        "warehouse": {
+          "enum": [
+            "los_angeles",
+            "zaragoza"
+          ],
+          "title": "Warehouse",
+          "type": "string"
+        },
+        "client_id": {
+          "minLength": 1,
+          "title": "Client Id",
+          "type": "string"
         },
         "product_id": {
-          "type": "integer"
+          "minLength": 1,
+          "title": "Product Id",
+          "type": "string"
         },
-        "sku": {
+        "product_category": {
+          "enum": [
+            "fashion",
+            "electronics",
+            "cosmetics"
+          ],
+          "title": "Product Category",
           "type": "string"
         },
         "quantity": {
-          "type": "integer",
-          "minimum": 1
+          "title": "Quantity",
+          "type": "integer"
         },
-        "warehouse_location": {
-          "$ref": "#/definitions/warehouseLocation"
-        },
-        "client_brand": {
-          "type": "string"
-        }
-      }
-    },
-    "outboundOrderCreatedProperties": {
-      "type": "object",
-      "required": [
-        "order_id",
-        "product_id",
-        "sku",
-        "quantity",
-        "warehouse_location",
-        "resulting_stock"
-      ],
-      "additionalProperties": false,
-      "properties": {
         "order_id": {
-          "type": "integer"
-        },
-        "product_id": {
-          "type": "integer"
-        },
-        "sku": {
+          "minLength": 1,
+          "title": "Order Id",
           "type": "string"
         },
-        "quantity": {
-          "type": "integer",
-          "minimum": 1
-        },
-        "warehouse_location": {
-          "$ref": "#/definitions/warehouseLocation"
-        },
-        "resulting_stock": {
-          "type": "integer",
-          "minimum": 0
+        "duration_ms": {
+          "minimum": 0,
+          "title": "Duration Ms",
+          "type": "integer"
         }
-      }
-    },
-    "outboundOrderRejectedProperties": {
-      "type": "object",
+      },
       "required": [
+        "warehouse",
+        "client_id",
         "product_id",
-        "sku",
-        "requested_quantity",
-        "available_stock",
-        "rejection_reason"
+        "product_category",
+        "quantity",
+        "order_id",
+        "duration_ms"
       ],
-      "additionalProperties": false,
-      "properties": {
-        "product_id": {
-          "type": "integer"
-        },
-        "sku": {
-          "type": "string"
-        },
-        "requested_quantity": {
-          "type": "integer",
-          "minimum": 1
-        },
-        "available_stock": {
-          "type": "integer",
-          "minimum": 0
-        },
-        "rejection_reason": {
-          "type": "string",
-          "enum": ["insufficient_stock"]
-        }
-      }
+      "title": "PickingDurationRecordedProperties",
+      "type": "object"
     },
-    "stockThresholdTriggeredProperties": {
-      "type": "object",
-      "required": [
-        "product_id",
-        "sku",
-        "current_stock",
-        "low_stock_threshold",
-        "warehouse_location",
-        "client_brand"
-      ],
-      "additionalProperties": false,
-      "properties": {
-        "product_id": {
-          "type": "integer"
+    "PickingDurationRecordedEvent": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/envelopeBase"
         },
-        "sku": {
-          "type": "string"
-        },
-        "current_stock": {
-          "type": "integer",
-          "minimum": 0
-        },
-        "low_stock_threshold": {
-          "type": "integer",
-          "minimum": 0
-        },
-        "warehouse_location": {
-          "$ref": "#/definitions/warehouseLocation"
-        },
-        "client_brand": {
-          "type": "string"
+        {
+          "properties": {
+            "event_type": {
+              "const": "picking_duration_recorded"
+            },
+            "schemaVersion": {
+              "const": "1.0.0"
+            },
+            "properties": {
+              "$ref": "#/definitions/PickingDurationRecordedProperties"
+            }
+          }
         }
-      }
+      ]
     },
-    "pageViewedProperties": {
-      "type": "object",
-      "required": ["page_path"],
+    "FlowAbandonedProperties": {
       "additionalProperties": false,
       "properties": {
-        "page_path": {
-          "type": "string"
-        },
-        "referrer_path": {
-          "type": "string"
-        }
-      }
-    },
-    "formAbandonedProperties": {
-      "type": "object",
-      "required": ["form_type", "elapsed_seconds"],
-      "additionalProperties": false,
-      "properties": {
-        "form_type": {
-          "type": "string",
-          "enum": ["inbound", "outbound", "product"]
-        },
-        "last_field": {
+        "flow_type": {
+          "enum": [
+            "inbound",
+            "outbound",
+            "product"
+          ],
+          "title": "Flow Type",
           "type": "string"
         },
         "elapsed_seconds": {
-          "type": "integer",
-          "minimum": 0
+          "minimum": 0,
+          "title": "Elapsed Seconds",
+          "type": "integer"
+        },
+        "last_field": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Last Field"
         }
-      }
+      },
+      "required": [
+        "flow_type",
+        "elapsed_seconds"
+      ],
+      "title": "FlowAbandonedProperties",
+      "type": "object"
     },
-    "sessionStartedEvent": {
+    "FlowAbandonedEvent": {
       "allOf": [
-        { "$ref": "#/definitions/envelopeBase" },
+        {
+          "$ref": "#/definitions/envelopeBase"
+        },
         {
           "properties": {
-            "event_type": { "const": "session_started" },
-            "schemaVersion": { "const": "1.0.0" },
-            "properties": { "$ref": "#/definitions/sessionStartedProperties" }
-          }
-        }
-      ]
-    },
-    "credentialFailedEvent": {
-      "allOf": [
-        { "$ref": "#/definitions/envelopeBase" },
-        {
-          "properties": {
-            "event_type": { "const": "credential_failed" },
-            "schemaVersion": { "const": "1.0.0" },
-            "properties": { "$ref": "#/definitions/credentialFailedProperties" }
-          }
-        }
-      ]
-    },
-    "sessionExpiredEvent": {
-      "allOf": [
-        { "$ref": "#/definitions/envelopeBase" },
-        {
-          "properties": {
-            "event_type": { "const": "session_expired" },
-            "schemaVersion": { "const": "1.0.0" },
-            "properties": { "$ref": "#/definitions/sessionExpiredProperties" }
-          }
-        }
-      ]
-    },
-    "productCreatedEvent": {
-      "allOf": [
-        { "$ref": "#/definitions/envelopeBase" },
-        {
-          "properties": {
-            "event_type": { "const": "product_created" },
-            "schemaVersion": { "const": "1.0.0" },
-            "properties": { "$ref": "#/definitions/productCreatedProperties" }
-          }
-        }
-      ]
-    },
-    "productCreateRejectedEvent": {
-      "allOf": [
-        { "$ref": "#/definitions/envelopeBase" },
-        {
-          "properties": {
-            "event_type": { "const": "product_create_rejected" },
-            "schemaVersion": { "const": "1.0.0" },
-            "properties": { "$ref": "#/definitions/productCreateRejectedProperties" }
-          }
-        }
-      ]
-    },
-    "inboundOrderCreatedEvent": {
-      "allOf": [
-        { "$ref": "#/definitions/envelopeBase" },
-        {
-          "properties": {
-            "event_type": { "const": "inbound_order_created" },
-            "schemaVersion": { "const": "1.0.0" },
-            "properties": { "$ref": "#/definitions/inboundOrderCreatedProperties" }
-          }
-        }
-      ]
-    },
-    "outboundOrderCreatedEvent": {
-      "allOf": [
-        { "$ref": "#/definitions/envelopeBase" },
-        {
-          "properties": {
-            "event_type": { "const": "outbound_order_created" },
-            "schemaVersion": { "const": "1.0.0" },
-            "properties": { "$ref": "#/definitions/outboundOrderCreatedProperties" }
-          }
-        }
-      ]
-    },
-    "outboundOrderRejectedEvent": {
-      "allOf": [
-        { "$ref": "#/definitions/envelopeBase" },
-        {
-          "properties": {
-            "event_type": { "const": "outbound_order_rejected" },
-            "schemaVersion": { "const": "1.0.0" },
-            "properties": { "$ref": "#/definitions/outboundOrderRejectedProperties" }
-          }
-        }
-      ]
-    },
-    "stockThresholdTriggeredEvent": {
-      "allOf": [
-        { "$ref": "#/definitions/envelopeBase" },
-        {
-          "properties": {
-            "event_type": { "const": "stock_threshold_triggered" },
-            "schemaVersion": { "const": "1.0.0" },
-            "properties": { "$ref": "#/definitions/stockThresholdTriggeredProperties" }
-          }
-        }
-      ]
-    },
-    "pageViewedEvent": {
-      "allOf": [
-        { "$ref": "#/definitions/envelopeBase" },
-        {
-          "properties": {
-            "event_type": { "const": "page_viewed" },
-            "schemaVersion": { "const": "1.0.0" },
-            "properties": { "$ref": "#/definitions/pageViewedProperties" }
-          }
-        }
-      ]
-    },
-    "formAbandonedEvent": {
-      "allOf": [
-        { "$ref": "#/definitions/envelopeBase" },
-        {
-          "properties": {
-            "event_type": { "const": "form_abandoned" },
-            "schemaVersion": { "const": "1.0.0" },
-            "properties": { "$ref": "#/definitions/formAbandonedProperties" }
+            "event_type": {
+              "const": "flow_abandoned"
+            },
+            "schemaVersion": {
+              "const": "1.0.0"
+            },
+            "properties": {
+              "$ref": "#/definitions/FlowAbandonedProperties"
+            }
           }
         }
       ]
     }
   },
   "oneOf": [
-    { "$ref": "#/definitions/sessionStartedEvent" },
-    { "$ref": "#/definitions/credentialFailedEvent" },
-    { "$ref": "#/definitions/sessionExpiredEvent" },
-    { "$ref": "#/definitions/productCreatedEvent" },
-    { "$ref": "#/definitions/productCreateRejectedEvent" },
-    { "$ref": "#/definitions/inboundOrderCreatedEvent" },
-    { "$ref": "#/definitions/outboundOrderCreatedEvent" },
-    { "$ref": "#/definitions/outboundOrderRejectedEvent" },
-    { "$ref": "#/definitions/stockThresholdTriggeredEvent" },
-    { "$ref": "#/definitions/pageViewedEvent" },
-    { "$ref": "#/definitions/formAbandonedEvent" }
+    {
+      "$ref": "#/definitions/InboundOrderCreatedEvent"
+    },
+    {
+      "$ref": "#/definitions/OutboundOrderCreatedEvent"
+    },
+    {
+      "$ref": "#/definitions/OutboundOrderRejectedEvent"
+    },
+    {
+      "$ref": "#/definitions/StockThresholdTriggeredEvent"
+    },
+    {
+      "$ref": "#/definitions/DirectStockEditRejectedEvent"
+    },
+    {
+      "$ref": "#/definitions/InventoryDiscrepancyDetectedEvent"
+    },
+    {
+      "$ref": "#/definitions/InboundOrderValidationFailedEvent"
+    },
+    {
+      "$ref": "#/definitions/UserLoginSucceededEvent"
+    },
+    {
+      "$ref": "#/definitions/UserLoginFailedEvent"
+    },
+    {
+      "$ref": "#/definitions/SessionExpiredEvent"
+    },
+    {
+      "$ref": "#/definitions/PageViewedEvent"
+    },
+    {
+      "$ref": "#/definitions/PageLoadRecordedEvent"
+    },
+    {
+      "$ref": "#/definitions/ApiLatencyRecordedEvent"
+    },
+    {
+      "$ref": "#/definitions/FrontendErrorUncaughtEvent"
+    },
+    {
+      "$ref": "#/definitions/PickingDurationRecordedEvent"
+    },
+    {
+      "$ref": "#/definitions/FlowAbandonedEvent"
+    }
   ]
 }

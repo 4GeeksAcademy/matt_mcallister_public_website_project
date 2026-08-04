@@ -74,7 +74,7 @@ const validateLead = (body: LeadPayload): Record<string, string> => {
     fields.services = "Select at least one service of interest";
   }
   if ((body.comments?.length ?? 0) > 500) {
-    fields.comments = "Comments cannot exceed 500 characters";
+    fields.comments = `Comments cannot exceed 500 characters (${500 - (body.comments?.length ?? 0)} remaining)`;
   }
   if (!body.privacy) {
     fields.privacy = "You must accept the privacy policy to continue";
@@ -101,8 +101,12 @@ router.post("/", (req, res, next) => {
     res.status(201).json({
       success: true,
       leadId,
-      message:
-        "Thank you for your interest in TrackFlow! We have received your request. Our commercial team will contact you within the next 24-48 hours.",
+      message: {
+        heading: "Thank you for your interest in TrackFlow!",
+        body: "We have received your request. Our commercial team will review your information and contact you within the next 24-48 hours to schedule a call and learn about your logistics needs in detail.",
+        urgent:
+          "If you have any urgent inquiry, write to us directly at comercial@trackflow.com",
+      },
     });
   } catch (error) {
     next(error);

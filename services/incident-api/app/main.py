@@ -121,7 +121,10 @@ def knowledge_query(body: KnowledgeQueryRequest) -> KnowledgeQueryResponse:
             status_code=502,
             detail="Knowledge query failed. Please try again shortly.",
         ) from exc
-    return KnowledgeQueryResponse(answer=result["answer"])
+    return KnowledgeQueryResponse(
+        answer=result["answer"],
+        sources=result.get("sources", []),
+    )
 
 
 @app.post("/export")

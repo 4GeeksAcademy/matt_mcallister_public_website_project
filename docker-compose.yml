@@ -31,7 +31,8 @@ services:
 
   leads-api:
     build:
-      context: ./services/leads-api
+      context: .
+      dockerfile: services/leads-api/Dockerfile
     environment:
       PORT: 4000
     ports: ["4000:4000"]
@@ -242,6 +243,7 @@ services:
       NEXT_PUBLIC_WEBSITE_API_URL: http://localhost:4000
       NEXT_PUBLIC_AUTH_API_URL: http://localhost:8000
       NEXT_PUBLIC_INCIDENTS_API_URL: http://localhost:8001
+      NEXT_PUBLIC_INVENTORY_API_URL: http://localhost:8003
       NEXT_PUBLIC_OPERATIONS_API_URL: http://localhost:8005
       NEXT_PUBLIC_TELEMETRY_ENDPOINT: http://localhost:8005/telemetry/events
       SUPPLIER_API_URL: http://supplier-api:8002
@@ -250,6 +252,8 @@ services:
       auth-api:
         condition: service_healthy
       incident-api:
+        condition: service_healthy
+      inventory-api:
         condition: service_healthy
       operations-api:
         condition: service_healthy

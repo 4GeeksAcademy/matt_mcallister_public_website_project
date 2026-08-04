@@ -16,12 +16,25 @@ class KnowledgeQueryRequest(BaseModel):
     question: str = Field(..., min_length=1)
 
 
+class KnowledgeSource(BaseModel):
+    source_document: str
+    section: str
+    language: str
+
+
 class KnowledgeQueryResponse(BaseModel):
     answer: str
+    sources: list[KnowledgeSource]
 
 
 def run_knowledge_query(question: str) -> dict[str, Any]:
     """Call pipeline query(); never expose raw Qdrant hits to the client."""
-    answer = rag_query(question)
-    logger.info("knowledge/query answered question=%r chars=%s", question[:80], len(answer))
-    return {"answer": answer}
+    result = rag_query(question)
+    logger.info(
+        "knowledge/query answered question=%r chars=%s sources=%s faithful=%s",
+        question[:80],
+        len(result["answer"]),
+        len(result["sources"]),
+        result["faithful"],
+    )
+    return {"answer": result["answer"], "sources": result["sources"]}

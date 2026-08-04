@@ -16,7 +16,7 @@ type ApiRequestOptions = RequestInit & {
   requireAuth?: boolean;
 };
 
-type User = {
+export type User = {
   id: string;
   name: string;
   email: string;
@@ -24,18 +24,19 @@ type User = {
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_AUTH_API_URL ?? "http://localhost:8000";
-const LOGIN_ENDPOINT = process.env.NEXT_PUBLIC_LOGIN_ENDPOINT ?? "/auth/login";
-const REGISTER_ENDPOINT = process.env.NEXT_PUBLIC_REGISTER_ENDPOINT ?? "/auth/register";
-const ME_ENDPOINT = process.env.NEXT_PUBLIC_ME_ENDPOINT ?? "/users/me";
-const CHANGE_PASSWORD_ENDPOINT_TEMPLATE =
-  process.env.NEXT_PUBLIC_CHANGE_PASSWORD_ENDPOINT ?? "/users/{id}/change-password";
+const LOGIN_ENDPOINT = "/auth/login";
+const REGISTER_ENDPOINT = "/auth/register";
+const ME_ENDPOINT = "/auth/me";
+const CHANGE_PASSWORD_ENDPOINT_TEMPLATE = "/users/{id}/change-password";
 
 const getErrorMessage = (errorBody: unknown, fallback: string) => {
   if (typeof errorBody !== "object" || !errorBody) {
     return fallback;
   }
 
-  const candidate = (errorBody as { message?: unknown }).message;
+  const body = errorBody as { detail?: unknown; message?: unknown };
+  const candidate =
+    typeof body.detail === "string" ? body.detail : body.message;
   if (typeof candidate === "string" && candidate.trim().length > 0) {
     return candidate;
   }
@@ -49,9 +50,33 @@ const getValidationErrors = (errorBody: unknown): Record<string, string> | undef
   }
 
   const body = errorBody as {
+    detail?: unknown;
     errors?: unknown;
     fieldErrors?: unknown;
   };
+
+  if (Array.isArray(body.detail)) {
+    const next: Record<string, string> = {};
+
+    body.detail.forEach((item) => {
+      if (typeof item !== "object" || !item) {
+        return;
+      }
+      const location = (item as { loc?: unknown }).loc;
+      const message = (item as { msg?: unknown }).msg;
+      const field =
+        Array.isArray(location) && location.length > 0
+          ? location[location.length - 1]
+          : null;
+      if (typeof field === "string" && typeof message === "string") {
+        next[field] = message;
+      }
+    });
+
+    if (Object.keys(next).length > 0) {
+      return next;
+    }
+  }
 
   if (body.fieldErrors && typeof body.fieldErrors === "object") {
     const next: Record<string, string> = {};
@@ -206,7 +231,8 @@ export const apiRequest = async <T>(path: string, options: ApiRequestOptions = {
 };
 
 type AuthResponse = {
-  token: string;
+  access_token: string;
+  token_type: "bearer";
 };
 
 export const authApi = {
@@ -245,7 +271,10 @@ export const userApi = {
 
     await apiRequest(endpoint, {
       method: "PUT",
-      body: JSON.stringify({ currentPassword, newPassword }),
+      body: JSON.stringify({
+        current_password: currentPassword,
+        new_password: newPassword,
+      }),
     });
   },
 };

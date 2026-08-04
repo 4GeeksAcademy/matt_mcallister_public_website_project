@@ -13,6 +13,7 @@ def test_register_valid_credentials_creates_user_and_returns_token(client, tinyd
 
     stored = tinydb.table("users").get(doc_id=1)
     assert stored is not None
+    assert stored["name"] == "Test User"
     assert stored["email"] == "user1@example.com"
     assert stored["hashed_password"] != "strongpass"
 

@@ -16,7 +16,11 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 @router.post("/login", response_model=Token)
 def login(payload: LoginRequest, db: TinyDB = Depends(get_db)) -> Token:
     user = get_user_by_email(db, payload.email)
-    if user is None or not verify_password(payload.password, user.hashed_password):
+    if (
+        user is None
+        or not user.is_active
+        or not verify_password(payload.password, user.hashed_password)
+    ):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password",

@@ -74,6 +74,14 @@ def test_candidate_crud_filtering_and_pagination(client: TestClient) -> None:
     assert patched.json()["status"] == "in_progress"
     assert patched.json()["stage"] == "review"
 
+    status_listing = client.get(
+        "/tracker/api/v1/records",
+        params={"status": "in_progress", "stage": "review"},
+    )
+    assert status_listing.status_code == 200
+    assert status_listing.json()["total"] == 1
+    assert status_listing.json()["data"][0]["id"] == candidate["id"]
+
     replacement = candidate_payload() | {"position": "Senior Operations Manager"}
     replaced = client.put(
         f"/tracker/api/v1/records/{candidate['id']}", json=replacement
@@ -81,6 +89,7 @@ def test_candidate_crud_filtering_and_pagination(client: TestClient) -> None:
     assert replaced.status_code == 200
     assert replaced.json()["position"] == "Senior Operations Manager"
     assert replaced.json()["status"] == "in_progress"
+    assert replaced.json()["stage"] == "review"
 
     deleted = client.delete(f"/tracker/api/v1/records/{candidate['id']}")
     assert deleted.status_code == 204

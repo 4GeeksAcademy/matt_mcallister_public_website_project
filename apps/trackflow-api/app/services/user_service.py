@@ -13,6 +13,7 @@ USERS_TABLE = "users"
 def _to_user(doc_id: int, data: dict) -> User:
     return User(
         id=doc_id,
+        name=data.get("name", ""),
         email=data["email"],
         hashed_password=data["hashed_password"],
         is_active=data.get("is_active", True),
@@ -48,6 +49,7 @@ def create_user(db: TinyDB, payload: UserCreate) -> User:
     now = datetime.now(timezone.utc).isoformat()
     doc_id = table.insert(
         {
+            "name": payload.name,
             "email": str(payload.email),
             "hashed_password": hash_password(payload.password),
             "is_active": True,
@@ -64,6 +66,8 @@ def update_user(db: TinyDB, user: User, payload: UserUpdate) -> User:
     updates: dict = {}
     if payload.email is not None:
         updates["email"] = str(payload.email)
+    if payload.name is not None:
+        updates["name"] = payload.name
     if payload.password is not None:
         updates["hashed_password"] = hash_password(payload.password)
     if payload.is_active is not None:
@@ -74,6 +78,13 @@ def update_user(db: TinyDB, user: User, payload: UserUpdate) -> User:
 
     refreshed = table.get(doc_id=user.id)
     return _to_user(user.id, refreshed)
+
+
+def change_password(db: TinyDB, user: User, new_password: str) -> None:
+    db.table(USERS_TABLE).update(
+        {"hashed_password": hash_password(new_password)},
+        doc_ids=[user.id],
+    )
 
 
 def delete_user(db: TinyDB, user: User) -> None:

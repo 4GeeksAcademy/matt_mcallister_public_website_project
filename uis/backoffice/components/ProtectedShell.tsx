@@ -4,22 +4,40 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { PropsWithChildren, useEffect, useMemo, useState } from "react";
 
+import { userApi } from "@/lib/api-client";
 import { hasValidSession, logout } from "@/lib/auth";
 
 export default function ProtectedShell({ children }: PropsWithChildren) {
   const router = useRouter();
   const pathname = usePathname();
-  const [ready] = useState(() => hasValidSession());
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     if (!hasValidSession()) {
       router.replace("/login");
+      return;
     }
+
+    let active = true;
+    userApi.getMe().then(
+      () => {
+        if (active) {
+          setReady(true);
+        }
+      },
+      () => undefined,
+    );
+
+    return () => {
+      active = false;
+    };
   }, [router]);
 
   const links = useMemo(
     () => [
       { href: "/", label: "Dashboard" },
+      { href: "/operations-analysis", label: "Carrier & inventory" },
+      { href: "/inventory", label: "Inventory" },
       { href: "/account/profile", label: "Profile" },
       { href: "/account/change-password", label: "Change password" },
     ],

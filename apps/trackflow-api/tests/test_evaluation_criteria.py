@@ -22,12 +22,25 @@ def test_user_crud_end_to_end_is_reachable(client):
     assert get_one.status_code == 200
     assert get_one.json()["email"] == "crud@example.com"
 
+    update = client.put("/users/1", json={"name": "Crud User"}, headers=auth)
+    assert update.status_code == 200
+    assert update.json()["name"] == "Crud User"
+
+    delete = client.delete("/users/1", headers=auth)
+    assert delete.status_code == 204
+
+
+def test_inactive_users_cannot_use_authenticated_routes(client):
+    register_user(client, "inactive-crud@example.com")
+    token = login_token(client, "inactive-crud@example.com")
+    auth = {"Authorization": f"Bearer {token}"}
+
     update = client.put("/users/1", json={"is_active": False}, headers=auth)
     assert update.status_code == 200
     assert update.json()["is_active"] is False
 
-    delete = client.delete("/users/1", headers=auth)
-    assert delete.status_code == 204
+    assert client.get("/auth/me", headers=auth).status_code == 401
+    assert client.delete("/users/1", headers=auth).status_code == 401
 
 
 def test_protected_routes_return_401_without_valid_token(client):
@@ -40,7 +53,14 @@ def test_protected_routes_return_401_without_valid_token(client):
 
 def test_auth_and_users_route_structure(client):
     assert client.post("/auth/login", json={"email": "x@example.com", "password": "bad"}).status_code in [401, 422]
-    assert client.post("/users", json={"email": "prefix@example.com", "password": "strongpass"}).status_code == 201
+    assert client.post(
+        "/users",
+        json={
+            "name": "Prefix User",
+            "email": "prefix@example.com",
+            "password": "strongpass",
+        },
+    ).status_code == 201
 
     assert client.get("/user").status_code == 404
     assert client.get("/authentication/me").status_code == 404

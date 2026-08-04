@@ -25,10 +25,10 @@ type FormData = {
 
 type SubmitPhase = "idle" | "loading" | "fulfilled" | "rejected";
 
-type Status = {
-  kind: "success" | "error";
-  message: string;
-} | null;
+type Status =
+  | { kind: "success" }
+  | { kind: "error"; message: string }
+  | null;
 
 const initialData: FormData = {
   companyName: "",
@@ -47,6 +47,12 @@ const initialData: FormData = {
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const phoneRegex = /^\+\d[\d\s-]{6,}$/;
+const successCopy = {
+  heading: "Thank you for your interest in TrackFlow!",
+  body: "We have received your request. Our commercial team will review your information and contact you within the next 24-48 hours to schedule a call and learn about your logistics needs in detail.",
+  urgent:
+    "If you have any urgent inquiry, write to us directly at comercial@trackflow.com",
+};
 
 const errorMessages = {
   companyName: "Company name must have at least 2 characters",
@@ -59,7 +65,6 @@ const errorMessages = {
   monthlyVolume: "Select estimated monthly volume",
   has3pl: "Indicate if you currently work with another logistics provider",
   services: "Select at least one service of interest",
-  comments: "Comments cannot exceed 500 characters",
   privacy: "You must accept the privacy policy to continue",
 };
 
@@ -172,7 +177,9 @@ export default function LeadForm() {
     if (!formData.monthlyVolume) nextErrors.monthlyVolume = errorMessages.monthlyVolume;
     if (!formData.has3pl) nextErrors.has3pl = errorMessages.has3pl;
     if (!formData.services.length) nextErrors.services = errorMessages.services;
-    if (remainingChars < 0) nextErrors.comments = errorMessages.comments;
+    if (remainingChars < 0) {
+      nextErrors.comments = `Comments cannot exceed 500 characters (${remainingChars} remaining)`;
+    }
     if (!formData.privacy) nextErrors.privacy = errorMessages.privacy;
 
     setErrors(nextErrors);
@@ -222,15 +229,10 @@ export default function LeadForm() {
         return;
       }
 
-      const body = (await response.json()) as { message?: string };
+      await response.json();
 
       setSubmitPhase("fulfilled");
-      setStatus({
-        kind: "success",
-        message:
-          body.message ??
-          "Thank you for your interest in TrackFlow! We have received your request. Our commercial team will contact you within the next 24-48 hours.",
-      });
+      setStatus({ kind: "success" });
       setFormData(initialData);
       setErrors({});
     } catch {
@@ -257,19 +259,17 @@ export default function LeadForm() {
         </div>
       ) : null}
 
-      {status ? (
+      {status?.kind === "success" ? (
         <div className={statusClass} role="status" aria-live="polite">
-          {status.message ?? "An unexpected error occurred."}
-          {status.kind === "success" ? (
-            <>
-              {" "}
-              If urgent, email{" "}
-              <a className="link" href="mailto:comercial@trackflow.com">
-                comercial@trackflow.com
-              </a>
-              .
-            </>
-          ) : null}
+          <p className="font-semibold">{successCopy.heading}</p>
+          <p className="mt-2">{successCopy.body}</p>
+          <p className="mt-2">{successCopy.urgent}</p>
+        </div>
+      ) : null}
+
+      {status?.kind === "error" ? (
+        <div className={statusClass} role="status" aria-live="polite">
+          {status.message}
         </div>
       ) : null}
 
@@ -300,7 +300,7 @@ export default function LeadForm() {
 
         <div>
           <label className="form-label" htmlFor="phone">Phone *</label>
-          <input className={`form-input ${errors.phone ? "input-invalid" : ""}`} id="phone" placeholder="+1 213 555 0147" value={formData.phone} onChange={(e) => setField("phone", e.target.value)} />
+          <input className={`form-input ${errors.phone ? "input-invalid" : ""}`} id="phone" type="tel" placeholder="+1 213 555 0147" value={formData.phone} onChange={(e) => setField("phone", e.target.value)} />
           <p className="form-error">{errors.phone ?? ""}</p>
         </div>
 
@@ -376,7 +376,7 @@ export default function LeadForm() {
 
         <div className="md:col-span-2">
           <label className="form-label" htmlFor="comments">Comments or specific needs</label>
-          <textarea className={`form-input ${errors.comments ? "input-invalid" : ""}`} id="comments" rows={4} maxLength={550} value={formData.comments} onChange={(e) => setField("comments", e.target.value)} />
+          <textarea className={`form-input ${errors.comments ? "input-invalid" : ""}`} id="comments" rows={4} maxLength={500} value={formData.comments} onChange={(e) => setField("comments", e.target.value)} />
           <div className="mt-1 flex justify-between text-xs text-ink/70">
             <p className="form-error">{errors.comments ?? ""}</p>
             <p>{remainingChars} characters remaining</p>

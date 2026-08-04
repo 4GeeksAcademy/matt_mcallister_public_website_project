@@ -2,33 +2,28 @@
  * TrackFlow client-side telemetry service.
  * All backoffice tracking goes through track() — never direct fetch/axios for events.
  */
+import type {
+  TelemetryEvent,
+  TelemetryEventType,
+  TelemetryPropertyMap,
+  Warehouse,
+  ProductCategory,
+} from "../../../../packages/shared/types/telemetry";
 
 export const SCHEMA_VERSION = "1.0.0";
+export type { Warehouse, ProductCategory };
 
 const FLUSH_INTERVAL_MS = 10_000;
 const MAX_QUEUE_SIZE = 20;
 const MAX_RETRIES = 3;
 
-type Properties = Record<string, unknown>;
-
-export type TelemetryEnvelope = {
-  eventId: string;
-  timestamp: string;
-  sessionId: string;
-  userId: string;
-  event_type: string;
-  schemaVersion: string;
-  requestId: string;
-  properties: Properties;
-};
-
-const queue: TelemetryEnvelope[] = [];
+const queue: TelemetryEvent[] = [];
 let flushTimer: ReturnType<typeof setInterval> | null = null;
 let sessionId = "sess_anonymous";
 let userId = "anonymous";
 let initialized = false;
 
-const STREAM_TYPES = new Set([
+const STREAM_TYPES: Set<TelemetryEventType> = new Set([
   "stock_threshold_triggered",
   "direct_stock_edit_rejected",
   "user_login_failed",
@@ -108,7 +103,7 @@ function beaconFlush() {
 }
 
 async function sendWithRetry(
-  batch: TelemetryEnvelope[],
+  batch: TelemetryEvent[],
   attempt: number
 ): Promise<boolean> {
   try {
@@ -144,11 +139,14 @@ async function flush(force: boolean) {
 /**
  * Capture an event. Envelope fields are filled automatically.
  */
-export function track(eventType: string, properties: Properties = {}): void {
+export function track<T extends TelemetryEventType>(
+  eventType: T,
+  properties: TelemetryPropertyMap[T]
+): void {
   if (typeof window === "undefined") return;
   initTelemetry();
 
-  const event: TelemetryEnvelope = {
+  const event = {
     eventId: uuid(),
     timestamp: new Date().toISOString(),
     sessionId,
@@ -157,7 +155,7 @@ export function track(eventType: string, properties: Properties = {}): void {
     schemaVersion: SCHEMA_VERSION,
     requestId: uuid(),
     properties: { ...properties },
-  };
+  } as TelemetryEvent;
   queue.push(event);
 
   if (queue.length >= MAX_QUEUE_SIZE || STREAM_TYPES.has(eventType)) {

@@ -1,12 +1,21 @@
 # Project Brief
 
 ## Business Description
-TrackFlow is a milestone tracking and analytics platform designed to help teams and organizations monitor progress, identify bottlenecks, and optimize workflows.
+TrackFlow is a logistics and warehouse operations platform serving e-commerce
+brands in the United States and Spain. The monorepo covers the public website,
+operations backoffice, supplier directory, talent pipeline, FastAPI services,
+data pipelines, telemetry, and commercial knowledge (RAG) workflows.
 
 ## Objectives
-- Provide a clear and intuitive interface for tracking project milestones.
-- Deliver actionable insights through data visualization and analytics.
-- Ensure seamless integration with existing tools and workflows.
+- Provide canonical UIs and APIs for leads, auth, incidents, inventory,
+  suppliers, talent, telemetry, and reporting.
+- Keep every supported component aligned with its authoritative context
+  document (see root README requirements source map).
+- Deliver actionable warehouse and carrier insights from shared TypeScript
+  business logic (`packages/trackflow-core`).
 
 ## Problem Statement
-Many teams struggle with tracking project progress effectively, leading to missed deadlines, inefficiencies, and lack of visibility. TrackFlow aims to solve this by offering a centralized platform for milestone tracking and performance analysis.
+TrackFlow consolidates logistics operations across LA and Zaragoza. Teams need
+a single, context-conformant platform for incident management, inventory
+orders, supplier relationships, talent tracking, and commercial knowledge —
+without conflicting duplicate implementations or stale contracts.

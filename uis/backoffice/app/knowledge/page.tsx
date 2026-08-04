@@ -5,9 +5,16 @@ import { FormEvent, useEffect, useState } from "react";
 
 type Theme = "light" | "dark";
 
+type KnowledgeSource = {
+  source_document: string;
+  section: string;
+  language: string;
+};
+
 export default function KnowledgePage() {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState<string | null>(null);
+  const [sources, setSources] = useState<KnowledgeSource[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [theme, setTheme] = useState<Theme>("light");
@@ -38,6 +45,7 @@ export default function KnowledgePage() {
     setLoading(true);
     setError(null);
     setAnswer(null);
+    setSources([]);
 
     const apiBase =
       process.env.NEXT_PUBLIC_INCIDENTS_API_URL?.replace(/\/$/, "") ||
@@ -57,16 +65,21 @@ export default function KnowledgePage() {
         );
       }
 
-      const data = (await response.json()) as { answer?: string };
+      const data = (await response.json()) as {
+        answer?: string;
+        sources?: KnowledgeSource[];
+      };
       if (typeof data.answer !== "string" || !data.answer.trim()) {
         throw new Error("The API returned an empty answer.");
       }
       setAnswer(data.answer);
+      setSources(Array.isArray(data.sources) ? data.sources : []);
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Unexpected error talking to the API.";
       setError(message);
       setAnswer(null);
+      setSources([]);
     } finally {
       setLoading(false);
     }
@@ -194,6 +207,20 @@ export default function KnowledgePage() {
               Answer
             </h2>
             <p className="mt-3 whitespace-pre-wrap leading-relaxed">{answer}</p>
+            {sources.length > 0 ? (
+              <div className="mt-5 border-t border-current/10 pt-4">
+                <h3 className="text-sm font-medium uppercase tracking-wide opacity-70">
+                  Sources
+                </h3>
+                <ul className="mt-2 space-y-1 text-sm">
+                  {sources.map((source) => (
+                    <li key={`${source.source_document}-${source.section}`}>
+                      {source.source_document} · {source.section} ({source.language})
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
           </section>
         ) : null}
       </main>

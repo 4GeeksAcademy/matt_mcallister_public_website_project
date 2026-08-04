@@ -5,12 +5,13 @@ from conftest import login_token, register_user
 
 
 def test_me_valid_token_returns_current_user(client):
-    register_user(client, "me@example.com")
+    register_user(client, "me@example.com", name="Me User")
     token = login_token(client, "me@example.com")
 
     response = client.get("/auth/me", headers={"Authorization": f"Bearer {token}"})
 
     assert response.status_code == 200
+    assert response.json()["name"] == "Me User"
     assert response.json()["email"] == "me@example.com"
 
 
@@ -47,3 +48,20 @@ def test_me_malformed_token_rejected(client):
     response = client.get("/auth/me", headers={"Authorization": "Bearer not-a-token"})
 
     assert response.status_code == 401
+
+
+def test_me_rejects_token_after_user_is_deactivated(client):
+    register_user(client, "inactive@example.com")
+    token = login_token(client, "inactive@example.com")
+    auth = {"Authorization": f"Bearer {token}"}
+
+    response = client.put("/users/1", json={"is_active": False}, headers=auth)
+    assert response.status_code == 200
+
+    assert client.get("/auth/me", headers=auth).status_code == 401
+    login = client.post(
+        "/auth/login",
+        json={"email": "inactive@example.com", "password": "strongpass"},
+    )
+    assert login.status_code == 401
+    assert login.json()["detail"] == "Invalid email or password"

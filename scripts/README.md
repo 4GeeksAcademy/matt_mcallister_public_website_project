@@ -30,3 +30,16 @@ python -m pytest scripts/test_analyze_context.py -q
 - Forces `origin` to `customer`
 - Maps `country` → `la_office` / `zaragoza_office`
 - Idempotent on `incident_id`
+
+## RAG evaluation
+
+```bash
+# CI path: in-memory Qdrant + deterministic embedder (gates Recall@3 >= 80%)
+PYTHONPATH=. python scripts/run_rag_eval.py --local-index
+
+# Optional stub retriever (no indexing)
+python scripts/run_rag_eval.py --mock
+
+# Live OpenAI + Qdrant index (requires OPENAI_API_KEY and Qdrant)
+python scripts/run_rag_eval.py
+```

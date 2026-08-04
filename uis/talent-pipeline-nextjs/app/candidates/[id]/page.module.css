@@ -62,6 +62,16 @@
   font-size: 1.55rem;
 }
 
+.stats select {
+  width: 100%;
+  margin-top: 0.35rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 0.45rem;
+  text-transform: capitalize;
+  background: #fff;
+}
+
 .profileBlock {
   max-width: 960px;
   margin: 1.2rem auto 0;
@@ -117,7 +127,8 @@
   gap: 0.8rem;
 }
 
-.secondaryCta {
+.secondaryCta,
+.primaryCta {
   display: inline-flex;
   align-items: center;
   padding: 0.65rem 1.1rem;
@@ -127,6 +138,25 @@
   color: #9a3412;
   background: #fff7ed;
   text-decoration: none;
+}
+
+.primaryCta {
+  border-color: #0f766e;
+  color: #fff;
+  background: #0f766e;
+}
+
+.value a {
+  color: #0f766e;
+  text-decoration: underline;
+}
+
+.feedback {
+  margin-top: 0.8rem;
+  border-radius: 10px;
+  padding: 0.65rem;
+  color: #334155;
+  background: #f1f5f9;
 }
 
 @media (max-width: 900px) {

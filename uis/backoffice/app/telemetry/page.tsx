@@ -57,11 +57,19 @@ function MetricTable({
 export default function TelemetryPage() {
   const [report, setReport] = useState<Report | null>(null);
   const [error, setError] = useState("");
+  const [periodDays, setPeriodDays] = useState(7);
 
   useEffect(() => {
     async function load() {
       try {
-        const res = await timedFetch(`${API}/telemetry/report`);
+        setError("");
+        const end = new Date();
+        const start = new Date(end.getTime() - periodDays * 24 * 60 * 60 * 1000);
+        const query = new URLSearchParams({
+          start_date: start.toISOString(),
+          end_date: end.toISOString(),
+        });
+        const res = await timedFetch(`${API}/telemetry/report?${query}`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         setReport(await res.json());
       } catch (err) {
@@ -69,7 +77,7 @@ export default function TelemetryPage() {
       }
     }
     void load();
-  }, []);
+  }, [periodDays]);
 
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-10">
@@ -78,6 +86,18 @@ export default function TelemetryPage() {
         <p className="mt-2 text-slate-400">
           Technical operational metrics for the engineering team.
         </p>
+        <label className="mt-4 block max-w-48 text-sm text-slate-300">
+          Reporting period
+          <select
+            className="mt-1 w-full rounded border border-slate-700 bg-slate-900 px-3 py-2"
+            value={periodDays}
+            onChange={(event) => setPeriodDays(Number(event.target.value))}
+          >
+            <option value={7}>Last 7 days</option>
+            <option value={30}>Last 30 days</option>
+            <option value={90}>Last 90 days</option>
+          </select>
+        </label>
         {report && (
           <p className="mt-2 text-sm text-cyan-300">
             Period: {report.period.from} → {report.period.to}

@@ -1,94 +1,36 @@
-import {
-  buildExecutiveSnapshot,
-  milestone2SampleInput,
-} from "@/lib/milestone2";
+import Link from "next/link";
 
 export default function Home() {
-  const snapshot = buildExecutiveSnapshot(milestone2SampleInput);
-
   return (
-    <div>
-      <main className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-10 md:px-10">
-        <header className="space-y-2">
-          <h1 className="text-3xl font-semibold md:text-4xl">
-            Executive Operations Snapshot
-          </h1>
-          <p className="max-w-2xl text-slate-300">
-            Values below are produced by the shared Milestone 2 business-logic
-            module imported from the monorepo.
-          </p>
-          <p>
-            <a
-              href="/knowledge"
-              className="text-sm text-cyan-300 underline-offset-4 hover:underline"
-            >
-              Open commercial knowledge assistant
-            </a>
-          </p>
-        </header>
+    <main className="min-h-screen bg-slate-950 px-6 py-16 text-slate-100">
+      <div className="mx-auto max-w-5xl">
+        <p className="text-sm font-semibold uppercase tracking-[0.25em] text-cyan-300">
+          TrackFlow
+        </p>
+        <h1 className="mt-4 max-w-3xl text-4xl font-semibold md:text-6xl">
+          Keep logistics partners and operations moving together.
+        </h1>
+        <p className="mt-6 max-w-2xl text-lg text-slate-300">
+          Use the application workspace to manage the supplier relationships that
+          support TrackFlow&apos;s logistics network.
+        </p>
 
-        <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
-          <article className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
-            <p className="text-sm text-slate-400">Global Shipment Volume</p>
-            <p className="mt-2 text-2xl font-semibold">
-              {snapshot.globalShipmentVolume.toLocaleString()}
+        <section className="mt-12 grid gap-5 md:grid-cols-2">
+          <Link
+            className="rounded-2xl border border-cyan-800 bg-cyan-950/30 p-6 transition hover:border-cyan-500 hover:bg-cyan-950/50"
+            href="/suppliers"
+          >
+            <h2 className="text-2xl font-semibold text-cyan-200">Supplier directory</h2>
+            <p className="mt-3 text-slate-300">
+              Register suppliers, filter the directory, update rates, and manage
+              partner status for the USA and Spain.
             </p>
-          </article>
-          <article className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
-            <p className="text-sm text-slate-400">On-Time Rate</p>
-            <p className="mt-2 text-2xl font-semibold">
-              {snapshot.globalOnTimeRate}%
+            <p className="mt-5 text-sm font-semibold text-cyan-300">
+              Open supplier directory →
             </p>
-          </article>
-          <article className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
-            <p className="text-sm text-slate-400">Return Rate</p>
-            <p className="mt-2 text-2xl font-semibold">
-              {snapshot.globalReturnRate}%
-            </p>
-          </article>
-          <article className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
-            <p className="text-sm text-slate-400">Average CSAT</p>
-            <p className="mt-2 text-2xl font-semibold">{snapshot.averageCsat}%</p>
-          </article>
-          <article className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
-            <p className="text-sm text-slate-400">Performance Status</p>
-            <p className="mt-2 text-2xl font-semibold text-cyan-300">
-              {snapshot.performanceStatus}
-            </p>
-          </article>
+          </Link>
         </section>
-
-        <section className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-slate-800 text-slate-300">
-              <tr>
-                <th className="px-4 py-3 font-medium">Country</th>
-                <th className="px-4 py-3 font-medium">Shipment Volume</th>
-                <th className="px-4 py-3 font-medium">On-Time %</th>
-                <th className="px-4 py-3 font-medium">Returns %</th>
-                <th className="px-4 py-3 font-medium">CSAT %</th>
-                <th className="px-4 py-3 font-medium">Cost (USD)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {snapshot.countryBreakdown.map((row) => (
-                <tr key={row.country} className="border-t border-slate-800">
-                  <td className="px-4 py-3">{row.country}</td>
-                  <td className="px-4 py-3">{row.shipmentVolume.toLocaleString()}</td>
-                  <td className="px-4 py-3">{row.onTimeRate}%</td>
-                  <td className="px-4 py-3">{row.returnRate}%</td>
-                  <td className="px-4 py-3">{row.customerSatisfaction}%</td>
-                  <td className="px-4 py-3">${row.operatingCostUsd.toLocaleString()}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </section>
-
-        <footer className="text-sm text-slate-400">
-          Total operating cost: ${snapshot.totalOperatingCostUsd.toLocaleString()}
-        </footer>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }

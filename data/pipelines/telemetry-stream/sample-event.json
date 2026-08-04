@@ -7,11 +7,11 @@
   "schemaVersion": "1.0.0",
   "requestId": "req_9e8d7c6b",
   "properties": {
-    "order_id": 42,
-    "product_id": 7,
-    "sku": "TF-SHOE-001",
+    "warehouse": "los_angeles",
+    "client_id": "client_fashion_co",
+    "product_id": "SKU-F-001",
+    "product_category": "fashion",
     "quantity": 50,
-    "warehouse_location": "los_angeles",
-    "client_brand": "AcmeApparel"
+    "order_id": "IN-42"
   }
 }

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
@@ -76,24 +77,102 @@ def test_query_returns_model_output_not_raw_chunks() -> None:
         choices=[SimpleNamespace(message=SimpleNamespace(content=generated))]
     )
 
-    answer = rag_pipeline.query(
+    result = rag_pipeline.query(
         "What's the standard return window?",
         retrieve_fn=lambda *args, **kwargs: retrieved,
         openai_client=mock_openai,
     )
 
-    assert answer == generated
-    assert answer != retrieved[0]["text"]
-    assert "chunk_index" not in answer
+    assert result["answer"] == generated
+    assert result["answer"] != retrieved[0]["text"]
+    assert result["sources"] == [
+        {
+            "source_document": "returns-policy",
+            "section": "Standard return window",
+            "language": "en",
+        }
+    ]
+    assert "text" not in result["sources"][0]
+    assert "chunk_index" not in result["sources"][0]
+    assert "_score" not in result["sources"][0]
+    assert result["faithful"] is True
     mock_openai.chat.completions.create.assert_called_once()
 
 
 def test_query_honest_fallback_when_no_chunks() -> None:
-    answer = rag_pipeline.query(
+    result = rag_pipeline.query(
         "unrelated question with no hits",
         retrieve_fn=lambda *args, **kwargs: [],
         openai_client=MagicMock(),
     )
 
-    assert "knowledge base" in answer.lower()
-    assert "30 calendar days" not in answer
+    assert "knowledge base" in result["answer"].lower()
+    assert "30 calendar days" not in result["answer"]
+    assert result["sources"] == []
+
+
+def test_query_rejects_unsupported_rate_or_timeframe() -> None:
+    retrieved = [
+        {
+            "source_document": "returns-policy",
+            "section": "Return eligibility",
+            "language": "en",
+            "text": "Eligible products may be returned after review.",
+        }
+    ]
+    mock_openai = MagicMock()
+    mock_openai.chat.completions.create.return_value = SimpleNamespace(
+        choices=[
+            SimpleNamespace(
+                message=SimpleNamespace(
+                    content="Returns have a 14 day window and a 12% fee."
+                )
+            )
+        ]
+    )
+
+    result = rag_pipeline.query(
+        "What are the return terms?",
+        retrieve_fn=lambda *args, **kwargs: retrieved,
+        openai_client=mock_openai,
+    )
+
+    assert result["faithful"] is False
+    assert result["unsupported_claims"] == ["14 day", "12%"]
+    assert "cannot confirm" in result["answer"].lower()
+    assert "14 day" not in result["answer"]
+
+
+def test_recall_at_3_uses_all_canonical_eval_queries() -> None:
+    expected_by_question = {
+        case["question"]: case["expected_source_document"]
+        for case in json.loads(
+            rag_pipeline.EVAL_QUERIES_PATH.read_text(encoding="utf-8")
+        )
+    }
+
+    def fake_retrieve(question: str, **kwargs):
+        assert kwargs["k"] == 3
+        return [
+            {"source_document": "irrelevant"},
+            {"source_document": expected_by_question[question]},
+        ]
+
+    report = rag_pipeline.evaluate_recall_at_3(retrieve_fn=fake_retrieve)
+
+    assert report["metric"] == "Recall@3"
+    assert report["total"] == 10
+    assert report["hits"] == 10
+    assert report["recall_at_3"] == 1.0
+
+
+def test_local_index_recall_at_3_meets_threshold() -> None:
+    retrieve_fn = rag_pipeline.build_local_index_retrieve_fn()
+    report = rag_pipeline.evaluate_recall_at_3(
+        retrieve_fn=retrieve_fn,
+        min_score=0.0,
+    )
+
+    assert report["total"] == 10
+    assert report["recall_at_3"] >= 0.8
+    assert report["hits"] >= 8

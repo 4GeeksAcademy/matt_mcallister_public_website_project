@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import os
+import subprocess
+import sys
 from pathlib import Path
 
 from fastapi.testclient import TestClient
@@ -105,3 +107,75 @@ def test_incident_crud_filters_summary_and_lifecycle(
     summary = client.get("/api/incidents/summary")
     assert summary.status_code == 200
     assert summary.json()["data"]["by_status"] == {"in_progress": 1}
+
+
+def test_seed_csv_produces_exact_context_summary(
+    tmp_path: Path, monkeypatch
+) -> None:
+    db_path = tmp_path / "seeded-incidents.db"
+    monkeypatch.setenv("INCIDENTS_DB_PATH", str(db_path))
+    repo_root = Path(__file__).resolve().parents[3]
+    env = os.environ.copy()
+    env["INCIDENTS_DB_PATH"] = str(db_path)
+
+    seeded = subprocess.run(
+        [
+            sys.executable,
+            str(repo_root / "scripts" / "seed_incidents.py"),
+            "--csv-path",
+            str(fixture_path),
+        ],
+        cwd=repo_root,
+        env=env,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert seeded.returncode == 0, seeded.stderr
+    summary = client.get("/api/incidents/summary")
+    assert summary.status_code == 200
+    assert summary.json()["data"]["by_status"] == {
+        "open": 29,
+        "resolved": 52,
+        "discarded": 14,
+    }
+    assert summary.json()["data"]["by_category"] == {
+        "lost_parcel": 14,
+        "carrier_issue": 45,
+        "delivery_failure": 19,
+        "returns_issue": 17,
+    }
+    assert sum(summary.json()["data"]["by_status"].values()) == 95
+
+
+def test_knowledge_query_returns_sources(monkeypatch) -> None:
+    monkeypatch.setattr(
+        "app.main.run_knowledge_query",
+        lambda question: {
+            "answer": "The standard return window is 30 calendar days.",
+            "sources": [
+                {
+                    "source_document": "returns-policy",
+                    "section": "Standard return window",
+                    "language": "en",
+                }
+            ],
+        },
+    )
+
+    response = client.post(
+        "/knowledge/query",
+        json={"question": "What is the standard return window?"},
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["answer"].startswith("The standard return window")
+    assert payload["sources"] == [
+        {
+            "source_document": "returns-policy",
+            "section": "Standard return window",
+            "language": "en",
+        }
+    ]

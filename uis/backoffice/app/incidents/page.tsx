@@ -7,6 +7,7 @@ import {
   branchLabel,
   getFriendlyError,
   incidentBranches,
+  incidentCategories,
   incidentOrigins,
   incidentStatuses,
 } from "@/components/incidentDomain";
@@ -14,12 +15,14 @@ import { Incident } from "../../../../packages/shared/types";
 
 type Filters = {
   status: string;
+  category: string;
   origin: string;
   branch: string;
 };
 
 const initialFilters: Filters = {
   status: "",
+  category: "",
   origin: "",
   branch: "",
 };
@@ -35,6 +38,7 @@ export default function IncidentsPage() {
     const params = new URLSearchParams();
 
     if (filters.status) params.set("status", filters.status);
+    if (filters.category) params.set("category", filters.category);
     if (filters.origin) params.set("origin", filters.origin);
     if (filters.branch) params.set("branch", filters.branch);
 
@@ -131,7 +135,7 @@ export default function IncidentsPage() {
       </header>
 
       <section className="mb-6 rounded-2xl border border-slate-800 bg-slate-900 p-4">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
           <select
             aria-label="Filter by status"
             value={filters.status}
@@ -144,6 +148,22 @@ export default function IncidentsPage() {
             {incidentStatuses.map((status) => (
               <option key={status} value={status}>
                 {status}
+              </option>
+            ))}
+          </select>
+
+          <select
+            aria-label="Filter by category"
+            value={filters.category}
+            onChange={(event) =>
+              setFilters((prev) => ({ ...prev, category: event.target.value }))
+            }
+            className="rounded-md border border-slate-700 bg-slate-950 px-3 py-2"
+          >
+            <option value="">All categories</option>
+            {incidentCategories.map((category) => (
+              <option key={category} value={category}>
+                {category}
               </option>
             ))}
           </select>

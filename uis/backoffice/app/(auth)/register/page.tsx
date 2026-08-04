@@ -85,7 +85,7 @@ export default function RegisterPage() {
 
     try {
       const response = await authApi.register(fields.name, fields.email, fields.password);
-      setToken(response.token);
+      setToken(response.access_token);
       router.replace("/");
     } catch (error) {
       const fallback = "Registration failed. Please review your information and try again.";

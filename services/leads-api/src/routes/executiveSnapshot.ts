@@ -1,15 +1,21 @@
 import { Router } from "express";
 import {
-  buildExecutiveSnapshot,
-  milestone2SampleInput,
-} from "../../../../packages/shared/business-logic/milestone2.js";
+  buildOperationsAnalysis,
+  demoCarriers,
+  demoProducts,
+  demoShipments,
+} from "../../../../packages/trackflow-core/src/index.js";
 import { ApiError } from "../types/errors.js";
 
 const router = Router();
 
 router.get("/", (_req, res, next) => {
   try {
-    const snapshot = buildExecutiveSnapshot(milestone2SampleInput);
+    const snapshot = buildOperationsAnalysis(
+      demoProducts,
+      demoShipments,
+      demoCarriers,
+    );
     res.status(200).json({ data: snapshot });
   } catch (error) {
     next(

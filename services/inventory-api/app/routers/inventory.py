@@ -3,9 +3,8 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import Session
 
-from app.api.deps import get_current_user
+from app.api.deps import get_token_subject
 from app.database import get_db
-from app.models.user import User
 from app.schemas.inventory import (
     InboundOrderCreate,
     OrderRead,
@@ -20,7 +19,11 @@ router = APIRouter(prefix="/inventory", tags=["inventory"])
 
 
 @router.get("/products", response_model=list[ProductRead])
-def list_products(session: Session = Depends(get_db)) -> list[ProductRead]:
+def list_products(
+    session: Session = Depends(get_db),
+    subject: str = Depends(get_token_subject),
+) -> list[ProductRead]:
+    _ = subject
     return inventory_service.list_products(session)
 
 
@@ -28,14 +31,19 @@ def list_products(session: Session = Depends(get_db)) -> list[ProductRead]:
 def create_product(
     payload: ProductCreate,
     session: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    subject: str = Depends(get_token_subject),
 ) -> ProductRead:
-    _ = current_user
+    _ = subject
     return inventory_service.create_product(session, payload)
 
 
 @router.get("/products/{product_id}", response_model=ProductRead)
-def get_product(product_id: int, session: Session = Depends(get_db)) -> ProductRead:
+def get_product(
+    product_id: int,
+    session: Session = Depends(get_db),
+    subject: str = Depends(get_token_subject),
+) -> ProductRead:
+    _ = subject
     product = inventory_service.get_product_read(session, product_id)
     if product is None:
         raise HTTPException(
@@ -49,10 +57,10 @@ def get_product(product_id: int, session: Session = Depends(get_db)) -> ProductR
 def create_inbound_order(
     payload: InboundOrderCreate,
     session: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    subject: str = Depends(get_token_subject),
 ) -> dict:
     order = inventory_service.create_inbound_order(
-        session, payload, user_uuid=str(current_user.id)
+        session, payload, user_uuid=subject
     )
     return {"id": order.id, "product_id": order.product_id, "quantity": order.quantity}
 
@@ -61,14 +69,18 @@ def create_inbound_order(
 def create_outbound_order(
     payload: OutboundOrderCreate,
     session: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    subject: str = Depends(get_token_subject),
 ) -> dict:
     order = inventory_service.create_outbound_order(
-        session, payload, user_uuid=str(current_user.id)
+        session, payload, user_uuid=subject
     )
     return {"id": order.id, "product_id": order.product_id, "quantity": order.quantity}
 
 
 @router.get("/orders", response_model=list[OrderRead])
-def list_orders(session: Session = Depends(get_db)) -> list[OrderRead]:
+def list_orders(
+    session: Session = Depends(get_db),
+    subject: str = Depends(get_token_subject),
+) -> list[OrderRead]:
+    _ = subject
     return inventory_service.list_orders(session)

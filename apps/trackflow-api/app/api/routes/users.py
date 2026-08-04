@@ -2,10 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from tinydb import TinyDB
 
 from app.api.deps import get_current_user, require_self_or_admin
+from app.core.security import verify_password
 from app.db.session import get_db
 from app.models.user import User
-from app.schemas.user import UserCreate, UserRead, UserUpdate
+from app.schemas.user import ChangePasswordRequest, UserCreate, UserRead, UserUpdate
 from app.services.user_service import (
+    change_password,
     create_user,
     delete_user,
     get_user_by_email,
@@ -65,6 +67,29 @@ def put_user(
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already registered")
     updated = update_user(db, user, payload)
     return UserRead.model_validate(updated)
+
+
+@router.put(
+    "/{user_id}/change-password",
+    status_code=status.HTTP_204_NO_CONTENT,
+    response_model=None,
+)
+def update_password(
+    user_id: int,
+    payload: ChangePasswordRequest,
+    db: TinyDB = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> None:
+    user = get_user_by_id(db, user_id)
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    require_self_or_admin(current_user, user.id)
+    if not verify_password(payload.current_password, user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Current password is incorrect",
+        )
+    change_password(db, user, payload.new_password)
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
