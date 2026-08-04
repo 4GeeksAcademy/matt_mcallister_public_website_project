@@ -179,3 +179,31 @@ def test_knowledge_query_returns_sources(monkeypatch) -> None:
             "language": "en",
         }
     ]
+
+
+def test_agent_query_returns_trace_id(monkeypatch) -> None:
+    monkeypatch.setattr(
+        "app.main.run_agent_query",
+        lambda question, thread_id=None: {
+            "answer": "No, standard SLAs do not apply during Black Friday.",
+            "sources": [
+                {
+                    "source_document": "sla-delivery",
+                    "section": "High-demand peak dates warning",
+                    "language": "en",
+                }
+            ],
+            "trace_id": "trace-123",
+        },
+    )
+
+    response = client.post(
+        "/agent/query",
+        json={"question": "Can we promise 3-5 day SLA during Black Friday?"},
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["trace_id"] == "trace-123"
+    assert "Black Friday" in payload["answer"] or "SLA" in payload["answer"]
+    assert payload["sources"][0]["source_document"] == "sla-delivery"

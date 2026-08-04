@@ -27,6 +27,11 @@ from app.knowledge_bridge import (  # noqa: E402
     KnowledgeQueryResponse,
     run_knowledge_query,
 )
+from app.agent_bridge import (  # noqa: E402
+    AgentQueryRequest,
+    AgentQueryResponse,
+    run_agent_query,
+)
 from app.incidents import router as incidents_router  # noqa: E402
 from services.celery_app.celery import app as celery_app  # noqa: E402
 from services.celery_app.tasks import analyze_incident  # noqa: E402
@@ -124,6 +129,23 @@ def knowledge_query(body: KnowledgeQueryRequest) -> KnowledgeQueryResponse:
     return KnowledgeQueryResponse(
         answer=result["answer"],
         sources=result.get("sources", []),
+    )
+
+
+@app.post("/agent/query", response_model=AgentQueryResponse)
+def agent_query(body: AgentQueryRequest) -> AgentQueryResponse:
+    """Answer commercial knowledge questions via the LangGraph support agent."""
+    try:
+        result = run_agent_query(body.question.strip(), thread_id=body.thread_id)
+    except Exception as exc:  # noqa: BLE001 — surface as 502 for client UX
+        raise HTTPException(
+            status_code=502,
+            detail="Agent query failed. Please try again shortly.",
+        ) from exc
+    return AgentQueryResponse(
+        answer=result["answer"],
+        sources=result.get("sources", []),
+        trace_id=result["trace_id"],
     )
 
 

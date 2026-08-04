@@ -46,6 +46,17 @@ does not have relevant information and do not invent company facts.
 exactly as stated in the context.
 """
 
+NO_CONTEXT_MESSAGE = (
+    "I do not have relevant information in the TrackFlow knowledge base "
+    "for that question, so I cannot confirm those terms. Please check with "
+    "commercial leadership before making a commitment."
+)
+
+FAITHFULNESS_REJECTION_MESSAGE = (
+    "I cannot confirm those rates or timeframes from the retrieved TrackFlow "
+    "knowledge. Please check the cited source or commercial leadership."
+)
+
 
 def retrieve(
     query: str,
@@ -96,7 +107,7 @@ def retrieve(
     return payloads
 
 
-def _build_context(chunks: list[dict]) -> str:
+def build_context(chunks: list[dict]) -> str:
     blocks: list[str] = []
     for i, chunk in enumerate(chunks, start=1):
         source = chunk.get("source_document", "unknown")
@@ -108,7 +119,9 @@ def _build_context(chunks: list[dict]) -> str:
     return "\n\n".join(blocks)
 
 
-def _generate(question: str, context: str, *, openai_client: OpenAI | None = None) -> str:
+def generate_answer(
+    question: str, context: str, *, openai_client: OpenAI | None = None
+) -> str:
     client = openai_client or get_openai_client()
     user_prompt = (
         f"Retrieved context:\n{context}\n\n"
@@ -364,11 +377,7 @@ def query(
     if not chunks:
         logger.info("No chunks above min_score for question=%r", question[:80])
         return {
-            "answer": (
-                "I do not have relevant information in the TrackFlow knowledge base "
-                "for that question, so I cannot confirm those terms. Please check with "
-                "commercial leadership before making a commitment."
-            ),
+            "answer": NO_CONTEXT_MESSAGE,
             "sources": [],
             "faithful": True,
             "unsupported_claims": [],
@@ -384,8 +393,8 @@ def query(
             chunk.get("_score"),
         )
 
-    context = _build_context(context_chunks)
-    answer = _generate(question, context, openai_client=openai_client)
+    context = build_context(context_chunks)
+    answer = generate_answer(question, context, openai_client=openai_client)
     faithfulness = check_faithfulness(answer, context)
     if not faithfulness["faithful"]:
         logger.warning(
@@ -393,10 +402,7 @@ def query(
             question[:80],
             faithfulness["unsupported_claims"],
         )
-        answer = (
-            "I cannot confirm those rates or timeframes from the retrieved TrackFlow "
-            "knowledge. Please check the cited source or commercial leadership."
-        )
+        answer = FAITHFULNESS_REJECTION_MESSAGE
     return {
         "answer": answer,
         "sources": citation_metadata(chunks),
