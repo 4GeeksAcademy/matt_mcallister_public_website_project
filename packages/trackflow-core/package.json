@@ -1,0 +1,16 @@
+{
+  "name": "@repo/trackflow-core",
+  "version": "0.0.1",
+  "private": true,
+  "description": "TrackFlow Milestone 2 programming utilities",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  }
+}

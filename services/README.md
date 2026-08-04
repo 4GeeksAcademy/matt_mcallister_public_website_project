@@ -1,27 +1,17 @@
 # TrackFlow services
 
-Backend services for the TrackFlow monorepo.
+Canonical backend services use separate directories and ports:
 
-| Path | Role |
-|------|------|
-| [`api/`](api/) | FastAPI incident analysis API (`POST /analyze`, `GET /tasks/{task_id}`, `POST /export`) |
-| [`celery_app/`](celery_app/) | Celery worker tasks, Redis broker client, and DLQ (`task_failures`) |
+- `leads-api` — Express leads and executive snapshots on port 4000
+  (imports `packages/trackflow-core`).
+- `../apps/trackflow-api` — FastAPI authentication on port 8000.
+- `incident-api` — FastAPI incident manager, CSV analysis, and RAG on port 8001.
+- `supplier-api` — FastAPI supplier directory on port 8002.
+- `inventory-api` — FastAPI products and inbound/outbound orders on port 8003.
+- `talent-api` — FastAPI candidate and notes API on port 8004.
+- `main.py` (operations API) — telemetry ingest/report, inventory stub helpers,
+  and weekly reporting endpoints on port 8005.
+- `celery_app` — incident background jobs backed by Redis.
 
-## Docker (Redis + Celery + API)
-
-From the repo root:
-
-```bash
-docker compose up --build
-```
-
-| Service | URL / port |
-|---------|------------|
-| API | http://127.0.0.1:8001 |
-| Flower | http://127.0.0.1:5555 |
-| Redis | `localhost:6379` |
-| Postgres (DLQ) | `localhost:5432` |
-
-See [`celery_app/README.md`](celery_app/README.md) for local (non-Docker) worker commands.
-
-> Nightly export / `job_runner` / `job_runs` are a separate orchestration path and are not used by these per-request Celery tasks.
+Each service owns its manifest, tests, README, and `/health` endpoint. Use the
+root Docker Compose stack for integrated development.

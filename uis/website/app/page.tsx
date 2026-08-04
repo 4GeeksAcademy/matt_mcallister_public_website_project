@@ -2,14 +2,51 @@ import LeadForm from "@/components/LeadForm";
 import {
   benefits,
   coverage,
-  proofMetrics,
   quickFacts,
   services,
 } from "@/components/siteData";
 
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "TrackFlow",
+  description: "Warehouse management and last-mile deliveries for e-commerce",
+  url: "https://trackflow.com",
+  foundingDate: "2009",
+  address: [
+    {
+      "@type": "PostalAddress",
+      addressCountry: "US",
+      addressLocality: "Los Angeles",
+      addressRegion: "California",
+    },
+    {
+      "@type": "PostalAddress",
+      addressCountry: "ES",
+      addressLocality: "Zaragoza",
+      addressRegion: "Aragón",
+    },
+  ],
+  contactPoint: {
+    "@type": "ContactPoint",
+    telephone: "+1-213-555-0147",
+    contactType: "sales",
+    availableLanguage: ["Spanish", "English"],
+  },
+  sameAs: ["https://linkedin.com/company/trackflow"],
+  areaServed: [
+    { "@type": "Country", name: "United States" },
+    { "@type": "Country", name: "Spain" },
+  ],
+};
+
 export default function Home() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+      />
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-ink focus:px-4 focus:py-2 focus:text-white"
@@ -124,23 +161,6 @@ export default function Home() {
                 <p className="mt-2 text-sm text-ink/80">{benefit.description}</p>
               </article>
             ))}
-          </div>
-        </section>
-
-        <section className="bg-ink py-16 text-white" aria-labelledby="proof-title">
-          <div className="mx-auto max-w-7xl px-6">
-            <h2 id="proof-title" className="font-display text-3xl font-bold sm:text-4xl">Proof-oriented operations</h2>
-            <p className="mt-3 max-w-3xl text-white/80">
-              We continuously track delivery performance, incident rates, and returns patterns to improve decision making. Data references used in this website are based on internal operational snapshots for demonstration purposes.
-            </p>
-            <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {proofMetrics.map((metric) => (
-                <div key={metric.label} className="rounded-xl border border-white/20 bg-white/5 p-4">
-                  <p className="text-xs uppercase tracking-wide text-white/70">{metric.label}</p>
-                  <p className="mt-2 text-2xl font-semibold">{metric.value}</p>
-                </div>
-              ))}
-            </div>
           </div>
         </section>
 

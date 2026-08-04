@@ -1,0 +1,4 @@
+email-validator>=2.2,<3
+fastapi>=0.116,<1
+tinydb>=4.8,<5
+uvicorn[standard]>=0.35,<1

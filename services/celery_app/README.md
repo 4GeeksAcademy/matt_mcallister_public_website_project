@@ -29,7 +29,7 @@ Prerequisites: Redis and Postgres running (e.g. `docker compose up redis postgre
 cd /path/to/repo
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r services/api/requirements.txt
+pip install -r services/incident-api/requirements.txt
 
 export REDIS_URL=redis://localhost:6379/0
 export DATABASE_URL=postgresql://trackflow:trackflow@localhost:5432/trackflow

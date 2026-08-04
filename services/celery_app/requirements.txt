@@ -1,2 +1,2 @@
-# TrackFlow background workers share the API dependency set.
--r ../api/requirements.txt
+# TrackFlow background workers share the incident API dependency set.
+-r ../incident-api/requirements.txt

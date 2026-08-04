@@ -1,5 +1,6 @@
 "use client";
 
+import { apiUrls, parseApiError } from "@/lib/api";
 import { FormEvent, useMemo, useState } from "react";
 
 type Volume = "" | "0-100" | "101-500" | "501-2000" | "2000+" | "Not sure";
@@ -22,10 +23,12 @@ type FormData = {
   privacy: boolean;
 };
 
-type Status = {
-  kind: "success" | "error";
-  message: string;
-} | null;
+type SubmitPhase = "idle" | "loading" | "fulfilled" | "rejected";
+
+type Status =
+  | { kind: "success" }
+  | { kind: "error"; message: string }
+  | null;
 
 const initialData: FormData = {
   companyName: "",
@@ -44,6 +47,12 @@ const initialData: FormData = {
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const phoneRegex = /^\+\d[\d\s-]{6,}$/;
+const successCopy = {
+  heading: "Thank you for your interest in TrackFlow!",
+  body: "We have received your request. Our commercial team will review your information and contact you within the next 24-48 hours to schedule a call and learn about your logistics needs in detail.",
+  urgent:
+    "If you have any urgent inquiry, write to us directly at comercial@trackflow.com",
+};
 
 const errorMessages = {
   companyName: "Company name must have at least 2 characters",
@@ -56,7 +65,6 @@ const errorMessages = {
   monthlyVolume: "Select estimated monthly volume",
   has3pl: "Indicate if you currently work with another logistics provider",
   services: "Select at least one service of interest",
-  comments: "Comments cannot exceed 500 characters",
   privacy: "You must accept the privacy policy to continue",
 };
 
@@ -98,6 +106,8 @@ export default function LeadForm() {
   const [formData, setFormData] = useState<FormData>(initialData);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
   const [status, setStatus] = useState<Status>(null);
+  const [submitPhase, setSubmitPhase] = useState<SubmitPhase>("idle");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const remainingChars = 500 - formData.comments.length;
   const showVolumeWarning =
@@ -152,6 +162,9 @@ export default function LeadForm() {
         valid = url.protocol === "http:" || url.protocol === "https:";
       } catch {
         valid = false;
+        if (process.env.NODE_ENV === "development") {
+          console.warn("Invalid website URL provided in lead form.");
+        }
       }
 
       if (!valid) {
@@ -164,20 +177,24 @@ export default function LeadForm() {
     if (!formData.monthlyVolume) nextErrors.monthlyVolume = errorMessages.monthlyVolume;
     if (!formData.has3pl) nextErrors.has3pl = errorMessages.has3pl;
     if (!formData.services.length) nextErrors.services = errorMessages.services;
-    if (remainingChars < 0) nextErrors.comments = errorMessages.comments;
+    if (remainingChars < 0) {
+      nextErrors.comments = `Comments cannot exceed 500 characters (${remainingChars} remaining)`;
+    }
     if (!formData.privacy) nextErrors.privacy = errorMessages.privacy;
 
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (!validate()) {
+      setSubmitPhase("rejected");
       setStatus({
         kind: "error",
-        message: "Please review the highlighted fields and try again.",
+        message:
+          "Please review the highlighted fields and try again. If you need help, contact comercial@trackflow.com.",
       });
       return;
     }
@@ -191,33 +208,68 @@ export default function LeadForm() {
       assignedRoute: score.route,
     };
 
-    console.log("TrackFlow lead payload:", payload);
+    setSubmitPhase("loading");
+    setIsSubmitting(true);
+    setStatus(null);
 
-    setStatus({
-      kind: "success",
-      message:
-        "Thank you for your interest in TrackFlow! We have received your request. Our commercial team will contact you within the next 24-48 hours.",
-    });
+    try {
+      const response = await fetch(apiUrls.leads, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-    setFormData(initialData);
-    setErrors({});
+      if (!response.ok) {
+        const message = await parseApiError(response);
+        setSubmitPhase("rejected");
+        setStatus({
+          kind: "error",
+          message: `${message} If the problem continues, contact comercial@trackflow.com.`,
+        });
+        return;
+      }
+
+      await response.json();
+
+      setSubmitPhase("fulfilled");
+      setStatus({ kind: "success" });
+      setFormData(initialData);
+      setErrors({});
+    } catch {
+      setSubmitPhase("rejected");
+      setStatus({
+        kind: "error",
+        message:
+          "We could not send your request right now. Check your connection and try again, or email comercial@trackflow.com directly.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <form className="rounded-2xl bg-white p-6 shadow-md" noValidate onSubmit={handleSubmit}>
-      {status ? (
+      {submitPhase === "loading" ? (
+        <div
+          className="rounded-md border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-900"
+          role="status"
+          aria-live="polite"
+        >
+          Sending your request…
+        </div>
+      ) : null}
+
+      {status?.kind === "success" ? (
+        <div className={statusClass} role="status" aria-live="polite">
+          <p className="font-semibold">{successCopy.heading}</p>
+          <p className="mt-2">{successCopy.body}</p>
+          <p className="mt-2">{successCopy.urgent}</p>
+        </div>
+      ) : null}
+
+      {status?.kind === "error" ? (
         <div className={statusClass} role="status" aria-live="polite">
           {status.message}
-          {status.kind === "success" ? (
-            <>
-              {" "}
-              If urgent, email{" "}
-              <a className="link" href="mailto:comercial@trackflow.com">
-                comercial@trackflow.com
-              </a>
-              .
-            </>
-          ) : null}
         </div>
       ) : null}
 
@@ -231,31 +283,31 @@ export default function LeadForm() {
         <div className="md:col-span-2">
           <label className="form-label" htmlFor="companyName">Company name *</label>
           <input className={`form-input ${errors.companyName ? "input-invalid" : ""}`} id="companyName" value={formData.companyName} onChange={(e) => setField("companyName", e.target.value)} />
-          <p className="form-error">{errors.companyName}</p>
+          <p className="form-error">{errors.companyName ?? ""}</p>
         </div>
 
         <div className="md:col-span-2">
           <label className="form-label" htmlFor="contactPerson">Contact person *</label>
           <input className={`form-input ${errors.contactPerson ? "input-invalid" : ""}`} id="contactPerson" value={formData.contactPerson} onChange={(e) => setField("contactPerson", e.target.value)} />
-          <p className="form-error">{errors.contactPerson}</p>
+          <p className="form-error">{errors.contactPerson ?? ""}</p>
         </div>
 
         <div>
           <label className="form-label" htmlFor="email">Corporate email *</label>
           <input className={`form-input ${errors.email ? "input-invalid" : ""}`} id="email" type="email" value={formData.email} onChange={(e) => setField("email", e.target.value)} />
-          <p className="form-error">{errors.email}</p>
+          <p className="form-error">{errors.email ?? ""}</p>
         </div>
 
         <div>
           <label className="form-label" htmlFor="phone">Phone *</label>
-          <input className={`form-input ${errors.phone ? "input-invalid" : ""}`} id="phone" placeholder="+1 213 555 0147" value={formData.phone} onChange={(e) => setField("phone", e.target.value)} />
-          <p className="form-error">{errors.phone}</p>
+          <input className={`form-input ${errors.phone ? "input-invalid" : ""}`} id="phone" type="tel" placeholder="+1 213 555 0147" value={formData.phone} onChange={(e) => setField("phone", e.target.value)} />
+          <p className="form-error">{errors.phone ?? ""}</p>
         </div>
 
         <div className="md:col-span-2">
           <label className="form-label" htmlFor="website">Company website</label>
           <input className={`form-input ${errors.website ? "input-invalid" : ""}`} id="website" placeholder="https://example.com" value={formData.website} onChange={(e) => setField("website", e.target.value)} />
-          <p className="form-error">{errors.website}</p>
+          <p className="form-error">{errors.website ?? ""}</p>
         </div>
 
         <div>
@@ -267,7 +319,7 @@ export default function LeadForm() {
             <option value="Both">Both</option>
             <option value="Other">Other</option>
           </select>
-          <p className="form-error">{errors.country}</p>
+          <p className="form-error">{errors.country ?? ""}</p>
         </div>
 
         <div>
@@ -280,7 +332,7 @@ export default function LeadForm() {
             <option value="Food">Food</option>
             <option value="Other">Other</option>
           </select>
-          <p className="form-error">{errors.productType}</p>
+          <p className="form-error">{errors.productType ?? ""}</p>
         </div>
 
         <div>
@@ -293,7 +345,7 @@ export default function LeadForm() {
             <option value="2000+">2000+</option>
             <option value="Not sure">Not sure</option>
           </select>
-          <p className="form-error">{errors.monthlyVolume}</p>
+          <p className="form-error">{errors.monthlyVolume ?? ""}</p>
         </div>
 
         <fieldset>
@@ -306,7 +358,7 @@ export default function LeadForm() {
               </label>
             ))}
           </div>
-          <p className="form-error">{errors.has3pl}</p>
+          <p className="form-error">{errors.has3pl ?? ""}</p>
         </fieldset>
 
         <fieldset className="md:col-span-2">
@@ -319,14 +371,14 @@ export default function LeadForm() {
               </label>
             ))}
           </div>
-          <p className="form-error">{errors.services}</p>
+          <p className="form-error">{errors.services ?? ""}</p>
         </fieldset>
 
         <div className="md:col-span-2">
           <label className="form-label" htmlFor="comments">Comments or specific needs</label>
-          <textarea className={`form-input ${errors.comments ? "input-invalid" : ""}`} id="comments" rows={4} maxLength={550} value={formData.comments} onChange={(e) => setField("comments", e.target.value)} />
+          <textarea className={`form-input ${errors.comments ? "input-invalid" : ""}`} id="comments" rows={4} maxLength={500} value={formData.comments} onChange={(e) => setField("comments", e.target.value)} />
           <div className="mt-1 flex justify-between text-xs text-ink/70">
-            <p className="form-error">{errors.comments}</p>
+            <p className="form-error">{errors.comments ?? ""}</p>
             <p>{remainingChars} characters remaining</p>
           </div>
         </div>
@@ -336,12 +388,16 @@ export default function LeadForm() {
             <input className="mt-1" type="checkbox" checked={formData.privacy} onChange={(e) => setField("privacy", e.target.checked)} />
             <span>I accept the privacy policy *</span>
           </label>
-          <p className="form-error">{errors.privacy}</p>
+          <p className="form-error">{errors.privacy ?? ""}</p>
         </div>
       </div>
 
-      <button type="submit" className="mt-8 rounded-md bg-ocean px-6 py-3 text-sm font-semibold text-white transition hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-ocean/50">
-        Submit request
+      <button
+        type="submit"
+        disabled={isSubmitting}
+        className="mt-8 rounded-md bg-ocean px-6 py-3 text-sm font-semibold text-white transition hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-ocean/50 disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {isSubmitting ? "Sending…" : "Submit request"}
       </button>
     </form>
   );
