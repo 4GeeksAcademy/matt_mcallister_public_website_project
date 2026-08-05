@@ -9,14 +9,18 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, StateGraph
 
 from agents.support_agent.nodes import (
+    classify_route,
     make_generate_node,
     make_retrieve_node,
+    make_ticket_lookup_node,
     no_context_response,
     receive_question,
     set_error,
+    ticket_format_answer,
 )
 from agents.support_agent.state import AgentState
-from agents.support_agent.trace import get_trace, store_trace
+from agents.support_agent.trace import store_trace
+from agents.tools.incident_lookup import TicketLookupInput, TicketLookupResult
 
 _CHECKPOINTER = MemorySaver()
 _COMPILED_GRAPH = None
@@ -25,6 +29,12 @@ _COMPILED_GRAPH = None
 def _route_after_receive(state: AgentState) -> str:
     if state.get("error"):
         return "set_error"
+    return "classify_route"
+
+
+def _route_after_classify(state: AgentState) -> str:
+    if state.get("route") == "ticket":
+        return "ticket_lookup_node"
     return "retrieve_node"
 
 
@@ -37,11 +47,15 @@ def _route_after_retrieve(state: AgentState) -> str:
 def build_graph(
     *,
     retrieve_fn: Optional[Callable[..., list[dict]]] = None,
+    lookup_fn: Optional[Callable[[TicketLookupInput], TicketLookupResult]] = None,
     openai_client: Any | None = None,
 ):
     graph = StateGraph(AgentState)
     graph.add_node("receive_question", receive_question)
+    graph.add_node("classify_route", classify_route)
     graph.add_node("set_error", set_error)
+    graph.add_node("ticket_lookup_node", make_ticket_lookup_node(lookup_fn))
+    graph.add_node("format_ticket_answer", ticket_format_answer)
     graph.add_node("retrieve_node", make_retrieve_node(retrieve_fn))
     graph.add_node("no_context_response", no_context_response)
     graph.add_node("generate_node", make_generate_node(openai_client=openai_client))
@@ -50,9 +64,16 @@ def build_graph(
     graph.add_conditional_edges(
         "receive_question",
         _route_after_receive,
-        {"set_error": "set_error", "retrieve_node": "retrieve_node"},
+        {"set_error": "set_error", "classify_route": "classify_route"},
     )
     graph.add_edge("set_error", END)
+    graph.add_conditional_edges(
+        "classify_route",
+        _route_after_classify,
+        {"ticket_lookup_node": "ticket_lookup_node", "retrieve_node": "retrieve_node"},
+    )
+    graph.add_edge("ticket_lookup_node", "format_ticket_answer")
+    graph.add_edge("format_ticket_answer", END)
     graph.add_conditional_edges(
         "retrieve_node",
         _route_after_retrieve,
@@ -69,11 +90,16 @@ def build_graph(
 def get_compiled_graph(
     *,
     retrieve_fn: Optional[Callable[..., list[dict]]] = None,
+    lookup_fn: Optional[Callable[[TicketLookupInput], TicketLookupResult]] = None,
     openai_client: Any | None = None,
 ):
     global _COMPILED_GRAPH
-    if retrieve_fn is not None or openai_client is not None:
-        return build_graph(retrieve_fn=retrieve_fn, openai_client=openai_client)
+    if retrieve_fn is not None or lookup_fn is not None or openai_client is not None:
+        return build_graph(
+            retrieve_fn=retrieve_fn,
+            lookup_fn=lookup_fn,
+            openai_client=openai_client,
+        )
     if _COMPILED_GRAPH is None:
         _COMPILED_GRAPH = build_graph()
     return _COMPILED_GRAPH
@@ -84,31 +110,39 @@ def run_agent(
     *,
     thread_id: Optional[str] = None,
     retrieve_fn: Optional[Callable[..., list[dict]]] = None,
+    lookup_fn: Optional[Callable[[TicketLookupInput], TicketLookupResult]] = None,
     openai_client: Any | None = None,
 ) -> dict[str, Any]:
     """Execute the compiled graph and return answer, sources, and trace_id."""
     run_id = thread_id or str(uuid.uuid4())
     compiled = get_compiled_graph(
         retrieve_fn=retrieve_fn,
+        lookup_fn=lookup_fn,
         openai_client=openai_client,
     )
     config = {"configurable": {"thread_id": run_id}}
     initial_state: AgentState = {
         "question": question,
+        "route": "",
         "chunks": [],
         "context": "",
         "answer": "",
         "sources": [],
+        "tool_input": {},
+        "tool_result": {},
+        "sources_used": [],
         "error": None,
         "trace": [],
     }
     result = compiled.invoke(initial_state, config=config)
     trace = list(result.get("trace") or [])
     store_trace(run_id, trace)
+    sources_used = list(result.get("sources_used") or [])
     return {
         "answer": result.get("answer") or "",
         "sources": result.get("sources") or [],
         "trace_id": run_id,
+        "sources_used": sources_used,
     }
 
 

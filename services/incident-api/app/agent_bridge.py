@@ -27,6 +27,7 @@ class AgentQueryResponse(BaseModel):
     answer: str
     sources: list[AgentSource]
     trace_id: str
+    sources_used: list[str] = Field(default_factory=list)
 
 
 def run_agent_query(question: str, *, thread_id: Optional[str] = None) -> dict[str, Any]:

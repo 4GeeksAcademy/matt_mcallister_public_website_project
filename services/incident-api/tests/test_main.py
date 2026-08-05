@@ -194,6 +194,7 @@ def test_agent_query_returns_trace_id(monkeypatch) -> None:
                 }
             ],
             "trace_id": "trace-123",
+            "sources_used": ["ticket_tool"],
         },
     )
 
@@ -205,5 +206,6 @@ def test_agent_query_returns_trace_id(monkeypatch) -> None:
     assert response.status_code == 200
     payload = response.json()
     assert payload["trace_id"] == "trace-123"
+    assert payload["sources_used"] == ["ticket_tool"]
     assert "Black Friday" in payload["answer"] or "SLA" in payload["answer"]
     assert payload["sources"][0]["source_document"] == "sla-delivery"
