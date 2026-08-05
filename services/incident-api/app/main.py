@@ -146,6 +146,7 @@ def agent_query(body: AgentQueryRequest) -> AgentQueryResponse:
         answer=result["answer"],
         sources=result.get("sources", []),
         trace_id=result["trace_id"],
+        sources_used=result.get("sources_used", []),
     )
 
 

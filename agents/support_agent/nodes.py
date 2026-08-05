@@ -4,6 +4,15 @@ from __future__ import annotations
 
 from typing import Any, Callable
 
+from agents.tools.incident_lookup import (
+    MSG_UNAVAILABLE,
+    TicketLookupInput,
+    TicketLookupResult,
+    classify_question_route,
+    format_ticket_answer,
+    lookup_incident,
+    parse_ticket_intent,
+)
 from data.pipelines.rag import (
     FAITHFULNESS_REJECTION_MESSAGE,
     NO_CONTEXT_MESSAGE,
@@ -50,6 +59,27 @@ def receive_question(state: AgentState) -> dict[str, Any]:
     }
 
 
+def classify_route(state: AgentState) -> dict[str, Any]:
+    route, signals = classify_question_route(state["question"])
+    tool_input = (
+        parse_ticket_intent(state["question"]).model_dump()
+        if route == "ticket"
+        else {}
+    )
+    step = _next_step(state)
+    return {
+        "route": route,
+        "tool_input": tool_input,
+        "trace": [
+            make_trace_entry(
+                "classify_route",
+                step=step,
+                output_summary={"route": route, **signals},
+            )
+        ],
+    }
+
+
 def set_error(state: AgentState) -> dict[str, Any]:
     message = state.get("error") or "Invalid request."
     step = _next_step(state)
@@ -61,6 +91,65 @@ def set_error(state: AgentState) -> dict[str, Any]:
                 "set_error",
                 step=step,
                 output_summary={"error": message},
+            )
+        ],
+    }
+
+
+def make_ticket_lookup_node(
+    lookup_fn: Callable[[TicketLookupInput], TicketLookupResult] | None = None,
+) -> Callable[[AgentState], dict[str, Any]]:
+    lookup_callable = lookup_fn or lookup_incident
+
+    def ticket_lookup_node(state: AgentState) -> dict[str, Any]:
+        tool_input = TicketLookupInput.model_validate(state.get("tool_input") or {})
+        try:
+            result = lookup_callable(tool_input)
+        except Exception:
+            result = TicketLookupResult(
+                ok=False,
+                error_code="unavailable",
+                error_message=MSG_UNAVAILABLE,
+            )
+        step = _next_step(state)
+        return {
+            "tool_result": result.model_dump(),
+            "trace": [
+                make_trace_entry(
+                    "ticket_lookup_node",
+                    step=step,
+                    output_summary={
+                        "http_method": result.http_method,
+                        "http_path": result.http_path,
+                        "ok": result.ok,
+                        "error_code": result.error_code,
+                        "incident_count": len(result.incidents),
+                        "duration_ms": result.duration_ms,
+                    },
+                )
+            ],
+        }
+
+    return ticket_lookup_node
+
+
+def ticket_format_answer(state: AgentState) -> dict[str, Any]:
+    result = TicketLookupResult.model_validate(state.get("tool_result") or {})
+    answer = format_ticket_answer(result)
+    step = _next_step(state)
+    return {
+        "answer": answer,
+        "sources": [],
+        "sources_used": ["ticket_tool"],
+        "trace": [
+            make_trace_entry(
+                "format_ticket_answer",
+                step=step,
+                output_summary={
+                    "ok": result.ok,
+                    "answer_chars": len(answer),
+                    "source": "ticket_tool",
+                },
             )
         ],
     }
@@ -101,11 +190,12 @@ def no_context_response(state: AgentState) -> dict[str, Any]:
         "answer": NO_CONTEXT_MESSAGE,
         "sources": [],
         "context": "",
+        "sources_used": ["rag"],
         "trace": [
             make_trace_entry(
                 "no_context_response",
                 step=step,
-                output_summary={"fallback": "no_chunks_above_threshold"},
+                output_summary={"fallback": "no_chunks_above_threshold", "source": "rag"},
             )
         ],
     }
@@ -132,6 +222,7 @@ def make_generate_node(
             "context": context,
             "answer": answer,
             "sources": citation_metadata(chunks),
+            "sources_used": ["rag"],
             "trace": [
                 make_trace_entry(
                     "generate_node",
@@ -140,6 +231,7 @@ def make_generate_node(
                         "answer_chars": len(answer),
                         "source_count": len(chunks),
                         "faithful": faithfulness["faithful"],
+                        "source": "rag",
                     },
                 )
             ],
