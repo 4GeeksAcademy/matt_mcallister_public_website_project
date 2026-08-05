@@ -1,0 +1,6 @@
+#!/Users/match/Documents/4Geeks/milestone_project_trackflow_getmystatsup-3/.venv-mcp/bin/python3
+import sys
+from fastapi.cli import main
+if __name__ == '__main__':
+    sys.argv[0] = sys.argv[0].removesuffix('.exe')
+    sys.exit(main())

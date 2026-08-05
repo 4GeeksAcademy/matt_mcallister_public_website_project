@@ -140,6 +140,36 @@ services:
       retries: 10
     networks: [trackflow_network]
 
+  company-tools-mcp:
+    build:
+      context: .
+      dockerfile: mcps/company_tools/Dockerfile
+    environment:
+      MCP_SERVER_HOST: 0.0.0.0
+      MCP_SERVER_PORT: 8006
+      MCP_RESOURCE_URL: ${MCP_RESOURCE_URL:-http://localhost:8006/mcp}
+      MCP_OIDC_ISSUER: ${MCP_OIDC_ISSUER:-https://test-issuer.local}
+      MCP_JWKS_URI: ${MCP_JWKS_URI:-}
+      MCP_AUDIENCE: ${MCP_AUDIENCE:-http://localhost:8006/mcp}
+      MCP_AUTH_TEST_MODE: ${MCP_AUTH_TEST_MODE:-1}
+      MCP_TEST_JWT_SECRET: ${SECRET_KEY:-local-development-secret-change-me}
+      INCIDENTS_API_URL: http://incident-api:8001
+      INVENTORY_API_URL: http://inventory-api:8003
+      INVENTORY_SERVICE_TOKEN: ${INVENTORY_SERVICE_TOKEN:-}
+      MCP_BACKEND_TIMEOUT_SECONDS: 10.0
+    ports: ["8006:8006"]
+    depends_on:
+      incident-api:
+        condition: service_healthy
+      inventory-api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8006/.well-known/oauth-protected-resource/mcp')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [trackflow_network]
+
   talent-api:
     build:
       context: .
