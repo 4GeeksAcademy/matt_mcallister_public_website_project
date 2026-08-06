@@ -22,6 +22,12 @@ PYTHONPATH=services/supplier-api \
   "$UV_BIN" run --python 3.11 --project services/supplier-api --extra dev \
   python -m pytest services/supplier-api/tests
 
+PYTHONPATH=. \
+  "$UV_BIN" run --no-project --python 3.11 \
+  --with-requirements mcps/company_tools/requirements.txt \
+  --with-requirements services/incident-api/requirements.txt \
+  python -m pytest tests/mcp tests/pipelines/test_agent_graph.py tests/pipelines/test_agent_tools.py -q
+
 PYTHONPATH=services/incident-api \
   "$UV_BIN" run --no-project --python 3.11 \
   --with-requirements services/incident-api/requirements.txt \

@@ -1,10 +1,10 @@
 # TrackFlow Support Knowledge Agent
 
-Commercial knowledge assistant for account managers, implemented as an explicit **LangGraph** over the Milestone 7 RAG pipeline with an optional **incident ticket tool** for operational lookups.
+Commercial knowledge assistant for account managers, implemented as an explicit **LangGraph** over the Milestone 7 RAG pipeline with **MCP-backed incident ticket lookups**.
 
 ## Goal
 
-Answer prospect and client questions the way a TrackFlow salesperson would — grounded in indexed policy docs — and look up real incident ticket status from the incident manager when the question is operational.
+Answer prospect and client questions the way a TrackFlow salesperson would — grounded in indexed policy docs — and look up real incident ticket status through the OAuth-protected MCP company-tools server when the question is operational.
 
 ## Graph
 
@@ -13,9 +13,9 @@ flowchart TD
   receiveQuestion[receive_question] --> validQ{valid?}
   validQ -->|no| setError[set_error]
   validQ -->|yes| classify[classify_route]
-  classify -->|ticket| ticketLookup[ticket_lookup_node]
+  classify -->|ticket| mcpTicket[mcp_ticket_lookup_node]
   classify -->|knowledge| retrieveNode[retrieve_node]
-  ticketLookup --> ticketAnswer[format_ticket_answer]
+  mcpTicket --> ticketAnswer[format_ticket_answer]
   ticketAnswer --> endNode[END]
   setError --> endNode
   retrieveNode --> hasCtx{chunks?}
@@ -26,9 +26,9 @@ flowchart TD
 ```
 
 - **Knowledge path:** `retrieve()` + `generate_answer()` from [`data/pipelines/rag.py`](../../data/pipelines/rag.py)
-- **Ticket path:** [`agents/tools/incident_lookup.py`](../tools/incident_lookup.py) calls real `GET /api/incidents` over HTTP — never simulated data
+- **Ticket path:** [`agents/mcp/client.py`](../mcp/client.py) loads tools via `langchain-mcp-adapters` and invokes `incidents_get` / `incidents_list` on the MCP server — no direct incident-api HTTP from the agent
 
-Routing is automatic from question content (incident ID or ticket keywords → tool; otherwise → RAG).
+Routing is automatic from question content (incident ID or ticket keywords → MCP ticket tool; otherwise → RAG).
 
 ## API
 
@@ -57,14 +57,16 @@ Response:
 }
 ```
 
-Ticket answers use `"sources_used": ["ticket_tool"]` and empty `sources` (no KB citations).
+Ticket answers use `"sources_used": ["mcp_ticket_tool"]` and empty `sources` (no KB citations).
 
 ## Environment
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
-| `INCIDENTS_API_URL` | `http://localhost:8001` | Incident manager base URL for ticket tool |
-| `INCIDENT_TOOL_TIMEOUT_SECONDS` | `5.0` | HTTP timeout for ticket lookups |
+| `MCP_SERVER_URL` | `http://localhost:8006/mcp` | MCP company-tools endpoint |
+| `MCP_AGENT_ACCESS_TOKEN` | _(required for live MCP)_ | OAuth Bearer token with `incidents:read` |
+
+See [`mcps/company_tools/README.md`](../../mcps/company_tools/README.md) for MCP server configuration.
 
 ## Trace inspection
 
@@ -73,7 +75,7 @@ from agents.support_agent.trace import get_trace
 get_trace(trace_id)
 ```
 
-Each run records node order plus whether `rag` or `ticket_tool` was used.
+Each run records node order plus whether `rag` or `mcp_ticket_tool` was used.
 
 ## Tests
 

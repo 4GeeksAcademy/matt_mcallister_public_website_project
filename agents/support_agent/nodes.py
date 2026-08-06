@@ -4,13 +4,13 @@ from __future__ import annotations
 
 from typing import Any, Callable
 
+from agents.mcp.ticket_lookup import lookup_incident_via_mcp
 from agents.tools.incident_lookup import (
     MSG_UNAVAILABLE,
     TicketLookupInput,
     TicketLookupResult,
     classify_question_route,
     format_ticket_answer,
-    lookup_incident,
     parse_ticket_intent,
 )
 from data.pipelines.rag import (
@@ -99,9 +99,9 @@ def set_error(state: AgentState) -> dict[str, Any]:
 def make_ticket_lookup_node(
     lookup_fn: Callable[[TicketLookupInput], TicketLookupResult] | None = None,
 ) -> Callable[[AgentState], dict[str, Any]]:
-    lookup_callable = lookup_fn or lookup_incident
+    lookup_callable = lookup_fn or lookup_incident_via_mcp
 
-    def ticket_lookup_node(state: AgentState) -> dict[str, Any]:
+    def mcp_ticket_lookup_node(state: AgentState) -> dict[str, Any]:
         tool_input = TicketLookupInput.model_validate(state.get("tool_input") or {})
         try:
             result = lookup_callable(tool_input)
@@ -116,9 +116,10 @@ def make_ticket_lookup_node(
             "tool_result": result.model_dump(),
             "trace": [
                 make_trace_entry(
-                    "ticket_lookup_node",
+                    "mcp_ticket_lookup_node",
                     step=step,
                     output_summary={
+                        "transport": "mcp",
                         "http_method": result.http_method,
                         "http_path": result.http_path,
                         "ok": result.ok,
@@ -130,7 +131,7 @@ def make_ticket_lookup_node(
             ],
         }
 
-    return ticket_lookup_node
+    return mcp_ticket_lookup_node
 
 
 def ticket_format_answer(state: AgentState) -> dict[str, Any]:
@@ -140,7 +141,7 @@ def ticket_format_answer(state: AgentState) -> dict[str, Any]:
     return {
         "answer": answer,
         "sources": [],
-        "sources_used": ["ticket_tool"],
+        "sources_used": ["mcp_ticket_tool"],
         "trace": [
             make_trace_entry(
                 "format_ticket_answer",
@@ -148,7 +149,7 @@ def ticket_format_answer(state: AgentState) -> dict[str, Any]:
                 output_summary={
                     "ok": result.ok,
                     "answer_chars": len(answer),
-                    "source": "ticket_tool",
+                    "source": "mcp_ticket_tool",
                 },
             )
         ],

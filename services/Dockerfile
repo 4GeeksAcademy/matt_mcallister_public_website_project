@@ -11,6 +11,7 @@ RUN pip install --no-cache-dir -r /app/services/incident-api/requirements.txt
 
 COPY scripts /app/scripts
 COPY services /app/services
+COPY agents /app/agents
 COPY packages /app/packages
 COPY data /app/data
 COPY docs/company-knowledge-base /app/docs/company-knowledge-base

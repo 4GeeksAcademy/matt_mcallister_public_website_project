@@ -1,0 +1,25 @@
+{
+  "name": "TrackFlow MCP Playground",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "forwardPorts": [8001, 8003, 8006],
+  "portsAttributes": {
+    "8006": {
+      "label": "MCP Company Tools (Playground)",
+      "visibility": "public",
+      "onAutoForward": "notify"
+    },
+    "8001": {
+      "label": "Incident API",
+      "visibility": "private"
+    },
+    "8003": {
+      "label": "Inventory API",
+      "visibility": "private"
+    }
+  },
+  "postCreateCommand": "bash scripts/codespaces-forward-mcp.sh --setup-only || true"
+}

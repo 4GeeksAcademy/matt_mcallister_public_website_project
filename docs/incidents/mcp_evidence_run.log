@@ -1,0 +1,1168 @@
+Starting incident-api and inventory-api...
+#1 [internal] load local bake definitions
+#1 reading from stdin 1.32kB done
+#1 DONE 0.0s
+
+#2 [incident-api internal] load build definition from Dockerfile
+#2 transferring dockerfile: 672B 0.0s done
+#2 DONE 0.0s
+
+#3 [inventory-api internal] load build definition from PythonService.Dockerfile
+#3 transferring dockerfile: 278B 0.0s done
+#3 DONE 0.0s
+
+#4 [auth] library/python:pull token for registry-1.docker.io
+#4 DONE 0.0s
+
+#5 [inventory-api internal] load metadata for docker.io/library/python:3.12-slim
+#5 DONE 0.3s
+
+#6 [inventory-api internal] load .dockerignore
+#6 transferring context: 227B 0.0s done
+#6 DONE 0.1s
+
+#7 [incident-api internal] load build context
+#7 DONE 0.0s
+
+#8 [inventory-api internal] load build context
+#8 DONE 0.0s
+
+#9 [incident-api 1/5] FROM docker.io/library/python:3.12-slim@sha256:646fb0bca3dd3ea1bcc6feb72c17ed16eed6e10cffc732fcc1478bd3e7f02d7b
+#9 resolve docker.io/library/python:3.12-slim@sha256:646fb0bca3dd3ea1bcc6feb72c17ed16eed6e10cffc732fcc1478bd3e7f02d7b 0.0s done
+#9 resolve docker.io/library/python:3.12-slim@sha256:646fb0bca3dd3ea1bcc6feb72c17ed16eed6e10cffc732fcc1478bd3e7f02d7b 0.0s done
+#9 DONE 0.1s
+
+#8 [inventory-api internal] load build context
+#8 ...
+
+#7 [incident-api internal] load build context
+#7 transferring context: 616.58kB 0.3s done
+#7 DONE 0.5s
+
+#8 [inventory-api internal] load build context
+#8 ...
+
+#10 [incident-api  4/12] COPY services/incident-api/requirements.txt /app/services/incident-api/requirements.txt
+#10 CACHED
+
+#11 [incident-api 2/5] WORKDIR /app
+#11 CACHED
+
+#12 [incident-api  3/12] RUN apt-get update && apt-get install -y --no-install-recommends     curl     && rm -rf /var/lib/apt/lists/*
+#12 CACHED
+
+#13 [incident-api  5/12] RUN pip install --no-cache-dir -r /app/services/incident-api/requirements.txt
+#13 CACHED
+
+#8 [inventory-api internal] load build context
+#8 ...
+
+#14 [incident-api  6/12] COPY scripts /app/scripts
+#14 DONE 0.2s
+
+#8 [inventory-api internal] load build context
+#8 ...
+
+#15 [incident-api  7/12] COPY services /app/services
+#15 DONE 1.4s
+
+#8 [inventory-api internal] load build context
+#8 ...
+
+#16 [incident-api  8/12] COPY agents /app/agents
+#16 DONE 0.1s
+
+#8 [inventory-api internal] load build context
+#8 ...
+
+#17 [incident-api  9/12] COPY packages /app/packages
+#17 DONE 0.2s
+
+#18 [incident-api 10/12] COPY data /app/data
+#18 DONE 0.1s
+
+#8 [inventory-api internal] load build context
+#8 transferring context: 1.60MB 2.7s done
+#8 DONE 2.8s
+
+#19 [incident-api 11/12] COPY docs/company-knowledge-base /app/docs/company-knowledge-base
+#19 DONE 0.2s
+
+#11 [inventory-api 2/5] WORKDIR /app
+#11 CACHED
+
+#20 [incident-api 12/12] RUN mkdir -p /data/uploads
+#20 DONE 1.0s
+
+#21 [inventory-api 3/5] COPY . /app
+#21 ...
+
+#22 [incident-api] exporting to image
+#22 exporting layers 0.6s done
+#22 exporting manifest sha256:50feeff917c4d58196c700d8a81513e84fbadc45685cd796383d275a9fe0b700 0.0s done
+#22 exporting config sha256:bcc913ec8420f88d3ca6bc2a1bd7f1cac71d1b9846720864f1195cec1e8cefa2 0.0s done
+#22 exporting attestation manifest sha256:695dd782ecdd91076fefed04b7334d2ae817c2269a471454479d645e0a4a5cb5 0.1s done
+#22 exporting manifest list sha256:3fe949811dfacc07b23454ced4a2070b9d5a5824e7eae2fe3ab3485a9a47241f 0.0s done
+#22 naming to docker.io/library/milestone_project_trackflow_getmystatsup-incident-api:latest done
+#22 unpacking to docker.io/library/milestone_project_trackflow_getmystatsup-incident-api:latest 0.4s done
+#22 DONE 1.2s
+
+#21 [inventory-api 3/5] COPY . /app
+#21 ...
+
+#23 [incident-api] resolving provenance for metadata file
+#23 DONE 0.0s
+
+#21 [inventory-api 3/5] COPY . /app
+#21 DONE 13.6s
+
+#24 [inventory-api 4/5] RUN pip install --no-cache-dir -r "/app/services/inventory-api/requirements.txt"
+#24 3.319 Collecting prefect<3,>=2.14 (from -r /app/data/pipelines/requirements.txt (line 1))
+#24 3.353   Downloading prefect-2.20.25-py3-none-any.whl.metadata (12 kB)
+#24 3.497 Collecting pandas>=2.0 (from -r /app/data/pipelines/requirements.txt (line 2))
+#24 3.506   Downloading pandas-3.0.5-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (79 kB)
+#24 3.612 Collecting python-dotenv>=1.0.0 (from -r /app/data/pipelines/requirements.txt (line 3))
+#24 3.618   Downloading python_dotenv-1.2.2-py3-none-any.whl.metadata (27 kB)
+#24 3.719 Collecting pydantic<2.10,>=2.0 (from -r /app/data/pipelines/requirements.txt (line 4))
+#24 3.727   Downloading pydantic-2.9.2-py3-none-any.whl.metadata (149 kB)
+#24 3.802 Collecting openai<2,>=1.59 (from -r /app/data/pipelines/requirements.txt (line 5))
+#24 3.810   Downloading openai-1.109.1-py3-none-any.whl.metadata (29 kB)
+#24 3.839 Collecting qdrant-client<2,>=1.12 (from -r /app/data/pipelines/requirements.txt (line 6))
+#24 3.847   Downloading qdrant_client-1.19.0-py3-none-any.whl.metadata (11 kB)
+#24 3.882 Collecting pytest>=7.0 (from -r /app/data/pipelines/requirements.txt (line 7))
+#24 3.891   Downloading pytest-9.1.1-py3-none-any.whl.metadata (7.6 kB)
+#24 3.943 Collecting fastapi (from -r /app/services/inventory-api/requirements.txt (line 3))
+#24 3.951   Downloading fastapi-0.141.1-py3-none-any.whl.metadata (27 kB)
+#24 3.982 Collecting sqlmodel (from -r /app/services/inventory-api/requirements.txt (line 5))
+#24 3.990   Downloading sqlmodel-0.0.39-py3-none-any.whl.metadata (9.4 kB)
+#24 4.044 Collecting psycopg2-binary (from -r /app/services/inventory-api/requirements.txt (line 6))
+#24 4.053   Downloading psycopg2_binary-2.9.12-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (4.9 kB)
+#24 4.071 Collecting tinydb (from -r /app/services/inventory-api/requirements.txt (line 7))
+#24 4.080   Downloading tinydb-4.8.2-py3-none-any.whl.metadata (6.7 kB)
+#24 4.122 Collecting bcrypt==4.0.1 (from -r /app/services/inventory-api/requirements.txt (line 10))
+#24 4.130   Downloading bcrypt-4.0.1-cp36-abi3-manylinux_2_28_x86_64.whl.metadata (9.0 kB)
+#24 4.147 Collecting pydantic-settings (from -r /app/services/inventory-api/requirements.txt (line 11))
+#24 4.154   Downloading pydantic_settings-2.14.2-py3-none-any.whl.metadata (3.4 kB)
+#24 4.169 Collecting email-validator (from -r /app/services/inventory-api/requirements.txt (line 13))
+#24 4.177   Downloading email_validator-2.3.0-py3-none-any.whl.metadata (26 kB)
+#24 4.204 Collecting uvicorn[standard] (from -r /app/services/inventory-api/requirements.txt (line 4))
+#24 4.212   Downloading uvicorn-0.52.1-py3-none-any.whl.metadata (6.6 kB)
+#24 4.226 Collecting python-jose[cryptography] (from -r /app/services/inventory-api/requirements.txt (line 8))
+#24 4.233   Downloading python_jose-3.5.0-py2.py3-none-any.whl.metadata (5.5 kB)
+#24 4.246 Collecting passlib[bcrypt] (from -r /app/services/inventory-api/requirements.txt (line 9))
+#24 4.253   Downloading passlib-1.7.4-py2.py3-none-any.whl.metadata (1.7 kB)
+#24 4.271 Collecting aiosqlite<1.0.0,>=0.17.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 4.278   Downloading aiosqlite-0.22.1-py3-none-any.whl.metadata (4.3 kB)
+#24 4.312 Collecting alembic<2.0.0,>=1.7.5 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 4.319   Downloading alembic-1.19.0-py3-none-any.whl.metadata (7.3 kB)
+#24 4.339 Collecting apprise<2.0.0,>=1.8.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 4.347   Downloading apprise-1.12.0-py3-none-any.whl.metadata (62 kB)
+#24 4.386 Collecting asyncpg<0.32.0,>=0.23 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 4.396   Downloading asyncpg-0.31.0-cp312-cp312-manylinux_2_28_x86_64.whl.metadata (4.4 kB)
+#24 4.415 Collecting click<8.2,>=8.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 4.423   Downloading click-8.1.8-py3-none-any.whl.metadata (2.3 kB)
+#24 4.616 Collecting cryptography>=36.0.1 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 4.624   Downloading cryptography-50.0.0-cp311-abi3-manylinux_2_34_x86_64.whl.metadata (4.3 kB)
+#24 4.640 Collecting dateparser<2.0.0,>=1.1.1 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 4.648   Downloading dateparser-1.4.2-py3-none-any.whl.metadata (24 kB)
+#24 4.670 Collecting docker<8.0,>=4.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 4.677   Downloading docker-7.2.0-py3-none-any.whl.metadata (3.8 kB)
+#24 4.698 Collecting graphviz>=0.20.1 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 4.706   Downloading graphviz-0.21-py3-none-any.whl.metadata (12 kB)
+#24 4.724 Collecting jinja2<4.0.0,>=3.0.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 4.731   Downloading jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
+#24 4.742 Collecting jinja2-humanize-extension>=0.4.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 4.750   Downloading jinja2_humanize_extension-0.4.0-py3-none-any.whl.metadata (3.6 kB)
+#24 4.781 Collecting humanize<5.0.0,>=4.9.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 4.790   Downloading humanize-4.16.0-py3-none-any.whl.metadata (8.0 kB)
+#24 4.832 Collecting kubernetes<32.0.0,>=24.2.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 4.841   Downloading kubernetes-31.0.0-py2.py3-none-any.whl.metadata (1.5 kB)
+#24 4.899 Collecting pytz<2026,>=2021.1 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 4.911   Downloading pytz-2025.2-py2.py3-none-any.whl.metadata (22 kB)
+#24 4.938 Collecting readchar<5.0.0,>=4.0.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 4.950   Downloading readchar-4.2.2-py3-none-any.whl.metadata (7.5 kB)
+#24 5.229 Collecting sqlalchemy!=1.4.33,<2.0.36,>=1.4.22 (from sqlalchemy[asyncio]!=1.4.33,<2.0.36,>=1.4.22->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 5.237   Downloading SQLAlchemy-2.0.35-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (9.6 kB)
+#24 5.268 Collecting typer!=0.12.2,<0.18.0,>=0.12.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 5.277   Downloading typer-0.17.5-py3-none-any.whl.metadata (15 kB)
+#24 5.299 Collecting anyio<5.0,>=4.4.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 5.307   Downloading anyio-4.14.2-py3-none-any.whl.metadata (4.6 kB)
+#24 5.319 Collecting asgi-lifespan<3.0,>=1.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 5.327   Downloading asgi_lifespan-2.1.0-py3-none-any.whl.metadata (10 kB)
+#24 5.348 Collecting cachetools<7.0,>=5.3 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 5.357   Downloading cachetools-6.2.6-py3-none-any.whl.metadata (5.6 kB)
+#24 5.375 Collecting cloudpickle<4.0,>=2.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 5.383   Downloading cloudpickle-3.1.2-py3-none-any.whl.metadata (7.1 kB)
+#24 5.397 Collecting coolname<3.0.0,>=1.0.4 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 5.406   Downloading coolname-2.2.0-py2.py3-none-any.whl.metadata (6.2 kB)
+#24 5.430 Collecting croniter<6.0.0,>=1.0.12 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 5.439   Downloading croniter-5.0.1-py2.py3-none-any.whl.metadata (30 kB)
+#24 5.463 Collecting fsspec>=2022.5.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 5.471   Downloading fsspec-2026.7.0-py3-none-any.whl.metadata (10 kB)
+#24 5.510 Collecting exceptiongroup>=1.2.1 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 5.518   Downloading exceptiongroup-1.3.1-py3-none-any.whl.metadata (6.7 kB)
+#24 5.552 Collecting griffe<2.0.0,>=0.49.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 5.560   Downloading griffe-1.15.0-py3-none-any.whl.metadata (5.2 kB)
+#24 5.577 Collecting httpcore<2.0.0,>=1.0.5 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 5.584   Downloading httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
+#24 5.656 Collecting httpx!=0.23.2,>=0.23 (from httpx[http2]!=0.23.2,>=0.23->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 5.662   Downloading httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+#24 5.700 Collecting importlib-resources<6.5.0,>=6.1.3 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 5.714   Downloading importlib_resources-6.4.5-py3-none-any.whl.metadata (4.0 kB)
+#24 5.759 Collecting jsonpatch<2.0,>=1.32 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 5.770   Downloading jsonpatch-1.33-py2.py3-none-any.whl.metadata (3.0 kB)
+#24 5.808 Collecting jsonschema<5.0.0,>=4.0.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 5.816   Downloading jsonschema-4.26.0-py3-none-any.whl.metadata (7.6 kB)
+#24 6.063 Collecting orjson<4.0,>=3.7 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 6.071   Downloading orjson-3.11.9-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (41 kB)
+#24 6.092 Collecting packaging<25.1,>=21.3 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 6.100   Downloading packaging-25.0-py3-none-any.whl.metadata (3.3 kB)
+#24 6.114 Collecting pathspec>=0.8.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 6.122   Downloading pathspec-1.1.1-py3-none-any.whl.metadata (14 kB)
+#24 6.834 Collecting pydantic-core<3.0.0,>=2.12.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 6.841   Downloading pydantic_core-2.47.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.5 kB)
+#24 6.855 Collecting python-dateutil<3.0.0,>=2.8.2 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 6.864   Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata (8.4 kB)
+#24 6.879 Collecting python-slugify<9.0,>=5.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 6.886   Downloading python_slugify-8.0.4-py2.py3-none-any.whl.metadata (8.5 kB)
+#24 6.919 Collecting pyyaml<7.0.0,>=5.4.1 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 6.927   Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.4 kB)
+#24 6.937 Collecting rfc3339-validator<0.2.0,>=0.1.4 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 6.945   Downloading rfc3339_validator-0.1.4-py2.py3-none-any.whl.metadata (1.5 kB)
+#24 6.985 Collecting rich<15.0,>=11.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 6.992   Downloading rich-14.3.4-py3-none-any.whl.metadata (18 kB)
+#24 7.098 Collecting ruamel.yaml>=0.17.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 7.106   Downloading ruamel_yaml-0.19.1-py3-none-any.whl.metadata (16 kB)
+#24 7.119 Collecting sniffio<2.0.0,>=1.3.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 7.126   Downloading sniffio-1.3.1-py3-none-any.whl.metadata (3.9 kB)
+#24 7.137 Collecting toml>=0.10.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 7.145   Downloading toml-0.10.2-py2.py3-none-any.whl.metadata (7.1 kB)
+#24 7.165 Collecting typing-extensions<5.0.0,>=4.5.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 7.173   Downloading typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+#24 7.231 Collecting ujson<6.0.0,>=5.8.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 7.239   Downloading ujson-5.13.0-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (10.0 kB)
+#24 7.339 Collecting websockets<14.0,>=10.4 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 7.347   Downloading websockets-13.1-cp312-cp312-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.8 kB)
+#24 7.360 Collecting itsdangerous (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 7.367   Downloading itsdangerous-2.2.0-py3-none-any.whl.metadata (1.9 kB)
+#24 7.381 Collecting python-multipart>=0.0.7 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 7.388   Downloading python_multipart-0.0.32-py3-none-any.whl.metadata (2.1 kB)
+#24 7.429 Collecting pendulum<4,>=3.0.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 7.437   Downloading pendulum-3.2.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.8 kB)
+#24 7.650 Collecting numpy>=1.26.0 (from pandas>=2.0->-r /app/data/pipelines/requirements.txt (line 2))
+#24 7.658   Downloading numpy-2.5.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (6.6 kB)
+#24 7.672 Collecting annotated-types>=0.6.0 (from pydantic<2.10,>=2.0->-r /app/data/pipelines/requirements.txt (line 4))
+#24 7.679   Downloading annotated_types-0.8.0-py3-none-any.whl.metadata (15 kB)
+#24 7.688 Collecting pydantic-core<3.0.0,>=2.12.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 7.695   Downloading pydantic_core-2.23.4-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.6 kB)
+#24 7.728 Collecting distro<2,>=1.7.0 (from openai<2,>=1.59->-r /app/data/pipelines/requirements.txt (line 5))
+#24 7.735   Downloading distro-1.9.0-py3-none-any.whl.metadata (6.8 kB)
+#24 7.815 Collecting jiter<1,>=0.4.0 (from openai<2,>=1.59->-r /app/data/pipelines/requirements.txt (line 5))
+#24 7.822   Downloading jiter-0.16.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (5.2 kB)
+#24 7.911 Collecting tqdm>4 (from openai<2,>=1.59->-r /app/data/pipelines/requirements.txt (line 5))
+#24 7.922   Downloading tqdm-4.70.0-py3-none-any.whl.metadata (57 kB)
+#24 8.414 Collecting grpcio>=1.41.0 (from qdrant-client<2,>=1.12->-r /app/data/pipelines/requirements.txt (line 6))
+#24 8.422   Downloading grpcio-1.83.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (3.7 kB)
+#24 8.444 Collecting portalocker<4.0,>=2.7.0 (from qdrant-client<2,>=1.12->-r /app/data/pipelines/requirements.txt (line 6))
+#24 8.452   Downloading portalocker-3.2.0-py3-none-any.whl.metadata (8.7 kB)
+#24 8.676 Collecting protobuf>=3.20.0 (from qdrant-client<2,>=1.12->-r /app/data/pipelines/requirements.txt (line 6))
+#24 8.686   Downloading protobuf-7.35.1-cp310-abi3-manylinux2014_x86_64.whl.metadata (595 bytes)
+#24 8.754 Collecting urllib3<3,>=1.26.14 (from qdrant-client<2,>=1.12->-r /app/data/pipelines/requirements.txt (line 6))
+#24 8.762   Downloading urllib3-2.7.0-py3-none-any.whl.metadata (6.9 kB)
+#24 8.775 Collecting iniconfig>=1.0.1 (from pytest>=7.0->-r /app/data/pipelines/requirements.txt (line 7))
+#24 8.784   Downloading iniconfig-2.3.0-py3-none-any.whl.metadata (2.5 kB)
+#24 8.807 Collecting pluggy<2,>=1.5 (from pytest>=7.0->-r /app/data/pipelines/requirements.txt (line 7))
+#24 8.815   Downloading pluggy-1.6.0-py3-none-any.whl.metadata (4.8 kB)
+#24 8.844 Collecting pygments>=2.7.2 (from pytest>=7.0->-r /app/data/pipelines/requirements.txt (line 7))
+#24 8.852   Downloading pygments-2.20.0-py3-none-any.whl.metadata (2.5 kB)
+#24 8.901 Collecting starlette>=0.46.0 (from fastapi->-r /app/services/inventory-api/requirements.txt (line 3))
+#24 8.909   Downloading starlette-1.4.1-py3-none-any.whl.metadata (6.4 kB)
+#24 8.986 Collecting typing-inspection>=0.4.2 (from fastapi->-r /app/services/inventory-api/requirements.txt (line 3))
+#24 8.994   Downloading typing_inspection-0.4.2-py3-none-any.whl.metadata (2.6 kB)
+#24 9.009 Collecting annotated-doc>=0.0.2 (from fastapi->-r /app/services/inventory-api/requirements.txt (line 3))
+#24 9.018   Downloading annotated_doc-0.0.5-py3-none-any.whl.metadata (6.5 kB)
+#24 9.050 Collecting h11>=0.8 (from uvicorn[standard]->-r /app/services/inventory-api/requirements.txt (line 4))
+#24 9.057   Downloading h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+#24 9.088 Collecting httptools>=0.8.0 (from uvicorn[standard]->-r /app/services/inventory-api/requirements.txt (line 4))
+#24 9.096   Downloading httptools-0.8.0-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (3.5 kB)
+#24 9.131 Collecting uvloop>=0.15.1 (from uvicorn[standard]->-r /app/services/inventory-api/requirements.txt (line 4))
+#24 9.140   Downloading uvloop-0.22.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (4.9 kB)
+#24 9.212 Collecting watchfiles>=0.20 (from uvicorn[standard]->-r /app/services/inventory-api/requirements.txt (line 4))
+#24 9.220   Downloading watchfiles-1.2.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.9 kB)
+#24 9.274 INFO: pip is looking at multiple versions of sqlmodel to determine which version is compatible with other requirements. This could take a while.
+#24 9.275 Collecting sqlmodel (from -r /app/services/inventory-api/requirements.txt (line 5))
+#24 9.282   Downloading sqlmodel-0.0.38-py3-none-any.whl.metadata (10 kB)
+#24 9.292   Downloading sqlmodel-0.0.37-py3-none-any.whl.metadata (10 kB)
+#24 9.302   Downloading sqlmodel-0.0.36-py3-none-any.whl.metadata (10 kB)
+#24 9.312   Downloading sqlmodel-0.0.35-py3-none-any.whl.metadata (10 kB)
+#24 9.322   Downloading sqlmodel-0.0.34-py3-none-any.whl.metadata (10 kB)
+#24 9.332   Downloading sqlmodel-0.0.33-py3-none-any.whl.metadata (10 kB)
+#24 9.378 Collecting ecdsa!=0.15 (from python-jose[cryptography]->-r /app/services/inventory-api/requirements.txt (line 8))
+#24 9.385   Downloading ecdsa-0.19.2-py2.py3-none-any.whl.metadata (29 kB)
+#24 9.404 Collecting rsa!=4.1.1,!=4.4,<5.0,>=4.0 (from python-jose[cryptography]->-r /app/services/inventory-api/requirements.txt (line 8))
+#24 9.412   Downloading rsa-4.9.1-py3-none-any.whl.metadata (5.6 kB)
+#24 9.433 Collecting pyasn1>=0.5.0 (from python-jose[cryptography]->-r /app/services/inventory-api/requirements.txt (line 8))
+#24 9.442   Downloading pyasn1-0.6.4-py3-none-any.whl.metadata (8.4 kB)
+#24 9.493 Collecting dnspython>=2.0.0 (from email-validator->-r /app/services/inventory-api/requirements.txt (line 13))
+#24 9.502   Downloading dnspython-2.8.0-py3-none-any.whl.metadata (5.7 kB)
+#24 9.520 Collecting idna>=2.0.0 (from email-validator->-r /app/services/inventory-api/requirements.txt (line 13))
+#24 9.527   Downloading idna-3.18-py3-none-any.whl.metadata (6.1 kB)
+#24 9.577 Collecting Mako (from alembic<2.0.0,>=1.7.5->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 9.585   Downloading mako-1.4.1-py3-none-any.whl.metadata (2.9 kB)
+#24 9.632 Collecting requests (from apprise<2.0.0,>=1.8.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 9.640   Downloading requests-2.34.2-py3-none-any.whl.metadata (4.8 kB)
+#24 9.654 Collecting requests-oauthlib (from apprise<2.0.0,>=1.8.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 9.662   Downloading requests_oauthlib-2.0.0-py2.py3-none-any.whl.metadata (11 kB)
+#24 9.688 Collecting markdown (from apprise<2.0.0,>=1.8.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 9.696   Downloading markdown-3.10.3-py3-none-any.whl.metadata (5.1 kB)
+#24 9.715 Collecting certifi (from apprise<2.0.0,>=1.8.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 9.722   Downloading certifi-2026.7.22-py3-none-any.whl.metadata (2.5 kB)
+#24 9.834 Collecting cffi>=2.0.0 (from cryptography>=36.0.1->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 9.840   Downloading cffi-2.1.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (2.5 kB)
+#24 10.47 Collecting regex>=2024.9.11 (from dateparser<2.0.0,>=1.1.1->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 10.48   Downloading regex-2026.7.19-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (40 kB)
+#24 10.51 Collecting tzlocal>=0.2 (from dateparser<2.0.0,>=1.1.1->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 10.52   Downloading tzlocal-5.4.4-py3-none-any.whl.metadata (7.7 kB)
+#24 10.58 Collecting six>=1.9.0 (from ecdsa!=0.15->python-jose[cryptography]->-r /app/services/inventory-api/requirements.txt (line 8))
+#24 10.59   Downloading six-1.17.0-py2.py3-none-any.whl.metadata (1.7 kB)
+#24 10.63 Collecting colorama>=0.4 (from griffe<2.0.0,>=0.49.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 10.64   Downloading colorama-0.4.6-py2.py3-none-any.whl.metadata (17 kB)
+#24 10.71 Collecting h2<5,>=3 (from httpx[http2]!=0.23.2,>=0.23->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 10.71   Downloading h2-4.4.1-py3-none-any.whl.metadata (3.8 kB)
+#24 10.77 Collecting MarkupSafe>=2.0 (from jinja2<4.0.0,>=3.0.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 10.78   Downloading markupsafe-3.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.7 kB)
+#24 10.80 Collecting jsonpointer>=1.9 (from jsonpatch<2.0,>=1.32->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 10.81   Downloading jsonpointer-3.1.1-py3-none-any.whl.metadata (2.4 kB)
+#24 10.83 Collecting attrs>=22.2.0 (from jsonschema<5.0.0,>=4.0.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 10.84   Downloading attrs-26.1.0-py3-none-any.whl.metadata (8.8 kB)
+#24 10.85 Collecting jsonschema-specifications>=2023.03.6 (from jsonschema<5.0.0,>=4.0.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 10.86   Downloading jsonschema_specifications-2025.9.1-py3-none-any.whl.metadata (2.9 kB)
+#24 10.89 Collecting referencing>=0.28.4 (from jsonschema<5.0.0,>=4.0.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 10.89   Downloading referencing-0.37.0-py3-none-any.whl.metadata (2.8 kB)
+#24 11.21 Collecting rpds-py>=0.25.0 (from jsonschema<5.0.0,>=4.0.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 11.22   Downloading rpds_py-2026.6.3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.1 kB)
+#24 11.27 Collecting google-auth>=1.0.1 (from kubernetes<32.0.0,>=24.2.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 11.28   Downloading google_auth-2.56.3-py3-none-any.whl.metadata (6.0 kB)
+#24 11.32 Collecting websocket-client!=0.40.0,!=0.41.*,!=0.42.*,>=0.32.0 (from kubernetes<32.0.0,>=24.2.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 11.33   Downloading websocket_client-1.9.0-py3-none-any.whl.metadata (8.3 kB)
+#24 11.34 Collecting oauthlib>=3.2.2 (from kubernetes<32.0.0,>=24.2.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 11.35   Downloading oauthlib-3.3.1-py3-none-any.whl.metadata (7.9 kB)
+#24 11.37 Collecting durationpy>=0.7 (from kubernetes<32.0.0,>=24.2.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 11.38   Downloading durationpy-0.10-py3-none-any.whl.metadata (340 bytes)
+#24 11.41 Collecting tzdata>=2020.1 (from pendulum<4,>=3.0.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 11.41   Downloading tzdata-2026.3-py2.py3-none-any.whl.metadata (1.4 kB)
+#24 11.46 Collecting text-unidecode>=1.3 (from python-slugify<9.0,>=5.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 11.47   Downloading text_unidecode-1.3-py2.py3-none-any.whl.metadata (2.4 kB)
+#24 11.49 Collecting markdown-it-py>=2.2.0 (from rich<15.0,>=11.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 11.50   Downloading markdown_it_py-4.2.0-py3-none-any.whl.metadata (7.4 kB)
+#24 11.68 Collecting greenlet!=0.4.17 (from sqlalchemy!=1.4.33,<2.0.36,>=1.4.22->sqlalchemy[asyncio]!=1.4.33,<2.0.36,>=1.4.22->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 11.69   Downloading greenlet-3.5.4-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (3.8 kB)
+#24 11.76 Collecting shellingham>=1.3.0 (from typer!=0.12.2,<0.18.0,>=0.12.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 11.77   Downloading shellingham-1.5.4-py2.py3-none-any.whl.metadata (3.5 kB)
+#24 11.91 Collecting pycparser (from cffi>=2.0.0->cryptography>=36.0.1->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 11.91   Downloading pycparser-3.0-py3-none-any.whl.metadata (8.2 kB)
+#24 11.96 Collecting pyasn1-modules>=0.2.1 (from google-auth>=1.0.1->kubernetes<32.0.0,>=24.2.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 11.97   Downloading pyasn1_modules-0.4.2-py3-none-any.whl.metadata (3.5 kB)
+#24 12.17 Collecting hyperframe<7,>=6.1 (from h2<5,>=3->httpx[http2]!=0.23.2,>=0.23->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 12.18   Downloading hyperframe-6.1.0-py3-none-any.whl.metadata (4.3 kB)
+#24 12.20 Collecting hpack<5,>=4.2 (from h2<5,>=3->httpx[http2]!=0.23.2,>=0.23->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 12.21   Downloading hpack-4.2.0-py3-none-any.whl.metadata (3.3 kB)
+#24 12.25 Collecting mdurl~=0.1 (from markdown-it-py>=2.2.0->rich<15.0,>=11.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 12.27   Downloading mdurl-0.1.2-py3-none-any.whl.metadata (1.6 kB)
+#24 12.41 Collecting charset_normalizer<4,>=2 (from requests->apprise<2.0.0,>=1.8.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#24 12.42   Downloading charset_normalizer-3.4.9-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (41 kB)
+#24 12.64 Downloading bcrypt-4.0.1-cp36-abi3-manylinux_2_28_x86_64.whl (593 kB)
+#24 12.65    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 593.7/593.7 kB 51.4 MB/s eta 0:00:00
+#24 12.67 Downloading prefect-2.20.25-py3-none-any.whl (6.0 MB)
+#24 12.69    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.0/6.0 MB 280.3 MB/s eta 0:00:00
+#24 12.70 Downloading pandas-3.0.5-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (11.0 MB)
+#24 12.74    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 11.0/11.0 MB 338.5 MB/s eta 0:00:00
+#24 12.75 Downloading python_dotenv-1.2.2-py3-none-any.whl (22 kB)
+#24 12.75 Downloading pydantic-2.9.2-py3-none-any.whl (434 kB)
+#24 12.76 Downloading pydantic_core-2.23.4-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.1 MB)
+#24 12.77    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 206.0 MB/s eta 0:00:00
+#24 12.78 Downloading openai-1.109.1-py3-none-any.whl (948 kB)
+#24 12.79    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 948.6/948.6 kB 559.1 MB/s eta 0:00:00
+#24 12.79 Downloading qdrant_client-1.19.0-py3-none-any.whl (396 kB)
+#24 12.80 Downloading pytest-9.1.1-py3-none-any.whl (386 kB)
+#24 12.81 Downloading fastapi-0.141.1-py3-none-any.whl (131 kB)
+#24 12.82 Downloading sqlmodel-0.0.33-py3-none-any.whl (27 kB)
+#24 12.83 Downloading psycopg2_binary-2.9.12-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (4.3 MB)
+#24 12.84    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.3/4.3 MB 475.1 MB/s eta 0:00:00
+#24 12.85 Downloading tinydb-4.8.2-py3-none-any.whl (24 kB)
+#24 12.85 Downloading pydantic_settings-2.14.2-py3-none-any.whl (61 kB)
+#24 12.86 Downloading email_validator-2.3.0-py3-none-any.whl (35 kB)
+#24 12.87 Downloading aiosqlite-0.22.1-py3-none-any.whl (17 kB)
+#24 12.88 Downloading alembic-1.19.0-py3-none-any.whl (265 kB)
+#24 12.89 Downloading annotated_doc-0.0.5-py3-none-any.whl (5.3 kB)
+#24 12.89 Downloading annotated_types-0.8.0-py3-none-any.whl (13 kB)
+#24 12.90 Downloading anyio-4.14.2-py3-none-any.whl (125 kB)
+#24 12.91 Downloading apprise-1.12.0-py3-none-any.whl (1.8 MB)
+#24 12.92    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 169.5 MB/s eta 0:00:00
+#24 12.93 Downloading asgi_lifespan-2.1.0-py3-none-any.whl (10 kB)
+#24 12.94 Downloading asyncpg-0.31.0-cp312-cp312-manylinux_2_28_x86_64.whl (3.5 MB)
+#24 12.95    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.5/3.5 MB 460.5 MB/s eta 0:00:00
+#24 12.96 Downloading cachetools-6.2.6-py3-none-any.whl (11 kB)
+#24 12.96 Downloading click-8.1.8-py3-none-any.whl (98 kB)
+#24 12.97 Downloading cloudpickle-3.1.2-py3-none-any.whl (22 kB)
+#24 12.98 Downloading coolname-2.2.0-py2.py3-none-any.whl (37 kB)
+#24 12.99 Downloading croniter-5.0.1-py2.py3-none-any.whl (24 kB)
+#24 13.00 Downloading cryptography-50.0.0-cp311-abi3-manylinux_2_34_x86_64.whl (4.7 MB)
+#24 13.01    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.7/4.7 MB 432.1 MB/s eta 0:00:00
+#24 13.02 Downloading dateparser-1.4.2-py3-none-any.whl (316 kB)
+#24 13.03 Downloading distro-1.9.0-py3-none-any.whl (20 kB)
+#24 13.03 Downloading dnspython-2.8.0-py3-none-any.whl (331 kB)
+#24 13.04 Downloading docker-7.2.0-py3-none-any.whl (148 kB)
+#24 13.05 Downloading ecdsa-0.19.2-py2.py3-none-any.whl (150 kB)
+#24 13.06 Downloading exceptiongroup-1.3.1-py3-none-any.whl (16 kB)
+#24 13.07 Downloading fsspec-2026.7.0-py3-none-any.whl (206 kB)
+#24 13.08 Downloading graphviz-0.21-py3-none-any.whl (47 kB)
+#24 13.08 Downloading griffe-1.15.0-py3-none-any.whl (150 kB)
+#24 13.09 Downloading grpcio-1.83.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (7.0 MB)
+#24 13.12    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 7.0/7.0 MB 343.2 MB/s eta 0:00:00
+#24 13.13 Downloading h11-0.16.0-py3-none-any.whl (37 kB)
+#24 13.13 Downloading httpcore-1.0.9-py3-none-any.whl (78 kB)
+#24 13.14 Downloading httptools-0.8.0-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (523 kB)
+#24 13.15 Downloading httpx-0.28.1-py3-none-any.whl (73 kB)
+#24 13.16 Downloading humanize-4.16.0-py3-none-any.whl (137 kB)
+#24 13.16 Downloading idna-3.18-py3-none-any.whl (65 kB)
+#24 13.17 Downloading importlib_resources-6.4.5-py3-none-any.whl (36 kB)
+#24 13.18 Downloading iniconfig-2.3.0-py3-none-any.whl (7.5 kB)
+#24 13.19 Downloading jinja2-3.1.6-py3-none-any.whl (134 kB)
+#24 13.19 Downloading jinja2_humanize_extension-0.4.0-py3-none-any.whl (4.8 kB)
+#24 13.20 Downloading jiter-0.16.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (343 kB)
+#24 13.21 Downloading jsonpatch-1.33-py2.py3-none-any.whl (12 kB)
+#24 13.22 Downloading jsonschema-4.26.0-py3-none-any.whl (90 kB)
+#24 13.23 Downloading kubernetes-31.0.0-py2.py3-none-any.whl (1.9 MB)
+#24 13.23    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.9/1.9 MB 435.8 MB/s eta 0:00:00
+#24 13.24 Downloading numpy-2.5.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (16.7 MB)
+#24 13.29    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.7/16.7 MB 395.3 MB/s eta 0:00:00
+#24 13.30 Downloading orjson-3.11.9-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (134 kB)
+#24 13.31 Downloading packaging-25.0-py3-none-any.whl (66 kB)
+#24 13.31 Downloading pathspec-1.1.1-py3-none-any.whl (57 kB)
+#24 13.32 Downloading pendulum-3.2.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (348 kB)
+#24 13.33 Downloading pluggy-1.6.0-py3-none-any.whl (20 kB)
+#24 13.34 Downloading portalocker-3.2.0-py3-none-any.whl (22 kB)
+#24 13.34 Downloading protobuf-7.35.1-cp310-abi3-manylinux2014_x86_64.whl (327 kB)
+#24 13.35 Downloading pyasn1-0.6.4-py3-none-any.whl (84 kB)
+#24 13.36 Downloading pygments-2.20.0-py3-none-any.whl (1.2 MB)
+#24 13.37    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 222.4 MB/s eta 0:00:00
+#24 13.38 Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)
+#24 13.38 Downloading python_multipart-0.0.32-py3-none-any.whl (30 kB)
+#24 13.39 Downloading python_slugify-8.0.4-py2.py3-none-any.whl (10 kB)
+#24 13.40 Downloading pytz-2025.2-py2.py3-none-any.whl (509 kB)
+#24 13.41 Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (807 kB)
+#24 13.41    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 807.9/807.9 kB 395.0 MB/s eta 0:00:00
+#24 13.42 Downloading readchar-4.2.2-py3-none-any.whl (9.4 kB)
+#24 13.43 Downloading rfc3339_validator-0.1.4-py2.py3-none-any.whl (3.5 kB)
+#24 13.44 Downloading rich-14.3.4-py3-none-any.whl (310 kB)
+#24 13.45 Downloading rsa-4.9.1-py3-none-any.whl (34 kB)
+#24 13.45 Downloading ruamel_yaml-0.19.1-py3-none-any.whl (118 kB)
+#24 13.46 Downloading sniffio-1.3.1-py3-none-any.whl (10 kB)
+#24 13.47 Downloading SQLAlchemy-2.0.35-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.2 MB)
+#24 13.48    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.2/3.2 MB 480.3 MB/s eta 0:00:00
+#24 13.49 Downloading starlette-1.4.1-py3-none-any.whl (74 kB)
+#24 13.49 Downloading toml-0.10.2-py2.py3-none-any.whl (16 kB)
+#24 13.50 Downloading tqdm-4.70.0-py3-none-any.whl (80 kB)
+#24 13.51 Downloading typer-0.17.5-py3-none-any.whl (46 kB)
+#24 13.51 Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+#24 13.52 Downloading typing_inspection-0.4.2-py3-none-any.whl (14 kB)
+#24 13.53 Downloading ujson-5.13.0-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (57 kB)
+#24 13.54 Downloading urllib3-2.7.0-py3-none-any.whl (131 kB)
+#24 13.54 Downloading uvicorn-0.52.1-py3-none-any.whl (79 kB)
+#24 13.55 Downloading uvloop-0.22.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (4.4 MB)
+#24 13.57    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.4/4.4 MB 380.3 MB/s eta 0:00:00
+#24 13.57 Downloading watchfiles-1.2.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (456 kB)
+#24 13.58 Downloading websockets-13.1-cp312-cp312-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl (165 kB)
+#24 13.59 Downloading itsdangerous-2.2.0-py3-none-any.whl (16 kB)
+#24 13.60 Downloading passlib-1.7.4-py2.py3-none-any.whl (525 kB)
+#24 13.60    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 525.6/525.6 kB 478.8 MB/s eta 0:00:00
+#24 13.61 Downloading python_jose-3.5.0-py2.py3-none-any.whl (34 kB)
+#24 13.62 Downloading attrs-26.1.0-py3-none-any.whl (67 kB)
+#24 13.62 Downloading certifi-2026.7.22-py3-none-any.whl (136 kB)
+#24 13.63 Downloading cffi-2.1.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (221 kB)
+#24 13.64 Downloading colorama-0.4.6-py2.py3-none-any.whl (25 kB)
+#24 13.65 Downloading durationpy-0.10-py3-none-any.whl (3.9 kB)
+#24 13.66 Downloading google_auth-2.56.3-py3-none-any.whl (259 kB)
+#24 13.66 Downloading greenlet-3.5.4-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (621 kB)
+#24 13.67    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 621.5/621.5 kB 536.0 MB/s eta 0:00:00
+#24 13.68 Downloading h2-4.4.1-py3-none-any.whl (62 kB)
+#24 13.68 Downloading jsonpointer-3.1.1-py3-none-any.whl (7.7 kB)
+#24 13.69 Downloading jsonschema_specifications-2025.9.1-py3-none-any.whl (18 kB)
+#24 13.70 Downloading markdown_it_py-4.2.0-py3-none-any.whl (91 kB)
+#24 13.71 Downloading markupsafe-3.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (22 kB)
+#24 13.72 Downloading oauthlib-3.3.1-py3-none-any.whl (160 kB)
+#24 13.72 Downloading referencing-0.37.0-py3-none-any.whl (26 kB)
+#24 13.74 Downloading regex-2026.7.19-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (801 kB)
+#24 13.74    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 801.8/801.8 kB 527.5 MB/s eta 0:00:00
+#24 13.75 Downloading requests-2.34.2-py3-none-any.whl (73 kB)
+#24 13.75 Downloading rpds_py-2026.6.3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (366 kB)
+#24 13.76 Downloading shellingham-1.5.4-py2.py3-none-any.whl (9.8 kB)
+#24 13.77 Downloading six-1.17.0-py2.py3-none-any.whl (11 kB)
+#24 13.78 Downloading text_unidecode-1.3-py2.py3-none-any.whl (78 kB)
+#24 13.79 Downloading tzdata-2026.3-py2.py3-none-any.whl (348 kB)
+#24 13.80 Downloading tzlocal-5.4.4-py3-none-any.whl (18 kB)
+#24 13.80 Downloading websocket_client-1.9.0-py3-none-any.whl (82 kB)
+#24 13.81 Downloading mako-1.4.1-py3-none-any.whl (80 kB)
+#24 13.82 Downloading markdown-3.10.3-py3-none-any.whl (110 kB)
+#24 13.83 Downloading requests_oauthlib-2.0.0-py2.py3-none-any.whl (24 kB)
+#24 13.83 Downloading charset_normalizer-3.4.9-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (224 kB)
+#24 13.84 Downloading hpack-4.2.0-py3-none-any.whl (34 kB)
+#24 13.85 Downloading hyperframe-6.1.0-py3-none-any.whl (13 kB)
+#24 13.86 Downloading mdurl-0.1.2-py3-none-any.whl (10.0 kB)
+#24 13.86 Downloading pyasn1_modules-0.4.2-py3-none-any.whl (181 kB)
+#24 13.87 Downloading pycparser-3.0-py3-none-any.whl (48 kB)
+#24 14.44 Installing collected packages: text-unidecode, pytz, passlib, durationpy, coolname, websockets, websocket-client, uvloop, urllib3, ujson, tzlocal, tzdata, typing-extensions, tqdm, toml, tinydb, sniffio, six, shellingham, ruamel.yaml, rpds-py, regex, readchar, pyyaml, python-slugify, python-multipart, python-dotenv, pygments, pycparser, pyasn1, psycopg2-binary, protobuf, portalocker, pluggy, pathspec, packaging, orjson, oauthlib, numpy, mdurl, MarkupSafe, markdown, jsonpointer, jiter, itsdangerous, iniconfig, importlib-resources, idna, hyperframe, humanize, httptools, hpack, h11, greenlet, graphviz, fsspec, dnspython, distro, colorama, cloudpickle, click, charset_normalizer, certifi, cachetools, bcrypt, attrs, asyncpg, annotated-types, annotated-doc, aiosqlite, uvicorn, typing-inspection, sqlalchemy, rsa, rfc3339-validator, requests, referencing, python-dateutil, pytest, pydantic-core, pyasn1-modules, markdown-it-py, Mako, jsonpatch, jinja2, httpcore, h2, grpcio, griffe, exceptiongroup, email-validator, ecdsa, cffi, asgi-lifespan, anyio, watchfiles, starlette, rich, requests-oauthlib, python-jose, pydantic, pendulum, pandas, jsonschema-specifications, jinja2-humanize-extension, httpx, docker, dateparser, cryptography, croniter, alembic, typer, sqlmodel, pydantic-settings, openai, jsonschema, google-auth, fastapi, apprise, qdrant-client, kubernetes, prefect
+#24 42.24 Successfully installed Mako-1.4.1 MarkupSafe-3.0.3 aiosqlite-0.22.1 alembic-1.19.0 annotated-doc-0.0.5 annotated-types-0.8.0 anyio-4.14.2 apprise-1.12.0 asgi-lifespan-2.1.0 asyncpg-0.31.0 attrs-26.1.0 bcrypt-4.0.1 cachetools-6.2.6 certifi-2026.7.22 cffi-2.1.1 charset_normalizer-3.4.9 click-8.1.8 cloudpickle-3.1.2 colorama-0.4.6 coolname-2.2.0 croniter-5.0.1 cryptography-50.0.0 dateparser-1.4.2 distro-1.9.0 dnspython-2.8.0 docker-7.2.0 durationpy-0.10 ecdsa-0.19.2 email-validator-2.3.0 exceptiongroup-1.3.1 fastapi-0.141.1 fsspec-2026.7.0 google-auth-2.56.3 graphviz-0.21 greenlet-3.5.4 griffe-1.15.0 grpcio-1.83.0 h11-0.16.0 h2-4.4.1 hpack-4.2.0 httpcore-1.0.9 httptools-0.8.0 httpx-0.28.1 humanize-4.16.0 hyperframe-6.1.0 idna-3.18 importlib-resources-6.4.5 iniconfig-2.3.0 itsdangerous-2.2.0 jinja2-3.1.6 jinja2-humanize-extension-0.4.0 jiter-0.16.0 jsonpatch-1.33 jsonpointer-3.1.1 jsonschema-4.26.0 jsonschema-specifications-2025.9.1 kubernetes-31.0.0 markdown-3.10.3 markdown-it-py-4.2.0 mdurl-0.1.2 numpy-2.5.1 oauthlib-3.3.1 openai-1.109.1 orjson-3.11.9 packaging-25.0 pandas-3.0.5 passlib-1.7.4 pathspec-1.1.1 pendulum-3.2.0 pluggy-1.6.0 portalocker-3.2.0 prefect-2.20.25 protobuf-7.35.1 psycopg2-binary-2.9.12 pyasn1-0.6.4 pyasn1-modules-0.4.2 pycparser-3.0 pydantic-2.9.2 pydantic-core-2.23.4 pydantic-settings-2.14.2 pygments-2.20.0 pytest-9.1.1 python-dateutil-2.9.0.post0 python-dotenv-1.2.2 python-jose-3.5.0 python-multipart-0.0.32 python-slugify-8.0.4 pytz-2025.2 pyyaml-6.0.3 qdrant-client-1.19.0 readchar-4.2.2 referencing-0.37.0 regex-2026.7.19 requests-2.34.2 requests-oauthlib-2.0.0 rfc3339-validator-0.1.4 rich-14.3.4 rpds-py-2026.6.3 rsa-4.9.1 ruamel.yaml-0.19.1 shellingham-1.5.4 six-1.17.0 sniffio-1.3.1 sqlalchemy-2.0.35 sqlmodel-0.0.33 starlette-1.4.1 text-unidecode-1.3 tinydb-4.8.2 toml-0.10.2 tqdm-4.70.0 typer-0.17.5 typing-extensions-4.16.0 typing-inspection-0.4.2 tzdata-2026.3 tzlocal-5.4.4 ujson-5.13.0 urllib3-2.7.0 uvicorn-0.52.1 uvloop-0.22.1 watchfiles-1.2.0 websocket-client-1.9.0 websockets-13.1
+#24 42.24 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#24 42.39 
+#24 42.39 [notice] A new release of pip is available: 25.0.1 -> 26.2.1
+#24 42.39 [notice] To update, run: pip install --upgrade pip
+#24 DONE 44.7s
+
+#25 [inventory-api 5/5] WORKDIR /app/services/inventory-api
+#25 DONE 0.4s
+
+#26 [inventory-api] exporting to image
+#26 exporting layers
+#26 exporting layers 32.9s done
+#26 exporting manifest sha256:e637deb646429926693053fea5b2d27322a170525d83e41b510f66910fa01fb5 0.0s done
+#26 exporting config sha256:59c061d59bb3cfec6ffbd2dddfb5de0fb77c1c71ac86286d5b330d2a85a244cc 0.0s done
+#26 exporting attestation manifest sha256:7b0a6c77c9a5a41fea5536f8a89d87c47f075e4e39e75c8f1fb5d2d743d0650c 0.0s done
+#26 exporting manifest list sha256:8e2a3bdfbc818fa6f9c56491fe687fc04e8a1a1462b5d7b17a48194f22fbc75a done
+#26 naming to docker.io/library/milestone_project_trackflow_getmystatsup-inventory-api:latest done
+#26 unpacking to docker.io/library/milestone_project_trackflow_getmystatsup-inventory-api:latest
+#26 unpacking to docker.io/library/milestone_project_trackflow_getmystatsup-inventory-api:latest 21.3s done
+#26 DONE 54.3s
+
+#27 [inventory-api] resolving provenance for metadata file
+#27 DONE 0.0s
+ milestone_project_trackflow_getmystatsup-inventory-api  Built
+ milestone_project_trackflow_getmystatsup-incident-api  Built
+ Container milestone_project_trackflow_getmystatsup-qdrant-1  Running
+ Container milestone_project_trackflow_getmystatsup-postgres-1  Running
+ Container milestone_project_trackflow_getmystatsup-inventory-api-1  Recreate
+ Container milestone_project_trackflow_getmystatsup-redis-1  Running
+ Container milestone_project_trackflow_getmystatsup-incident-api-1  Recreate
+ Container milestone_project_trackflow_getmystatsup-incident-api-1  Recreated
+ Container milestone_project_trackflow_getmystatsup-inventory-api-1  Recreated
+ Container milestone_project_trackflow_getmystatsup-postgres-1  Waiting
+ Container milestone_project_trackflow_getmystatsup-inventory-api-1  Starting
+ Container milestone_project_trackflow_getmystatsup-inventory-api-1  Started
+ Container milestone_project_trackflow_getmystatsup-postgres-1  Healthy
+ Container milestone_project_trackflow_getmystatsup-incident-api-1  Starting
+ Container milestone_project_trackflow_getmystatsup-incident-api-1  Started
+Waiting for inventory-api health on http://127.0.0.1:8003/health ...
+Provisioning inventory service token...
+Starting company-tools-mcp with provisioned token...
+#1 [internal] load local bake definitions
+#1 reading from stdin 1.92kB done
+#1 DONE 0.0s
+
+#2 [inventory-api internal] load build definition from PythonService.Dockerfile
+#2 DONE 0.0s
+
+#2 [inventory-api internal] load build definition from PythonService.Dockerfile
+#2 transferring dockerfile: 278B 0.0s done
+#2 DONE 0.1s
+
+#3 [company-tools-mcp internal] load build definition from Dockerfile
+#3 transferring dockerfile: 400B 0.0s done
+#3 DONE 0.1s
+
+#4 [incident-api internal] load build definition from Dockerfile
+#4 transferring dockerfile: 672B 0.0s done
+#4 DONE 0.1s
+
+#5 [incident-api internal] load metadata for docker.io/library/python:3.12-slim
+#5 DONE 0.2s
+
+#6 [company-tools-mcp internal] load .dockerignore
+#6 transferring context: 227B 0.0s done
+#6 DONE 0.0s
+
+#7 [inventory-api internal] load build context
+#7 DONE 0.0s
+
+#8 [incident-api internal] load build context
+#8 DONE 0.0s
+
+#9 [company-tools-mcp internal] load metadata for docker.io/library/python:3.11-slim
+#9 DONE 0.2s
+
+#10 [company-tools-mcp internal] load build context
+#10 ...
+
+#11 [incident-api 1/5] FROM docker.io/library/python:3.12-slim@sha256:646fb0bca3dd3ea1bcc6feb72c17ed16eed6e10cffc732fcc1478bd3e7f02d7b
+#11 resolve docker.io/library/python:3.12-slim@sha256:646fb0bca3dd3ea1bcc6feb72c17ed16eed6e10cffc732fcc1478bd3e7f02d7b 0.0s done
+#11 DONE 0.1s
+
+#10 [company-tools-mcp internal] load build context
+#10 transferring context: 38.14kB 0.5s done
+#10 DONE 0.5s
+
+#12 [company-tools-mcp 1/5] FROM docker.io/library/python:3.11-slim@sha256:94c50be2dc994b873b55bc123e95e6dbade08095b3dfd790f51c34de3f08cbb7
+#12 resolve docker.io/library/python:3.11-slim@sha256:94c50be2dc994b873b55bc123e95e6dbade08095b3dfd790f51c34de3f08cbb7 0.4s done
+#12 DONE 0.4s
+
+#7 [inventory-api internal] load build context
+#7 ...
+
+#13 [company-tools-mcp 4/5] RUN pip install --no-cache-dir -r /tmp/mcp-requirements.txt
+#13 CACHED
+
+#14 [company-tools-mcp 2/5] WORKDIR /app
+#14 CACHED
+
+#15 [company-tools-mcp 3/5] COPY mcps/company_tools/requirements.txt /tmp/mcp-requirements.txt
+#15 CACHED
+
+#16 [company-tools-mcp 5/5] COPY mcps /app/mcps
+#16 CACHED
+
+#7 [inventory-api internal] load build context
+#7 ...
+
+#17 [company-tools-mcp] exporting to image
+#17 exporting layers 0.0s done
+#17 exporting manifest sha256:4526d02fa84154b06bf46599f920a4fb6b148881f0d0dc62dbfeeb9ea7b7f9f1 done
+#17 exporting config sha256:db52e1ae054f1fe7c9c5ea1c9971545dd4b2b446e6c089b7a07e25df4a8a868e done
+#17 exporting attestation manifest sha256:9527ad08e4446a9eda8829325ed4219eab668ba826d2f474c33dad676e22086d 0.1s done
+#17 exporting manifest list sha256:95fd449fb5cd8442ef177d614f8b479c28dd40535fa5bf2e6bada81fe479f764 0.1s done
+#17 naming to docker.io/library/milestone_project_trackflow_getmystatsup-company-tools-mcp:latest done
+#17 unpacking to docker.io/library/milestone_project_trackflow_getmystatsup-company-tools-mcp:latest 0.1s done
+#17 DONE 0.8s
+
+#7 [inventory-api internal] load build context
+#7 ...
+
+#18 [company-tools-mcp] resolving provenance for metadata file
+#18 DONE 0.1s
+
+#7 [inventory-api internal] load build context
+#7 ...
+
+#8 [incident-api internal] load build context
+#8 transferring context: 18.54kB 2.6s done
+#8 DONE 2.6s
+
+#19 [incident-api 2/5] WORKDIR /app
+#19 CACHED
+
+#20 [incident-api  4/12] COPY services/incident-api/requirements.txt /app/services/incident-api/requirements.txt
+#20 CACHED
+
+#21 [incident-api  6/12] COPY scripts /app/scripts
+#21 CACHED
+
+#22 [incident-api  5/12] RUN pip install --no-cache-dir -r /app/services/incident-api/requirements.txt
+#22 CACHED
+
+#23 [incident-api  8/12] COPY agents /app/agents
+#23 CACHED
+
+#24 [incident-api  9/12] COPY packages /app/packages
+#24 CACHED
+
+#25 [incident-api 10/12] COPY data /app/data
+#25 CACHED
+
+#26 [incident-api  7/12] COPY services /app/services
+#26 CACHED
+
+#27 [incident-api  3/12] RUN apt-get update && apt-get install -y --no-install-recommends     curl     && rm -rf /var/lib/apt/lists/*
+#27 CACHED
+
+#28 [incident-api 11/12] COPY docs/company-knowledge-base /app/docs/company-knowledge-base
+#28 CACHED
+
+#29 [incident-api 12/12] RUN mkdir -p /data/uploads
+#29 CACHED
+
+#7 [inventory-api internal] load build context
+#7 ...
+
+#30 [incident-api] exporting to image
+#30 exporting layers 0.0s done
+#30 exporting manifest sha256:50feeff917c4d58196c700d8a81513e84fbadc45685cd796383d275a9fe0b700 0.1s done
+#30 exporting config sha256:bcc913ec8420f88d3ca6bc2a1bd7f1cac71d1b9846720864f1195cec1e8cefa2 done
+#30 exporting attestation manifest sha256:8c1b6340af74a10fe5c7c9a78f3feee7aafca1e60b8bd72333bad8b6e9e07e32 0.0s done
+#30 exporting manifest list sha256:a42d63e0952ec93819d55541c1006d80f3c0427e966c71d6097bc93c4f0a2e47 0.0s done
+#30 naming to docker.io/library/milestone_project_trackflow_getmystatsup-incident-api:latest done
+#30 unpacking to docker.io/library/milestone_project_trackflow_getmystatsup-incident-api:latest 0.0s done
+#30 DONE 0.5s
+
+#7 [inventory-api internal] load build context
+#7 ...
+
+#31 [incident-api] resolving provenance for metadata file
+#31 DONE 0.0s
+
+#7 [inventory-api internal] load build context
+#7 transferring context: 88.66MB 7.6s
+#7 transferring context: 201.88MB 12.7s
+#7 transferring context: 238.76MB 17.8s
+#7 transferring context: 313.74MB 20.6s done
+#7 DONE 20.7s
+
+#19 [inventory-api 2/5] WORKDIR /app
+#19 CACHED
+
+#32 [inventory-api 3/5] COPY . /app
+#32 DONE 12.4s
+
+#33 [inventory-api 4/5] RUN pip install --no-cache-dir -r "/app/services/inventory-api/requirements.txt"
+#33 2.866 Collecting prefect<3,>=2.14 (from -r /app/data/pipelines/requirements.txt (line 1))
+#33 2.902   Downloading prefect-2.20.25-py3-none-any.whl.metadata (12 kB)
+#33 3.043 Collecting pandas>=2.0 (from -r /app/data/pipelines/requirements.txt (line 2))
+#33 3.051   Downloading pandas-3.0.5-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (79 kB)
+#33 3.104 Collecting python-dotenv>=1.0.0 (from -r /app/data/pipelines/requirements.txt (line 3))
+#33 3.112   Downloading python_dotenv-1.2.2-py3-none-any.whl.metadata (27 kB)
+#33 3.217 Collecting pydantic<2.10,>=2.0 (from -r /app/data/pipelines/requirements.txt (line 4))
+#33 3.226   Downloading pydantic-2.9.2-py3-none-any.whl.metadata (149 kB)
+#33 3.296 Collecting openai<2,>=1.59 (from -r /app/data/pipelines/requirements.txt (line 5))
+#33 3.303   Downloading openai-1.109.1-py3-none-any.whl.metadata (29 kB)
+#33 3.332 Collecting qdrant-client<2,>=1.12 (from -r /app/data/pipelines/requirements.txt (line 6))
+#33 3.339   Downloading qdrant_client-1.19.0-py3-none-any.whl.metadata (11 kB)
+#33 3.372 Collecting pytest>=7.0 (from -r /app/data/pipelines/requirements.txt (line 7))
+#33 3.380   Downloading pytest-9.1.1-py3-none-any.whl.metadata (7.6 kB)
+#33 3.429 Collecting fastapi (from -r /app/services/inventory-api/requirements.txt (line 3))
+#33 3.436   Downloading fastapi-0.141.1-py3-none-any.whl.metadata (27 kB)
+#33 3.456 Collecting sqlmodel (from -r /app/services/inventory-api/requirements.txt (line 5))
+#33 3.464   Downloading sqlmodel-0.0.39-py3-none-any.whl.metadata (9.4 kB)
+#33 3.520 Collecting psycopg2-binary (from -r /app/services/inventory-api/requirements.txt (line 6))
+#33 3.528   Downloading psycopg2_binary-2.9.12-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (4.9 kB)
+#33 3.545 Collecting tinydb (from -r /app/services/inventory-api/requirements.txt (line 7))
+#33 3.553   Downloading tinydb-4.8.2-py3-none-any.whl.metadata (6.7 kB)
+#33 3.589 Collecting bcrypt==4.0.1 (from -r /app/services/inventory-api/requirements.txt (line 10))
+#33 3.598   Downloading bcrypt-4.0.1-cp36-abi3-manylinux_2_28_x86_64.whl.metadata (9.0 kB)
+#33 3.627 Collecting pydantic-settings (from -r /app/services/inventory-api/requirements.txt (line 11))
+#33 3.638   Downloading pydantic_settings-2.14.2-py3-none-any.whl.metadata (3.4 kB)
+#33 3.655 Collecting email-validator (from -r /app/services/inventory-api/requirements.txt (line 13))
+#33 3.662   Downloading email_validator-2.3.0-py3-none-any.whl.metadata (26 kB)
+#33 3.690 Collecting uvicorn[standard] (from -r /app/services/inventory-api/requirements.txt (line 4))
+#33 3.697   Downloading uvicorn-0.52.1-py3-none-any.whl.metadata (6.6 kB)
+#33 3.712 Collecting python-jose[cryptography] (from -r /app/services/inventory-api/requirements.txt (line 8))
+#33 3.719   Downloading python_jose-3.5.0-py2.py3-none-any.whl.metadata (5.5 kB)
+#33 3.731 Collecting passlib[bcrypt] (from -r /app/services/inventory-api/requirements.txt (line 9))
+#33 3.740   Downloading passlib-1.7.4-py2.py3-none-any.whl.metadata (1.7 kB)
+#33 3.758 Collecting aiosqlite<1.0.0,>=0.17.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 3.765   Downloading aiosqlite-0.22.1-py3-none-any.whl.metadata (4.3 kB)
+#33 3.793 Collecting alembic<2.0.0,>=1.7.5 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 3.800   Downloading alembic-1.19.0-py3-none-any.whl.metadata (7.3 kB)
+#33 3.820 Collecting apprise<2.0.0,>=1.8.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 3.827   Downloading apprise-1.12.0-py3-none-any.whl.metadata (62 kB)
+#33 3.866 Collecting asyncpg<0.32.0,>=0.23 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 3.873   Downloading asyncpg-0.31.0-cp312-cp312-manylinux_2_28_x86_64.whl.metadata (4.4 kB)
+#33 3.899 Collecting click<8.2,>=8.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 3.907   Downloading click-8.1.8-py3-none-any.whl.metadata (2.3 kB)
+#33 4.204 Collecting cryptography>=36.0.1 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 4.213   Downloading cryptography-50.0.0-cp311-abi3-manylinux_2_34_x86_64.whl.metadata (4.3 kB)
+#33 4.231 Collecting dateparser<2.0.0,>=1.1.1 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 4.238   Downloading dateparser-1.4.2-py3-none-any.whl.metadata (24 kB)
+#33 4.262 Collecting docker<8.0,>=4.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 4.269   Downloading docker-7.2.0-py3-none-any.whl.metadata (3.8 kB)
+#33 4.287 Collecting graphviz>=0.20.1 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 4.294   Downloading graphviz-0.21-py3-none-any.whl.metadata (12 kB)
+#33 4.314 Collecting jinja2<4.0.0,>=3.0.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 4.321   Downloading jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
+#33 4.333 Collecting jinja2-humanize-extension>=0.4.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 4.345   Downloading jinja2_humanize_extension-0.4.0-py3-none-any.whl.metadata (3.6 kB)
+#33 4.373 Collecting humanize<5.0.0,>=4.9.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 4.382   Downloading humanize-4.16.0-py3-none-any.whl.metadata (8.0 kB)
+#33 4.409 Collecting kubernetes<32.0.0,>=24.2.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 4.416   Downloading kubernetes-31.0.0-py2.py3-none-any.whl.metadata (1.5 kB)
+#33 4.454 Collecting pytz<2026,>=2021.1 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 4.461   Downloading pytz-2025.2-py2.py3-none-any.whl.metadata (22 kB)
+#33 4.477 Collecting readchar<5.0.0,>=4.0.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 4.484   Downloading readchar-4.2.2-py3-none-any.whl.metadata (7.5 kB)
+#33 4.745 Collecting sqlalchemy!=1.4.33,<2.0.36,>=1.4.22 (from sqlalchemy[asyncio]!=1.4.33,<2.0.36,>=1.4.22->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 4.755   Downloading SQLAlchemy-2.0.35-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (9.6 kB)
+#33 4.788 Collecting typer!=0.12.2,<0.18.0,>=0.12.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 4.796   Downloading typer-0.17.5-py3-none-any.whl.metadata (15 kB)
+#33 4.816 Collecting anyio<5.0,>=4.4.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 4.824   Downloading anyio-4.14.2-py3-none-any.whl.metadata (4.6 kB)
+#33 4.835 Collecting asgi-lifespan<3.0,>=1.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 4.844   Downloading asgi_lifespan-2.1.0-py3-none-any.whl.metadata (10 kB)
+#33 4.867 Collecting cachetools<7.0,>=5.3 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 4.875   Downloading cachetools-6.2.6-py3-none-any.whl.metadata (5.6 kB)
+#33 4.890 Collecting cloudpickle<4.0,>=2.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 4.897   Downloading cloudpickle-3.1.2-py3-none-any.whl.metadata (7.1 kB)
+#33 4.909 Collecting coolname<3.0.0,>=1.0.4 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 4.916   Downloading coolname-2.2.0-py2.py3-none-any.whl.metadata (6.2 kB)
+#33 4.949 Collecting croniter<6.0.0,>=1.0.12 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 4.958   Downloading croniter-5.0.1-py2.py3-none-any.whl.metadata (30 kB)
+#33 5.006 Collecting fsspec>=2022.5.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 5.014   Downloading fsspec-2026.7.0-py3-none-any.whl.metadata (10 kB)
+#33 5.049 Collecting exceptiongroup>=1.2.1 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 5.057   Downloading exceptiongroup-1.3.1-py3-none-any.whl.metadata (6.7 kB)
+#33 5.086 Collecting griffe<2.0.0,>=0.49.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 5.094   Downloading griffe-1.15.0-py3-none-any.whl.metadata (5.2 kB)
+#33 5.113 Collecting httpcore<2.0.0,>=1.0.5 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 5.121   Downloading httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
+#33 5.158 Collecting httpx!=0.23.2,>=0.23 (from httpx[http2]!=0.23.2,>=0.23->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 5.166   Downloading httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+#33 5.264 Collecting importlib-resources<6.5.0,>=6.1.3 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 5.274   Downloading importlib_resources-6.4.5-py3-none-any.whl.metadata (4.0 kB)
+#33 5.294 Collecting jsonpatch<2.0,>=1.32 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 5.303   Downloading jsonpatch-1.33-py2.py3-none-any.whl.metadata (3.0 kB)
+#33 5.328 Collecting jsonschema<5.0.0,>=4.0.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 5.335   Downloading jsonschema-4.26.0-py3-none-any.whl.metadata (7.6 kB)
+#33 5.540 Collecting orjson<4.0,>=3.7 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 5.565   Downloading orjson-3.11.9-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (41 kB)
+#33 5.585 Collecting packaging<25.1,>=21.3 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 5.593   Downloading packaging-25.0-py3-none-any.whl.metadata (3.3 kB)
+#33 5.607 Collecting pathspec>=0.8.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 5.614   Downloading pathspec-1.1.1-py3-none-any.whl.metadata (14 kB)
+#33 6.266 Collecting pydantic-core<3.0.0,>=2.12.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 6.278   Downloading pydantic_core-2.47.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.5 kB)
+#33 6.293 Collecting python-dateutil<3.0.0,>=2.8.2 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 6.300   Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata (8.4 kB)
+#33 6.316 Collecting python-slugify<9.0,>=5.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 6.323   Downloading python_slugify-8.0.4-py2.py3-none-any.whl.metadata (8.5 kB)
+#33 6.353 Collecting pyyaml<7.0.0,>=5.4.1 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 6.360   Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.4 kB)
+#33 6.370 Collecting rfc3339-validator<0.2.0,>=0.1.4 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 6.377   Downloading rfc3339_validator-0.1.4-py2.py3-none-any.whl.metadata (1.5 kB)
+#33 6.417 Collecting rich<15.0,>=11.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 6.425   Downloading rich-14.3.4-py3-none-any.whl.metadata (18 kB)
+#33 6.527 Collecting ruamel.yaml>=0.17.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 6.535   Downloading ruamel_yaml-0.19.1-py3-none-any.whl.metadata (16 kB)
+#33 6.546 Collecting sniffio<2.0.0,>=1.3.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 6.557   Downloading sniffio-1.3.1-py3-none-any.whl.metadata (3.9 kB)
+#33 6.568 Collecting toml>=0.10.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 6.575   Downloading toml-0.10.2-py2.py3-none-any.whl.metadata (7.1 kB)
+#33 6.594 Collecting typing-extensions<5.0.0,>=4.5.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 6.602   Downloading typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+#33 6.659 Collecting ujson<6.0.0,>=5.8.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 6.667   Downloading ujson-5.13.0-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (10.0 kB)
+#33 6.769 Collecting websockets<14.0,>=10.4 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 6.777   Downloading websockets-13.1-cp312-cp312-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.8 kB)
+#33 6.790 Collecting itsdangerous (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 6.798   Downloading itsdangerous-2.2.0-py3-none-any.whl.metadata (1.9 kB)
+#33 6.812 Collecting python-multipart>=0.0.7 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 6.819   Downloading python_multipart-0.0.32-py3-none-any.whl.metadata (2.1 kB)
+#33 6.856 Collecting pendulum<4,>=3.0.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 6.864   Downloading pendulum-3.2.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.8 kB)
+#33 7.096 Collecting numpy>=1.26.0 (from pandas>=2.0->-r /app/data/pipelines/requirements.txt (line 2))
+#33 7.105   Downloading numpy-2.5.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (6.6 kB)
+#33 7.142 Collecting annotated-types>=0.6.0 (from pydantic<2.10,>=2.0->-r /app/data/pipelines/requirements.txt (line 4))
+#33 7.149   Downloading annotated_types-0.8.0-py3-none-any.whl.metadata (15 kB)
+#33 7.158 Collecting pydantic-core<3.0.0,>=2.12.0 (from prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 7.168   Downloading pydantic_core-2.23.4-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.6 kB)
+#33 7.199 Collecting distro<2,>=1.7.0 (from openai<2,>=1.59->-r /app/data/pipelines/requirements.txt (line 5))
+#33 7.207   Downloading distro-1.9.0-py3-none-any.whl.metadata (6.8 kB)
+#33 7.295 Collecting jiter<1,>=0.4.0 (from openai<2,>=1.59->-r /app/data/pipelines/requirements.txt (line 5))
+#33 7.303   Downloading jiter-0.16.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (5.2 kB)
+#33 7.378 Collecting tqdm>4 (from openai<2,>=1.59->-r /app/data/pipelines/requirements.txt (line 5))
+#33 7.386   Downloading tqdm-4.70.0-py3-none-any.whl.metadata (57 kB)
+#33 7.923 Collecting grpcio>=1.41.0 (from qdrant-client<2,>=1.12->-r /app/data/pipelines/requirements.txt (line 6))
+#33 7.932   Downloading grpcio-1.83.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (3.7 kB)
+#33 7.954 Collecting portalocker<4.0,>=2.7.0 (from qdrant-client<2,>=1.12->-r /app/data/pipelines/requirements.txt (line 6))
+#33 7.961   Downloading portalocker-3.2.0-py3-none-any.whl.metadata (8.7 kB)
+#33 8.094 Collecting protobuf>=3.20.0 (from qdrant-client<2,>=1.12->-r /app/data/pipelines/requirements.txt (line 6))
+#33 8.102   Downloading protobuf-7.35.1-cp310-abi3-manylinux2014_x86_64.whl.metadata (595 bytes)
+#33 8.185 Collecting urllib3<3,>=1.26.14 (from qdrant-client<2,>=1.12->-r /app/data/pipelines/requirements.txt (line 6))
+#33 8.192   Downloading urllib3-2.7.0-py3-none-any.whl.metadata (6.9 kB)
+#33 8.207 Collecting iniconfig>=1.0.1 (from pytest>=7.0->-r /app/data/pipelines/requirements.txt (line 7))
+#33 8.214   Downloading iniconfig-2.3.0-py3-none-any.whl.metadata (2.5 kB)
+#33 8.232 Collecting pluggy<2,>=1.5 (from pytest>=7.0->-r /app/data/pipelines/requirements.txt (line 7))
+#33 8.240   Downloading pluggy-1.6.0-py3-none-any.whl.metadata (4.8 kB)
+#33 8.260 Collecting pygments>=2.7.2 (from pytest>=7.0->-r /app/data/pipelines/requirements.txt (line 7))
+#33 8.268   Downloading pygments-2.20.0-py3-none-any.whl.metadata (2.5 kB)
+#33 8.301 Collecting starlette>=0.46.0 (from fastapi->-r /app/services/inventory-api/requirements.txt (line 3))
+#33 8.309   Downloading starlette-1.4.1-py3-none-any.whl.metadata (6.4 kB)
+#33 8.385 Collecting typing-inspection>=0.4.2 (from fastapi->-r /app/services/inventory-api/requirements.txt (line 3))
+#33 8.392   Downloading typing_inspection-0.4.2-py3-none-any.whl.metadata (2.6 kB)
+#33 8.405 Collecting annotated-doc>=0.0.2 (from fastapi->-r /app/services/inventory-api/requirements.txt (line 3))
+#33 8.413   Downloading annotated_doc-0.0.5-py3-none-any.whl.metadata (6.5 kB)
+#33 8.433 Collecting h11>=0.8 (from uvicorn[standard]->-r /app/services/inventory-api/requirements.txt (line 4))
+#33 8.440   Downloading h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+#33 8.468 Collecting httptools>=0.8.0 (from uvicorn[standard]->-r /app/services/inventory-api/requirements.txt (line 4))
+#33 8.476   Downloading httptools-0.8.0-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (3.5 kB)
+#33 8.512 Collecting uvloop>=0.15.1 (from uvicorn[standard]->-r /app/services/inventory-api/requirements.txt (line 4))
+#33 8.519   Downloading uvloop-0.22.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (4.9 kB)
+#33 8.585 Collecting watchfiles>=0.20 (from uvicorn[standard]->-r /app/services/inventory-api/requirements.txt (line 4))
+#33 8.592   Downloading watchfiles-1.2.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.9 kB)
+#33 8.690 INFO: pip is looking at multiple versions of sqlmodel to determine which version is compatible with other requirements. This could take a while.
+#33 8.693 Collecting sqlmodel (from -r /app/services/inventory-api/requirements.txt (line 5))
+#33 8.700   Downloading sqlmodel-0.0.38-py3-none-any.whl.metadata (10 kB)
+#33 8.711   Downloading sqlmodel-0.0.37-py3-none-any.whl.metadata (10 kB)
+#33 8.721   Downloading sqlmodel-0.0.36-py3-none-any.whl.metadata (10 kB)
+#33 8.732   Downloading sqlmodel-0.0.35-py3-none-any.whl.metadata (10 kB)
+#33 8.742   Downloading sqlmodel-0.0.34-py3-none-any.whl.metadata (10 kB)
+#33 8.753   Downloading sqlmodel-0.0.33-py3-none-any.whl.metadata (10 kB)
+#33 8.825 Collecting ecdsa!=0.15 (from python-jose[cryptography]->-r /app/services/inventory-api/requirements.txt (line 8))
+#33 8.834   Downloading ecdsa-0.19.2-py2.py3-none-any.whl.metadata (29 kB)
+#33 8.852 Collecting rsa!=4.1.1,!=4.4,<5.0,>=4.0 (from python-jose[cryptography]->-r /app/services/inventory-api/requirements.txt (line 8))
+#33 8.860   Downloading rsa-4.9.1-py3-none-any.whl.metadata (5.6 kB)
+#33 8.879 Collecting pyasn1>=0.5.0 (from python-jose[cryptography]->-r /app/services/inventory-api/requirements.txt (line 8))
+#33 8.886   Downloading pyasn1-0.6.4-py3-none-any.whl.metadata (8.4 kB)
+#33 8.935 Collecting dnspython>=2.0.0 (from email-validator->-r /app/services/inventory-api/requirements.txt (line 13))
+#33 8.943   Downloading dnspython-2.8.0-py3-none-any.whl.metadata (5.7 kB)
+#33 8.960 Collecting idna>=2.0.0 (from email-validator->-r /app/services/inventory-api/requirements.txt (line 13))
+#33 8.968   Downloading idna-3.18-py3-none-any.whl.metadata (6.1 kB)
+#33 9.011 Collecting Mako (from alembic<2.0.0,>=1.7.5->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 9.019   Downloading mako-1.4.1-py3-none-any.whl.metadata (2.9 kB)
+#33 9.058 Collecting requests (from apprise<2.0.0,>=1.8.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 9.067   Downloading requests-2.34.2-py3-none-any.whl.metadata (4.8 kB)
+#33 9.082 Collecting requests-oauthlib (from apprise<2.0.0,>=1.8.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 9.090   Downloading requests_oauthlib-2.0.0-py2.py3-none-any.whl.metadata (11 kB)
+#33 9.113 Collecting markdown (from apprise<2.0.0,>=1.8.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 9.121   Downloading markdown-3.10.3-py3-none-any.whl.metadata (5.1 kB)
+#33 9.141 Collecting certifi (from apprise<2.0.0,>=1.8.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 9.149   Downloading certifi-2026.7.22-py3-none-any.whl.metadata (2.5 kB)
+#33 9.354 Collecting cffi>=2.0.0 (from cryptography>=36.0.1->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 9.362   Downloading cffi-2.1.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (2.5 kB)
+#33 9.721 Collecting regex>=2024.9.11 (from dateparser<2.0.0,>=1.1.1->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 9.729   Downloading regex-2026.7.19-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (40 kB)
+#33 9.747 Collecting tzlocal>=0.2 (from dateparser<2.0.0,>=1.1.1->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 9.755   Downloading tzlocal-5.4.4-py3-none-any.whl.metadata (7.7 kB)
+#33 9.792 Collecting six>=1.9.0 (from ecdsa!=0.15->python-jose[cryptography]->-r /app/services/inventory-api/requirements.txt (line 8))
+#33 9.800   Downloading six-1.17.0-py2.py3-none-any.whl.metadata (1.7 kB)
+#33 9.828 Collecting colorama>=0.4 (from griffe<2.0.0,>=0.49.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 9.836   Downloading colorama-0.4.6-py2.py3-none-any.whl.metadata (17 kB)
+#33 9.882 Collecting h2<5,>=3 (from httpx[http2]!=0.23.2,>=0.23->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 9.892   Downloading h2-4.4.1-py3-none-any.whl.metadata (3.8 kB)
+#33 10.05 Collecting MarkupSafe>=2.0 (from jinja2<4.0.0,>=3.0.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 10.06   Downloading markupsafe-3.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.7 kB)
+#33 10.19 Collecting jsonpointer>=1.9 (from jsonpatch<2.0,>=1.32->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 10.21   Downloading jsonpointer-3.1.1-py3-none-any.whl.metadata (2.4 kB)
+#33 10.28 Collecting attrs>=22.2.0 (from jsonschema<5.0.0,>=4.0.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 10.30   Downloading attrs-26.1.0-py3-none-any.whl.metadata (8.8 kB)
+#33 10.36 Collecting jsonschema-specifications>=2023.03.6 (from jsonschema<5.0.0,>=4.0.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 10.38   Downloading jsonschema_specifications-2025.9.1-py3-none-any.whl.metadata (2.9 kB)
+#33 10.42 Collecting referencing>=0.28.4 (from jsonschema<5.0.0,>=4.0.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 10.43   Downloading referencing-0.37.0-py3-none-any.whl.metadata (2.8 kB)
+#33 10.73 Collecting rpds-py>=0.25.0 (from jsonschema<5.0.0,>=4.0.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 10.74   Downloading rpds_py-2026.6.3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.1 kB)
+#33 10.79 Collecting google-auth>=1.0.1 (from kubernetes<32.0.0,>=24.2.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 10.80   Downloading google_auth-2.56.3-py3-none-any.whl.metadata (6.0 kB)
+#33 10.83 Collecting websocket-client!=0.40.0,!=0.41.*,!=0.42.*,>=0.32.0 (from kubernetes<32.0.0,>=24.2.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 10.84   Downloading websocket_client-1.9.0-py3-none-any.whl.metadata (8.3 kB)
+#33 10.85 Collecting oauthlib>=3.2.2 (from kubernetes<32.0.0,>=24.2.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 10.86   Downloading oauthlib-3.3.1-py3-none-any.whl.metadata (7.9 kB)
+#33 10.88 Collecting durationpy>=0.7 (from kubernetes<32.0.0,>=24.2.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 10.89   Downloading durationpy-0.10-py3-none-any.whl.metadata (340 bytes)
+#33 10.92 Collecting tzdata>=2020.1 (from pendulum<4,>=3.0.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 10.93   Downloading tzdata-2026.3-py2.py3-none-any.whl.metadata (1.4 kB)
+#33 10.97 Collecting text-unidecode>=1.3 (from python-slugify<9.0,>=5.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 10.98   Downloading text_unidecode-1.3-py2.py3-none-any.whl.metadata (2.4 kB)
+#33 11.00 Collecting markdown-it-py>=2.2.0 (from rich<15.0,>=11.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 11.01   Downloading markdown_it_py-4.2.0-py3-none-any.whl.metadata (7.4 kB)
+#33 11.18 Collecting greenlet!=0.4.17 (from sqlalchemy!=1.4.33,<2.0.36,>=1.4.22->sqlalchemy[asyncio]!=1.4.33,<2.0.36,>=1.4.22->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 11.19   Downloading greenlet-3.5.4-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (3.8 kB)
+#33 11.26 Collecting shellingham>=1.3.0 (from typer!=0.12.2,<0.18.0,>=0.12.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 11.26   Downloading shellingham-1.5.4-py2.py3-none-any.whl.metadata (3.5 kB)
+#33 11.34 Collecting pycparser (from cffi>=2.0.0->cryptography>=36.0.1->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 11.35   Downloading pycparser-3.0-py3-none-any.whl.metadata (8.2 kB)
+#33 11.38 Collecting pyasn1-modules>=0.2.1 (from google-auth>=1.0.1->kubernetes<32.0.0,>=24.2.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 11.39   Downloading pyasn1_modules-0.4.2-py3-none-any.whl.metadata (3.5 kB)
+#33 11.44 Collecting hyperframe<7,>=6.1 (from h2<5,>=3->httpx[http2]!=0.23.2,>=0.23->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 11.45   Downloading hyperframe-6.1.0-py3-none-any.whl.metadata (4.3 kB)
+#33 11.46 Collecting hpack<5,>=4.2 (from h2<5,>=3->httpx[http2]!=0.23.2,>=0.23->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 11.47   Downloading hpack-4.2.0-py3-none-any.whl.metadata (3.3 kB)
+#33 11.50 Collecting mdurl~=0.1 (from markdown-it-py>=2.2.0->rich<15.0,>=11.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 11.51   Downloading mdurl-0.1.2-py3-none-any.whl.metadata (1.6 kB)
+#33 11.63 Collecting charset_normalizer<4,>=2 (from requests->apprise<2.0.0,>=1.8.0->prefect<3,>=2.14->-r /app/data/pipelines/requirements.txt (line 1))
+#33 11.64   Downloading charset_normalizer-3.4.9-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (41 kB)
+#33 11.74 Downloading bcrypt-4.0.1-cp36-abi3-manylinux_2_28_x86_64.whl (593 kB)
+#33 11.75    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 593.7/593.7 kB 100.8 MB/s eta 0:00:00
+#33 11.77 Downloading prefect-2.20.25-py3-none-any.whl (6.0 MB)
+#33 11.80    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.0/6.0 MB 205.5 MB/s eta 0:00:00
+#33 11.81 Downloading pandas-3.0.5-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (11.0 MB)
+#33 11.83    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 11.0/11.0 MB 459.3 MB/s eta 0:00:00
+#33 11.84 Downloading python_dotenv-1.2.2-py3-none-any.whl (22 kB)
+#33 11.85 Downloading pydantic-2.9.2-py3-none-any.whl (434 kB)
+#33 11.86 Downloading pydantic_core-2.23.4-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.1 MB)
+#33 11.87    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 230.9 MB/s eta 0:00:00
+#33 11.88 Downloading openai-1.109.1-py3-none-any.whl (948 kB)
+#33 11.88    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 948.6/948.6 kB 542.3 MB/s eta 0:00:00
+#33 11.89 Downloading qdrant_client-1.19.0-py3-none-any.whl (396 kB)
+#33 11.90 Downloading pytest-9.1.1-py3-none-any.whl (386 kB)
+#33 11.91 Downloading fastapi-0.141.1-py3-none-any.whl (131 kB)
+#33 11.92 Downloading sqlmodel-0.0.33-py3-none-any.whl (27 kB)
+#33 11.93 Downloading psycopg2_binary-2.9.12-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (4.3 MB)
+#33 11.94    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.3/4.3 MB 448.4 MB/s eta 0:00:00
+#33 11.94 Downloading tinydb-4.8.2-py3-none-any.whl (24 kB)
+#33 11.95 Downloading pydantic_settings-2.14.2-py3-none-any.whl (61 kB)
+#33 11.96 Downloading email_validator-2.3.0-py3-none-any.whl (35 kB)
+#33 11.97 Downloading aiosqlite-0.22.1-py3-none-any.whl (17 kB)
+#33 11.98 Downloading alembic-1.19.0-py3-none-any.whl (265 kB)
+#33 11.99 Downloading annotated_doc-0.0.5-py3-none-any.whl (5.3 kB)
+#33 11.99 Downloading annotated_types-0.8.0-py3-none-any.whl (13 kB)
+#33 12.00 Downloading anyio-4.14.2-py3-none-any.whl (125 kB)
+#33 12.01 Downloading apprise-1.12.0-py3-none-any.whl (1.8 MB)
+#33 12.02    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 237.4 MB/s eta 0:00:00
+#33 12.02 Downloading asgi_lifespan-2.1.0-py3-none-any.whl (10 kB)
+#33 12.03 Downloading asyncpg-0.31.0-cp312-cp312-manylinux_2_28_x86_64.whl (3.5 MB)
+#33 12.04    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.5/3.5 MB 477.9 MB/s eta 0:00:00
+#33 12.05 Downloading cachetools-6.2.6-py3-none-any.whl (11 kB)
+#33 12.06 Downloading click-8.1.8-py3-none-any.whl (98 kB)
+#33 12.07 Downloading cloudpickle-3.1.2-py3-none-any.whl (22 kB)
+#33 12.08 Downloading coolname-2.2.0-py2.py3-none-any.whl (37 kB)
+#33 12.08 Downloading croniter-5.0.1-py2.py3-none-any.whl (24 kB)
+#33 12.09 Downloading cryptography-50.0.0-cp311-abi3-manylinux_2_34_x86_64.whl (4.7 MB)
+#33 12.10    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.7/4.7 MB 463.0 MB/s eta 0:00:00
+#33 12.11 Downloading dateparser-1.4.2-py3-none-any.whl (316 kB)
+#33 12.12 Downloading distro-1.9.0-py3-none-any.whl (20 kB)
+#33 12.13 Downloading dnspython-2.8.0-py3-none-any.whl (331 kB)
+#33 12.13 Downloading docker-7.2.0-py3-none-any.whl (148 kB)
+#33 12.14 Downloading ecdsa-0.19.2-py2.py3-none-any.whl (150 kB)
+#33 12.15 Downloading exceptiongroup-1.3.1-py3-none-any.whl (16 kB)
+#33 12.16 Downloading fsspec-2026.7.0-py3-none-any.whl (206 kB)
+#33 12.16 Downloading graphviz-0.21-py3-none-any.whl (47 kB)
+#33 12.17 Downloading griffe-1.15.0-py3-none-any.whl (150 kB)
+#33 12.18 Downloading grpcio-1.83.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (7.0 MB)
+#33 12.20    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 7.0/7.0 MB 345.4 MB/s eta 0:00:00
+#33 12.21 Downloading h11-0.16.0-py3-none-any.whl (37 kB)
+#33 12.22 Downloading httpcore-1.0.9-py3-none-any.whl (78 kB)
+#33 12.23 Downloading httptools-0.8.0-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (523 kB)
+#33 12.24 Downloading httpx-0.28.1-py3-none-any.whl (73 kB)
+#33 12.24 Downloading humanize-4.16.0-py3-none-any.whl (137 kB)
+#33 12.25 Downloading idna-3.18-py3-none-any.whl (65 kB)
+#33 12.26 Downloading importlib_resources-6.4.5-py3-none-any.whl (36 kB)
+#33 12.27 Downloading iniconfig-2.3.0-py3-none-any.whl (7.5 kB)
+#33 12.27 Downloading jinja2-3.1.6-py3-none-any.whl (134 kB)
+#33 12.28 Downloading jinja2_humanize_extension-0.4.0-py3-none-any.whl (4.8 kB)
+#33 12.29 Downloading jiter-0.16.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (343 kB)
+#33 12.30 Downloading jsonpatch-1.33-py2.py3-none-any.whl (12 kB)
+#33 12.31 Downloading jsonschema-4.26.0-py3-none-any.whl (90 kB)
+#33 12.31 Downloading kubernetes-31.0.0-py2.py3-none-any.whl (1.9 MB)
+#33 12.32    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.9/1.9 MB 452.0 MB/s eta 0:00:00
+#33 12.33 Downloading numpy-2.5.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (16.7 MB)
+#33 12.37    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.7/16.7 MB 413.3 MB/s eta 0:00:00
+#33 12.38 Downloading orjson-3.11.9-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (134 kB)
+#33 12.39 Downloading packaging-25.0-py3-none-any.whl (66 kB)
+#33 12.40 Downloading pathspec-1.1.1-py3-none-any.whl (57 kB)
+#33 12.40 Downloading pendulum-3.2.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (348 kB)
+#33 12.41 Downloading pluggy-1.6.0-py3-none-any.whl (20 kB)
+#33 12.42 Downloading portalocker-3.2.0-py3-none-any.whl (22 kB)
+#33 12.43 Downloading protobuf-7.35.1-cp310-abi3-manylinux2014_x86_64.whl (327 kB)
+#33 12.44 Downloading pyasn1-0.6.4-py3-none-any.whl (84 kB)
+#33 12.44 Downloading pygments-2.20.0-py3-none-any.whl (1.2 MB)
+#33 12.45    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 403.5 MB/s eta 0:00:00
+#33 12.46 Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)
+#33 12.47 Downloading python_multipart-0.0.32-py3-none-any.whl (30 kB)
+#33 12.48 Downloading python_slugify-8.0.4-py2.py3-none-any.whl (10 kB)
+#33 12.48 Downloading pytz-2025.2-py2.py3-none-any.whl (509 kB)
+#33 12.49 Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (807 kB)
+#33 12.50    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 807.9/807.9 kB 545.5 MB/s eta 0:00:00
+#33 12.50 Downloading readchar-4.2.2-py3-none-any.whl (9.4 kB)
+#33 12.51 Downloading rfc3339_validator-0.1.4-py2.py3-none-any.whl (3.5 kB)
+#33 12.52 Downloading rich-14.3.4-py3-none-any.whl (310 kB)
+#33 12.53 Downloading rsa-4.9.1-py3-none-any.whl (34 kB)
+#33 12.53 Downloading ruamel_yaml-0.19.1-py3-none-any.whl (118 kB)
+#33 12.54 Downloading sniffio-1.3.1-py3-none-any.whl (10 kB)
+#33 12.55 Downloading SQLAlchemy-2.0.35-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.2 MB)
+#33 12.56    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.2/3.2 MB 301.1 MB/s eta 0:00:00
+#33 12.57 Downloading starlette-1.4.1-py3-none-any.whl (74 kB)
+#33 12.58 Downloading toml-0.10.2-py2.py3-none-any.whl (16 kB)
+#33 12.59 Downloading tqdm-4.70.0-py3-none-any.whl (80 kB)
+#33 12.60 Downloading typer-0.17.5-py3-none-any.whl (46 kB)
+#33 12.61 Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+#33 12.61 Downloading typing_inspection-0.4.2-py3-none-any.whl (14 kB)
+#33 12.62 Downloading ujson-5.13.0-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (57 kB)
+#33 12.63 Downloading urllib3-2.7.0-py3-none-any.whl (131 kB)
+#33 12.63 Downloading uvicorn-0.52.1-py3-none-any.whl (79 kB)
+#33 12.64 Downloading uvloop-0.22.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (4.4 MB)
+#33 12.66    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.4/4.4 MB 339.9 MB/s eta 0:00:00
+#33 12.66 Downloading watchfiles-1.2.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (456 kB)
+#33 12.67 Downloading websockets-13.1-cp312-cp312-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl (165 kB)
+#33 12.68 Downloading itsdangerous-2.2.0-py3-none-any.whl (16 kB)
+#33 12.69 Downloading passlib-1.7.4-py2.py3-none-any.whl (525 kB)
+#33 12.69    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 525.6/525.6 kB 470.1 MB/s eta 0:00:00
+#33 12.70 Downloading python_jose-3.5.0-py2.py3-none-any.whl (34 kB)
+#33 12.71 Downloading attrs-26.1.0-py3-none-any.whl (67 kB)
+#33 12.72 Downloading certifi-2026.7.22-py3-none-any.whl (136 kB)
+#33 12.72 Downloading cffi-2.1.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (221 kB)
+#33 12.73 Downloading colorama-0.4.6-py2.py3-none-any.whl (25 kB)
+#33 12.74 Downloading durationpy-0.10-py3-none-any.whl (3.9 kB)
+#33 12.75 Downloading google_auth-2.56.3-py3-none-any.whl (259 kB)
+#33 12.76 Downloading greenlet-3.5.4-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (621 kB)
+#33 12.76    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 621.5/621.5 kB 522.6 MB/s eta 0:00:00
+#33 12.77 Downloading h2-4.4.1-py3-none-any.whl (62 kB)
+#33 12.77 Downloading jsonpointer-3.1.1-py3-none-any.whl (7.7 kB)
+#33 12.78 Downloading jsonschema_specifications-2025.9.1-py3-none-any.whl (18 kB)
+#33 12.79 Downloading markdown_it_py-4.2.0-py3-none-any.whl (91 kB)
+#33 12.80 Downloading markupsafe-3.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (22 kB)
+#33 12.80 Downloading oauthlib-3.3.1-py3-none-any.whl (160 kB)
+#33 12.81 Downloading referencing-0.37.0-py3-none-any.whl (26 kB)
+#33 12.82 Downloading regex-2026.7.19-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (801 kB)
+#33 12.82    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 801.8/801.8 kB 553.0 MB/s eta 0:00:00
+#33 12.83 Downloading requests-2.34.2-py3-none-any.whl (73 kB)
+#33 12.84 Downloading rpds_py-2026.6.3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (366 kB)
+#33 12.85 Downloading shellingham-1.5.4-py2.py3-none-any.whl (9.8 kB)
+#33 12.85 Downloading six-1.17.0-py2.py3-none-any.whl (11 kB)
+#33 12.86 Downloading text_unidecode-1.3-py2.py3-none-any.whl (78 kB)
+#33 12.87 Downloading tzdata-2026.3-py2.py3-none-any.whl (348 kB)
+#33 12.88 Downloading tzlocal-5.4.4-py3-none-any.whl (18 kB)
+#33 12.88 Downloading websocket_client-1.9.0-py3-none-any.whl (82 kB)
+#33 12.89 Downloading mako-1.4.1-py3-none-any.whl (80 kB)
+#33 12.90 Downloading markdown-3.10.3-py3-none-any.whl (110 kB)
+#33 12.91 Downloading requests_oauthlib-2.0.0-py2.py3-none-any.whl (24 kB)
+#33 12.92 Downloading charset_normalizer-3.4.9-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (224 kB)
+#33 12.93 Downloading hpack-4.2.0-py3-none-any.whl (34 kB)
+#33 12.94 Downloading hyperframe-6.1.0-py3-none-any.whl (13 kB)
+#33 12.95 Downloading mdurl-0.1.2-py3-none-any.whl (10.0 kB)
+#33 12.96 Downloading pyasn1_modules-0.4.2-py3-none-any.whl (181 kB)
+#33 12.97 Downloading pycparser-3.0-py3-none-any.whl (48 kB)
+#33 13.51 Installing collected packages: text-unidecode, pytz, passlib, durationpy, coolname, websockets, websocket-client, uvloop, urllib3, ujson, tzlocal, tzdata, typing-extensions, tqdm, toml, tinydb, sniffio, six, shellingham, ruamel.yaml, rpds-py, regex, readchar, pyyaml, python-slugify, python-multipart, python-dotenv, pygments, pycparser, pyasn1, psycopg2-binary, protobuf, portalocker, pluggy, pathspec, packaging, orjson, oauthlib, numpy, mdurl, MarkupSafe, markdown, jsonpointer, jiter, itsdangerous, iniconfig, importlib-resources, idna, hyperframe, humanize, httptools, hpack, h11, greenlet, graphviz, fsspec, dnspython, distro, colorama, cloudpickle, click, charset_normalizer, certifi, cachetools, bcrypt, attrs, asyncpg, annotated-types, annotated-doc, aiosqlite, uvicorn, typing-inspection, sqlalchemy, rsa, rfc3339-validator, requests, referencing, python-dateutil, pytest, pydantic-core, pyasn1-modules, markdown-it-py, Mako, jsonpatch, jinja2, httpcore, h2, grpcio, griffe, exceptiongroup, email-validator, ecdsa, cffi, asgi-lifespan, anyio, watchfiles, starlette, rich, requests-oauthlib, python-jose, pydantic, pendulum, pandas, jsonschema-specifications, jinja2-humanize-extension, httpx, docker, dateparser, cryptography, croniter, alembic, typer, sqlmodel, pydantic-settings, openai, jsonschema, google-auth, fastapi, apprise, qdrant-client, kubernetes, prefect
+#33 40.80 Successfully installed Mako-1.4.1 MarkupSafe-3.0.3 aiosqlite-0.22.1 alembic-1.19.0 annotated-doc-0.0.5 annotated-types-0.8.0 anyio-4.14.2 apprise-1.12.0 asgi-lifespan-2.1.0 asyncpg-0.31.0 attrs-26.1.0 bcrypt-4.0.1 cachetools-6.2.6 certifi-2026.7.22 cffi-2.1.1 charset_normalizer-3.4.9 click-8.1.8 cloudpickle-3.1.2 colorama-0.4.6 coolname-2.2.0 croniter-5.0.1 cryptography-50.0.0 dateparser-1.4.2 distro-1.9.0 dnspython-2.8.0 docker-7.2.0 durationpy-0.10 ecdsa-0.19.2 email-validator-2.3.0 exceptiongroup-1.3.1 fastapi-0.141.1 fsspec-2026.7.0 google-auth-2.56.3 graphviz-0.21 greenlet-3.5.4 griffe-1.15.0 grpcio-1.83.0 h11-0.16.0 h2-4.4.1 hpack-4.2.0 httpcore-1.0.9 httptools-0.8.0 httpx-0.28.1 humanize-4.16.0 hyperframe-6.1.0 idna-3.18 importlib-resources-6.4.5 iniconfig-2.3.0 itsdangerous-2.2.0 jinja2-3.1.6 jinja2-humanize-extension-0.4.0 jiter-0.16.0 jsonpatch-1.33 jsonpointer-3.1.1 jsonschema-4.26.0 jsonschema-specifications-2025.9.1 kubernetes-31.0.0 markdown-3.10.3 markdown-it-py-4.2.0 mdurl-0.1.2 numpy-2.5.1 oauthlib-3.3.1 openai-1.109.1 orjson-3.11.9 packaging-25.0 pandas-3.0.5 passlib-1.7.4 pathspec-1.1.1 pendulum-3.2.0 pluggy-1.6.0 portalocker-3.2.0 prefect-2.20.25 protobuf-7.35.1 psycopg2-binary-2.9.12 pyasn1-0.6.4 pyasn1-modules-0.4.2 pycparser-3.0 pydantic-2.9.2 pydantic-core-2.23.4 pydantic-settings-2.14.2 pygments-2.20.0 pytest-9.1.1 python-dateutil-2.9.0.post0 python-dotenv-1.2.2 python-jose-3.5.0 python-multipart-0.0.32 python-slugify-8.0.4 pytz-2025.2 pyyaml-6.0.3 qdrant-client-1.19.0 readchar-4.2.2 referencing-0.37.0 regex-2026.7.19 requests-2.34.2 requests-oauthlib-2.0.0 rfc3339-validator-0.1.4 rich-14.3.4 rpds-py-2026.6.3 rsa-4.9.1 ruamel.yaml-0.19.1 shellingham-1.5.4 six-1.17.0 sniffio-1.3.1 sqlalchemy-2.0.35 sqlmodel-0.0.33 starlette-1.4.1 text-unidecode-1.3 tinydb-4.8.2 toml-0.10.2 tqdm-4.70.0 typer-0.17.5 typing-extensions-4.16.0 typing-inspection-0.4.2 tzdata-2026.3 tzlocal-5.4.4 ujson-5.13.0 urllib3-2.7.0 uvicorn-0.52.1 uvloop-0.22.1 watchfiles-1.2.0 websocket-client-1.9.0 websockets-13.1
+#33 40.80 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#33 40.89 
+#33 40.89 [notice] A new release of pip is available: 25.0.1 -> 26.2.1
+#33 40.89 [notice] To update, run: pip install --upgrade pip
+#33 DONE 43.7s
+
+#34 [inventory-api 5/5] WORKDIR /app/services/inventory-api
+#34 DONE 0.4s
+
+#35 [inventory-api] exporting to image
+#35 exporting layers
+#35 exporting layers 38.1s done
+#35 exporting manifest sha256:6a477ab1c82b124f5f6e3034856a6425f64cd04927b762c0012fdd1b70cf4e24
+#35 exporting manifest sha256:6a477ab1c82b124f5f6e3034856a6425f64cd04927b762c0012fdd1b70cf4e24 0.0s done
+#35 exporting config sha256:88637bedf05689fcdbbf708f78e46871fbe97cdf96227d2df2389826f8173945 0.0s done
+#35 exporting attestation manifest sha256:9cefdabe660e70abd268e167316c146136add9768cd0b86f449004af80ea7bbb 0.0s done
+#35 exporting manifest list sha256:d5f4158c10a711a8ac4643c86e3281fc2d947605c971a81807f343f39e22c1fd 0.0s done
+#35 naming to docker.io/library/milestone_project_trackflow_getmystatsup-inventory-api:latest done
+#35 unpacking to docker.io/library/milestone_project_trackflow_getmystatsup-inventory-api:latest
+#35 unpacking to docker.io/library/milestone_project_trackflow_getmystatsup-inventory-api:latest 24.7s done
+#35 DONE 62.9s
+
+#36 [inventory-api] resolving provenance for metadata file
+#36 DONE 0.0s
+ milestone_project_trackflow_getmystatsup-incident-api  Built
+ milestone_project_trackflow_getmystatsup-inventory-api  Built
+ milestone_project_trackflow_getmystatsup-company-tools-mcp  Built
+ Container milestone_project_trackflow_getmystatsup-postgres-1  Running
+ Container milestone_project_trackflow_getmystatsup-redis-1  Running
+ Container milestone_project_trackflow_getmystatsup-qdrant-1  Running
+ Container milestone_project_trackflow_getmystatsup-incident-api-1  Recreate
+ Container milestone_project_trackflow_getmystatsup-inventory-api-1  Recreate
+ Container milestone_project_trackflow_getmystatsup-incident-api-1  Recreated
+ Container milestone_project_trackflow_getmystatsup-inventory-api-1  Recreated
+ Container milestone_project_trackflow_getmystatsup-company-tools-mcp-1  Recreate
+ Container milestone_project_trackflow_getmystatsup-company-tools-mcp-1  Recreated
+ Container milestone_project_trackflow_getmystatsup-inventory-api-1  Starting
+ Container milestone_project_trackflow_getmystatsup-postgres-1  Waiting
+ Container milestone_project_trackflow_getmystatsup-inventory-api-1  Started
+ Container milestone_project_trackflow_getmystatsup-postgres-1  Healthy
+ Container milestone_project_trackflow_getmystatsup-incident-api-1  Starting
+ Container milestone_project_trackflow_getmystatsup-incident-api-1  Started
+ Container milestone_project_trackflow_getmystatsup-incident-api-1  Waiting
+ Container milestone_project_trackflow_getmystatsup-inventory-api-1  Waiting
+ Container milestone_project_trackflow_getmystatsup-inventory-api-1  Healthy
+ Container milestone_project_trackflow_getmystatsup-incident-api-1  Healthy
+ Container milestone_project_trackflow_getmystatsup-company-tools-mcp-1  Starting
+ Container milestone_project_trackflow_getmystatsup-company-tools-mcp-1  Started
+Done. MCP metadata endpoint:
+  http://127.0.0.1:8006/.well-known/oauth-protected-resource/mcp
+
+Token summary:
+  INVENTORY_SERVICE_TOKEN is set for this compose start command only.
+
+Next:
+  bash scripts/codespaces-forward-mcp.sh --start   # in Codespaces
+Evidence report written to docs/incidents/mcp_submission_evidence.md

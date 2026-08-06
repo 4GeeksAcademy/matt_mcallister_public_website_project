@@ -34,7 +34,7 @@ def _route_after_receive(state: AgentState) -> str:
 
 def _route_after_classify(state: AgentState) -> str:
     if state.get("route") == "ticket":
-        return "ticket_lookup_node"
+        return "mcp_ticket_lookup_node"
     return "retrieve_node"
 
 
@@ -54,7 +54,7 @@ def build_graph(
     graph.add_node("receive_question", receive_question)
     graph.add_node("classify_route", classify_route)
     graph.add_node("set_error", set_error)
-    graph.add_node("ticket_lookup_node", make_ticket_lookup_node(lookup_fn))
+    graph.add_node("mcp_ticket_lookup_node", make_ticket_lookup_node(lookup_fn))
     graph.add_node("format_ticket_answer", ticket_format_answer)
     graph.add_node("retrieve_node", make_retrieve_node(retrieve_fn))
     graph.add_node("no_context_response", no_context_response)
@@ -70,9 +70,9 @@ def build_graph(
     graph.add_conditional_edges(
         "classify_route",
         _route_after_classify,
-        {"ticket_lookup_node": "ticket_lookup_node", "retrieve_node": "retrieve_node"},
+        {"mcp_ticket_lookup_node": "mcp_ticket_lookup_node", "retrieve_node": "retrieve_node"},
     )
-    graph.add_edge("ticket_lookup_node", "format_ticket_answer")
+    graph.add_edge("mcp_ticket_lookup_node", "format_ticket_answer")
     graph.add_edge("format_ticket_answer", END)
     graph.add_conditional_edges(
         "retrieve_node",
