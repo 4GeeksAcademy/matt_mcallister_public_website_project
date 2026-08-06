@@ -56,6 +56,13 @@ Or via Docker Compose:
 docker compose up company-tools-mcp incident-api inventory-api
 ```
 
+If `inventory_list_products` fails because `INVENTORY_SERVICE_TOKEN` is missing,
+use the deterministic bootstrap flow below (it provisions a token and starts MCP):
+
+```bash
+bash scripts/compose-mcp-with-token.sh
+```
+
 ## MCP Playground (Codespaces)
 
 ### One-command setup (inside your Codespace)
@@ -69,6 +76,13 @@ Or with Docker Compose already running:
 
 ```bash
 docker compose up -d incident-api inventory-api company-tools-mcp
+bash scripts/codespaces-forward-mcp.sh
+```
+
+For evaluator reliability when `INVENTORY_SERVICE_TOKEN` is not already set:
+
+```bash
+bash scripts/compose-mcp-with-token.sh
 bash scripts/codespaces-forward-mcp.sh
 ```
 

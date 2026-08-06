@@ -1,15 +1,19 @@
 """Inventory MCP tools: read-only listing plus explicit write rejection."""
 
 import json
-from typing import Any, Literal, Optional
+from typing import Any, Callable, Literal, Optional
 
 from mcp.server.fastmcp import FastMCP
 from mcpauth import MCPAuth
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationError
 
 from mcps.company_tools.auth import require_scopes
 from mcps.company_tools.clients.inventory import InventoryClient
-from mcps.company_tools.errors import InventoryWriteForbidden, MCPToolError
+from mcps.company_tools.errors import (
+    InventoryWriteForbidden,
+    MCPToolError,
+    MCPValidationError,
+)
 from mcps.company_tools.logging import log_tool_invocation
 
 
@@ -31,6 +35,66 @@ def _tool_response(payload: dict[str, Any]) -> str:
     return json.dumps(payload, sort_keys=True)
 
 
+def _validation_message(exc: ValidationError) -> str:
+    first = exc.errors()[0] if exc.errors() else {}
+    field = ".".join(str(part) for part in first.get("loc", []))
+    message = first.get("msg") or "Invalid tool input."
+    if field:
+        return f"{field}: {message}"
+    return str(message)
+
+
+def _handle_tool(
+    *,
+    mcp_auth: MCPAuth,
+    tool_name: str,
+    required_scopes: tuple[str, ...],
+    action: Callable[[], Any],
+) -> str:
+    client_id = "unknown"
+    try:
+        auth_info = require_scopes(mcp_auth, *required_scopes)
+        client_id = auth_info.client_id
+        data = action()
+        log_tool_invocation(
+            client_id=client_id,
+            tool=tool_name,
+            success=True,
+        )
+        return _tool_response({"ok": True, "data": data})
+    except MCPToolError as exc:
+        log_tool_invocation(
+            client_id=client_id,
+            tool=tool_name,
+            success=False,
+            error_code=exc.code,
+        )
+        return _tool_response({"ok": False, **exc.to_dict()})
+    except ValidationError as exc:
+        validation_error = MCPValidationError(_validation_message(exc))
+        log_tool_invocation(
+            client_id=client_id,
+            tool=tool_name,
+            success=False,
+            error_code=validation_error.code,
+        )
+        return _tool_response({"ok": False, **validation_error.to_dict()})
+    except Exception as exc:  # pragma: no cover - defensive guardrail
+        log_tool_invocation(
+            client_id=client_id,
+            tool=tool_name,
+            success=False,
+            error_code="BACKEND_UNAVAILABLE",
+        )
+        return _tool_response(
+            {
+                "ok": False,
+                "error_code": "BACKEND_UNAVAILABLE",
+                "message": str(exc),
+            }
+        )
+
+
 def register_tools(mcp: FastMCP, mcp_auth: MCPAuth) -> None:
     @mcp.tool(
         name="inventory_list_products",
@@ -40,30 +104,16 @@ def register_tools(mcp: FastMCP, mcp_auth: MCPAuth) -> None:
         ),
     )
     def inventory_list_products() -> str:
-        client_id = "unknown"
-
         def action() -> list[dict[str, Any]]:
             with InventoryClient() as client:
                 return client.list_products()
 
-        try:
-            auth_info = require_scopes(mcp_auth, "inventory:read")
-            client_id = auth_info.client_id
-            data = action()
-            log_tool_invocation(
-                client_id=client_id,
-                tool="inventory_list_products",
-                success=True,
-            )
-            return _tool_response({"ok": True, "data": data})
-        except MCPToolError as exc:
-            log_tool_invocation(
-                client_id=client_id,
-                tool="inventory_list_products",
-                success=False,
-                error_code=exc.code,
-            )
-            return _tool_response({"ok": False, **exc.to_dict()})
+        return _handle_tool(
+            mcp_auth=mcp_auth,
+            tool_name="inventory_list_products",
+            required_scopes=("inventory:read",),
+            action=action,
+        )
 
     @mcp.tool(
         name="inventory_create_product",
@@ -79,23 +129,19 @@ def register_tools(mcp: FastMCP, mcp_auth: MCPAuth) -> None:
         client_brand: str,
         low_stock_threshold: int = 10,
     ) -> str:
-        _ = InventoryCreateProductInput(
-            name=name,
-            sku=sku,
-            warehouse_location=warehouse_location,
-            client_brand=client_brand,
-            low_stock_threshold=low_stock_threshold,
-        )
-        client_id = "unknown"
-        try:
-            auth_info = require_scopes(mcp_auth, "inventory:read")
-            client_id = auth_info.client_id
-            raise InventoryWriteForbidden()
-        except MCPToolError as exc:
-            log_tool_invocation(
-                client_id=client_id,
-                tool="inventory_create_product",
-                success=False,
-                error_code=exc.code,
+        def action() -> None:
+            _ = InventoryCreateProductInput(
+                name=name,
+                sku=sku,
+                warehouse_location=warehouse_location,
+                client_brand=client_brand,
+                low_stock_threshold=low_stock_threshold,
             )
-            return _tool_response({"ok": False, **exc.to_dict()})
+            raise InventoryWriteForbidden()
+
+        return _handle_tool(
+            mcp_auth=mcp_auth,
+            tool_name="inventory_create_product",
+            required_scopes=("inventory:read",),
+            action=action,
+        )

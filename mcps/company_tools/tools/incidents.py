@@ -5,10 +5,10 @@ from typing import Any, Callable, Optional
 
 from mcp.server.fastmcp import FastMCP
 from mcpauth import MCPAuth
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationError
 from mcps.company_tools.auth import require_scopes
 from mcps.company_tools.clients.incidents import IncidentsClient
-from mcps.company_tools.errors import MCPToolError
+from mcps.company_tools.errors import MCPToolError, MCPValidationError
 from mcps.company_tools.logging import log_tool_invocation
 
 
@@ -50,6 +50,15 @@ def _tool_response(payload: dict[str, Any]) -> str:
     return json.dumps(payload, sort_keys=True)
 
 
+def _validation_message(exc: ValidationError) -> str:
+    first = exc.errors()[0] if exc.errors() else {}
+    field = ".".join(str(part) for part in first.get("loc", []))
+    message = first.get("msg") or "Invalid tool input."
+    if field:
+        return f"{field}: {message}"
+    return str(message)
+
+
 def _handle_tool(
     *,
     mcp_auth: MCPAuth,
@@ -76,6 +85,15 @@ def _handle_tool(
             error_code=exc.code,
         )
         return _tool_response({"ok": False, **exc.to_dict()})
+    except ValidationError as exc:
+        validation_error = MCPValidationError(_validation_message(exc))
+        log_tool_invocation(
+            client_id=client_id,
+            tool=tool_name,
+            success=False,
+            error_code=validation_error.code,
+        )
+        return _tool_response({"ok": False, **validation_error.to_dict()})
     except Exception as exc:  # pragma: no cover - defensive guardrail
         log_tool_invocation(
             client_id=client_id,
@@ -108,16 +126,15 @@ def register_tools(mcp: FastMCP, mcp_auth: MCPAuth) -> None:
         origin: str,
         branch: str,
     ) -> str:
-        payload = IncidentCreateInput(
-            title=title,
-            description=description,
-            category=category,
-            status=status,
-            origin=origin,
-            branch=branch,
-        )
-
         def action() -> dict[str, Any]:
+            payload = IncidentCreateInput(
+                title=title,
+                description=description,
+                category=category,
+                status=status,
+                origin=origin,
+                branch=branch,
+            )
             with IncidentsClient() as client:
                 return client.create_incident(payload.model_dump())
 
@@ -136,9 +153,8 @@ def register_tools(mcp: FastMCP, mcp_auth: MCPAuth) -> None:
         ),
     )
     def incidents_get(incident_id: str) -> str:
-        payload = IncidentGetInput(incident_id=incident_id)
-
         def action() -> dict[str, Any]:
+            payload = IncidentGetInput(incident_id=incident_id)
             with IncidentsClient() as client:
                 return client.get_incident(payload.incident_id)
 
@@ -162,14 +178,13 @@ def register_tools(mcp: FastMCP, mcp_auth: MCPAuth) -> None:
         origin: Optional[str] = None,
         branch: Optional[str] = None,
     ) -> str:
-        payload = IncidentListInput(
-            status=status,
-            category=category,
-            origin=origin,
-            branch=branch,
-        )
-
         def action() -> list[dict[str, Any]]:
+            payload = IncidentListInput(
+                status=status,
+                category=category,
+                origin=origin,
+                branch=branch,
+            )
             with IncidentsClient() as client:
                 return client.list_incidents(**payload.model_dump(exclude_none=True))
 
@@ -188,9 +203,8 @@ def register_tools(mcp: FastMCP, mcp_auth: MCPAuth) -> None:
         ),
     )
     def incidents_update_status(incident_id: str, status: str) -> str:
-        payload = IncidentUpdateStatusInput(incident_id=incident_id, status=status)
-
         def action() -> dict[str, Any]:
+            payload = IncidentUpdateStatusInput(incident_id=incident_id, status=status)
             with IncidentsClient() as client:
                 return client.update_status(payload.incident_id, payload.status)
 

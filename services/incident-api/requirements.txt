@@ -1,5 +1,5 @@
-fastapi==0.115.0
-uvicorn[standard]==0.30.6
+fastapi>=0.118,<1
+uvicorn[standard]>=0.31,<0.32
 python-multipart==0.0.9
 celery[redis]==5.4.0
 redis==5.0.8

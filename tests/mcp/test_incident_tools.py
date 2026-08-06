@@ -131,3 +131,32 @@ def test_incident_tool_json_reports_not_found(incidents_client, mcp_test_env) ->
         )
     assert payload["ok"] is False
     assert payload["error_code"] == "INCIDENT_NOT_FOUND"
+
+
+def test_incident_create_invalid_input_returns_validation_error(mcp_test_env) -> None:
+    class _AuthInfo:
+        client_id = "test-client"
+        scopes = ["incidents:write"]
+
+    with patch(
+        "mcps.company_tools.tools.incidents.require_scopes",
+        return_value=_AuthInfo(),
+    ):
+        from mcp.server.fastmcp import FastMCP
+
+        mcp = FastMCP("test")
+        incident_tools.register_tools(mcp, object())
+        tool_fn = mcp._tool_manager._tools["incidents_create"].fn
+        payload = json.loads(
+            tool_fn(
+                title="",
+                description="Created through MCP client test.",
+                category="carrier_issue",
+                status="open",
+                origin="customer",
+                branch="la_office",
+            )
+        )
+
+    assert payload["ok"] is False
+    assert payload["error_code"] == "MCP_VALIDATION_ERROR"

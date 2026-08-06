@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from unittest.mock import MagicMock, patch
 
 from mcps.company_tools.clients.inventory import InventoryClient
@@ -74,3 +75,61 @@ def test_inventory_create_product_is_forbidden(mcp_test_env) -> None:
 
     assert payload["ok"] is False
     assert payload["error_code"] == "INVENTORY_WRITE_FORBIDDEN"
+
+
+def test_inventory_create_product_invalid_input_returns_validation_error(mcp_test_env) -> None:
+    class _AuthInfo:
+        client_id = "playground-client"
+        scopes = ["inventory:read"]
+
+    with patch(
+        "mcps.company_tools.tools.inventory.require_scopes",
+        return_value=_AuthInfo(),
+    ):
+        from mcp.server.fastmcp import FastMCP
+
+        mcp = FastMCP("test")
+        inventory_tools.register_tools(mcp, object())
+        tool_fn = mcp._tool_manager._tools["inventory_create_product"].fn
+        payload = json.loads(
+            tool_fn(
+                name="Blocked Product",
+                sku="BLOCK-001",
+                warehouse_location="los_angeles",
+                client_brand="TrackFlow",
+                low_stock_threshold=-1,
+            )
+        )
+
+    assert payload["ok"] is False
+    assert payload["error_code"] == "MCP_VALIDATION_ERROR"
+
+
+def test_inventory_validation_error_is_logged(caplog, mcp_test_env) -> None:
+    caplog.set_level(logging.INFO, logger="mcp.company_tools")
+
+    class _AuthInfo:
+        client_id = "playground-client"
+        scopes = ["inventory:read"]
+
+    with patch(
+        "mcps.company_tools.tools.inventory.require_scopes",
+        return_value=_AuthInfo(),
+    ):
+        from mcp.server.fastmcp import FastMCP
+
+        mcp = FastMCP("test")
+        inventory_tools.register_tools(mcp, object())
+        tool_fn = mcp._tool_manager._tools["inventory_create_product"].fn
+        _ = tool_fn(
+            name="Blocked Product",
+            sku="BLOCK-001",
+            warehouse_location="los_angeles",
+            client_brand="TrackFlow",
+            low_stock_threshold=-1,
+        )
+
+    payload = json.loads(caplog.records[-1].message)
+    assert payload["tool"] == "inventory_create_product"
+    assert payload["success"] is False
+    assert payload["error_code"] == "MCP_VALIDATION_ERROR"
