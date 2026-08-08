@@ -1,0 +1,11 @@
+{
+  "ticket_id": "rfp_seed_part3",
+  "departments": [
+    "warehouse",
+    "lastmile"
+  ],
+  "awaiting_human": {
+    "warehouse": true,
+    "lastmile": false
+  }
+}

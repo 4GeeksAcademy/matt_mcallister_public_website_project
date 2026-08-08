@@ -80,3 +80,38 @@ def analyze_incident(self, upload_id: str, source_file: str) -> dict:
         # Exponential backoff: 2, 4, 8 seconds (no immediate retry).
         countdown = 2 ** (self.request.retries + 1)
         raise self.retry(exc=exc, countdown=countdown) from exc
+
+
+@app.task(bind=True, max_retries=3, name="services.celery_app.tasks.run_rfp_intake")
+def run_rfp_intake(self, ticket_id: str) -> dict:
+    """Run the RFP intake/draft/approval bootstrap pipeline asynchronously."""
+    _repo_root = Path(__file__).resolve().parents[2]
+    if str(_repo_root) not in sys.path:
+        sys.path.insert(0, str(_repo_root))
+    from data.pipelines.rfp_intake.pipeline import run_rfp_intake_pipeline  # noqa: E402
+
+    started = time.monotonic()
+    try:
+        run_rfp_intake_pipeline(ticket_id)
+        duration_ms = round((time.monotonic() - started) * 1000, 2)
+        logger.info(
+            "task_id=%s ticket_id=%s status=success duration_ms=%s",
+            self.request.id,
+            ticket_id,
+            duration_ms,
+        )
+        return {"ticket_id": ticket_id, "status": "processed", "duration_ms": duration_ms}
+    except Exception as exc:
+        duration_ms = round((time.monotonic() - started) * 1000, 2)
+        logger.error(
+            "task_id=%s ticket_id=%s status=failure duration_ms=%s error=%s\n%s",
+            self.request.id,
+            ticket_id,
+            duration_ms,
+            exc,
+            traceback.format_exc(),
+        )
+        if self.request.retries >= self.max_retries:
+            raise
+        countdown = 2 ** (self.request.retries + 1)
+        raise self.retry(exc=exc, countdown=countdown) from exc

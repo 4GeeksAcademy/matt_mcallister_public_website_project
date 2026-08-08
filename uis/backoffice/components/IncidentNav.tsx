@@ -10,6 +10,7 @@ const links = [
   { href: "/incidents", label: "Incidents" },
   { href: "/incidents/summary", label: "Summary" },
   { href: "/incidents/analyze", label: "Analyze CSV" },
+  { href: "/rfp", label: "RFP Workflow" },
 ];
 
 export default function IncidentNav() {

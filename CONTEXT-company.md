@@ -87,3 +87,46 @@ Qdrant collection name: `trackflow_knowledge`
   return window?" or "which carrier best covers rural Aragón?" with a
   generated answer traceable back to its source.
 - A minimal query interface working against that endpoint.
+
+---
+
+## Milestone 9 — Agentic RFP Workflow
+
+> Authoritative spec: [`CONTEXT-milestone-9.md`](CONTEXT-milestone-9.md) (departments, compliance, arbitration, seed PDFs).
+
+### Departments and contacts
+
+| `department_id` | Department | Owner |
+| --- | --- | --- |
+| `warehouse` | Warehouse Operations | Ana Whitfield |
+| `lastmile` | Last Mile and Carrier Management | Carlos Vega |
+| `reverse` | Reverse Logistics | Sofía Ramos |
+
+Not every RFP activates all three departments — the orchestrator assigns only departments matching the requested scope.
+
+### Compliance rule_ids (§5)
+
+- `CURRENCY_US_USD` — US operations quoted in USD
+- `CURRENCY_SPAIN_EUR` — Spain operations quoted in EUR
+- `ONTIME_SLA_REQUIRED` — on-time delivery SLA (%) must be stated
+- `RETURNS_UNDER_48H_FORBIDDEN` — no returns processing under 48 hours
+- `VOLUME_DISCOUNT_TIER_REQUIRED` — volume-based discount tier table required
+- `NO_CARRIER_NEGOTIATED_RATES` — no disclosed carrier negotiated rates
+
+### Arbitration (§7)
+
+| Trigger id | Arbiter |
+| --- | --- |
+| `volume-vs-capacity` | Miguel Torres — cap volume to warehouse capacity |
+| `returns-sla-breach` | Sofía Ramos / Miguel Torres — force `request_changes` on under-48h claims |
+| `currency-mismatch` | Miguel Torres — rewrite to country currency |
+
+### Sample fixtures
+
+| Scenario | Fixture |
+| --- | --- |
+| ModaViva (Spain, warehouse + reverse) | `tests/fixtures/rfp/modaviva_rfp.txt` |
+| Luna Cosmetics (US, warehouse + lastmile) | `tests/fixtures/rfp/luna_cosmetics_rfp.txt` |
+| Invalid carrier pitch (reject) | `tests/fixtures/rfp/carrier_pitch.txt` |
+
+Curriculum PDFs: `rfp-requests/trackflow/` (see README there).
