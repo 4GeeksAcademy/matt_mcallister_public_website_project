@@ -1,0 +1,19 @@
+# TrackFlow Pricing Proposal RFP
+
+Client: Luna Cosmetics
+Country of origin: United States
+Submission deadline: 2026-09-20
+
+Requested services:
+- Warehousing in Los Angeles
+- Last mile delivery across US domestic lanes
+
+Estimated volume: 5,000 orders/month
+
+## Warehouse Operations
+
+Storage capacity for 5,000 orders/month in Los Angeles with onboarding in 2 weeks.
+
+## Last Mile and Carrier Management
+
+Cost per shipment and delivery SLA for domestic US lanes.

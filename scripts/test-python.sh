@@ -33,7 +33,7 @@ PYTHONPATH=services/incident-api \
   "$UV_BIN" run --no-project --python 3.11 \
   --with-requirements services/incident-api/requirements.txt \
   --with-requirements data/pipelines/requirements.txt \
-  python -m pytest services/incident-api/tests tests/pipelines scripts/test_analyze_context.py
+  python -m pytest services/incident-api/tests tests/pipelines/test_rfp_intake.py tests/pipelines/test_rfp_draft_eval.py tests/pipelines/test_rfp_approval.py tests/pipelines/test_rfp_e2e.py tests/pipelines scripts/test_analyze_context.py
 
 PYTHONPATH=. \
   "$UV_BIN" run --no-project --python 3.11 \

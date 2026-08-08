@@ -1,0 +1,24 @@
+# TrackFlow Pricing Proposal RFP — ModaViva (formal)
+
+Client: ModaViva
+Country of origin: Spain
+Submission deadline: 2026-10-01
+Reference budget: EUR 120,000/year
+
+Requested services:
+- Warehousing in Zaragoza
+- Reverse logistics / returns processing
+- Client uses own carrier for last mile (not in scope)
+
+Estimated volume: 2,800 orders/month
+
+## Warehouse Operations
+
+ModaViva requires pallet storage for seasonal fashion inventory in Zaragoza.
+Storage capacity must support inbound peaks during collection launches.
+Onboarding time target: 3 weeks from contract signature.
+
+## Reverse Logistics
+
+Returns processing for Spain e-commerce orders with inspection and restocking.
+Returns turnaround expectations should follow TrackFlow standard operations.

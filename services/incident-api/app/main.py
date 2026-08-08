@@ -35,6 +35,7 @@ from app.agent_bridge import (  # noqa: E402
     run_agent_query,
 )
 from app.incidents import router as incidents_router  # noqa: E402
+from app.rfp import router as rfp_router  # noqa: E402
 from services.celery_app.celery import app as celery_app  # noqa: E402
 from services.celery_app.tasks import analyze_incident  # noqa: E402
 
@@ -58,6 +59,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.include_router(incidents_router)
+app.include_router(rfp_router)
 
 _last_result: AnalysisResult | None = None
 

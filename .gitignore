@@ -26,3 +26,5 @@ __pycache__/
 
 # Local run output
 results.csv
+.rfp-checkpoints/
+data/raw/rfp/
