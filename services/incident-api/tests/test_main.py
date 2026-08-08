@@ -184,7 +184,7 @@ def test_knowledge_query_returns_sources(monkeypatch) -> None:
 def test_agent_query_returns_trace_id(monkeypatch) -> None:
     monkeypatch.setattr(
         "app.main.run_agent_query",
-        lambda question, thread_id=None: {
+        lambda question, thread_id=None, user_id=None: {
             "answer": "No, standard SLAs do not apply during Black Friday.",
             "sources": [
                 {
@@ -209,3 +209,23 @@ def test_agent_query_returns_trace_id(monkeypatch) -> None:
     assert payload["sources_used"] == ["mcp_ticket_tool"]
     assert "Black Friday" in payload["answer"] or "SLA" in payload["answer"]
     assert payload["sources"][0]["source_document"] == "sla-delivery"
+
+
+def test_agent_guardrail_summary_returns_counts(monkeypatch) -> None:
+    monkeypatch.setattr(
+        "app.main.guardrail_summary",
+        lambda reset=False: {
+            "generated_at": "2026-08-08T16:00:00+00:00",
+            "by_rule": {"jailbreak_variant_1": 2, "casual_steer_back": 1},
+            "by_type": {"security": 2, "content": 1},
+            "total": 3,
+        },
+    )
+
+    response = client.get("/agent/guardrails/summary")
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["total"] == 3
+    assert payload["by_rule"]["jailbreak_variant_1"] == 2
+    assert payload["by_type"]["content"] == 1

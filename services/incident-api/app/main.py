@@ -30,6 +30,8 @@ from app.knowledge_bridge import (  # noqa: E402
 from app.agent_bridge import (  # noqa: E402
     AgentQueryRequest,
     AgentQueryResponse,
+    GuardrailSummaryResponse,
+    guardrail_summary,
     run_agent_query,
 )
 from app.incidents import router as incidents_router  # noqa: E402
@@ -136,7 +138,11 @@ def knowledge_query(body: KnowledgeQueryRequest) -> KnowledgeQueryResponse:
 def agent_query(body: AgentQueryRequest) -> AgentQueryResponse:
     """Answer commercial knowledge questions via the LangGraph support agent."""
     try:
-        result = run_agent_query(body.question.strip(), thread_id=body.thread_id)
+        result = run_agent_query(
+            body.question.strip(),
+            thread_id=body.thread_id,
+            user_id=body.user_id,
+        )
     except Exception as exc:  # noqa: BLE001 — surface as 502 for client UX
         raise HTTPException(
             status_code=502,
@@ -147,7 +153,19 @@ def agent_query(body: AgentQueryRequest) -> AgentQueryResponse:
         sources=result.get("sources", []),
         trace_id=result["trace_id"],
         sources_used=result.get("sources_used", []),
+        memory_proposal=result.get("memory_proposal"),
+        pending_proposal=result.get("pending_proposal"),
+        guardrail_blocked=result.get("guardrail_blocked", False),
+        guardrail_type=result.get("guardrail_type"),
+        guardrail_rule=result.get("guardrail_rule"),
     )
+
+
+@app.get("/agent/guardrails/summary", response_model=GuardrailSummaryResponse)
+def agent_guardrail_summary(reset: bool = False) -> GuardrailSummaryResponse:
+    """Return guardrail trigger counts for the current process."""
+    payload = guardrail_summary(reset=reset)
+    return GuardrailSummaryResponse(**payload)
 
 
 @app.post("/export")

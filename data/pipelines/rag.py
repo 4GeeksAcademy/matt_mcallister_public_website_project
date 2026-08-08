@@ -18,33 +18,13 @@ from data.process.rag import (
     get_openai_client,
     get_qdrant_client,
 )
+from agents.support_agent.prompts import SYSTEM_INSTRUCTIONS as SYSTEM_PROMPT
+from agents.support_agent.prompts import build_generation_messages
 
 logger = logging.getLogger(__name__)
 
 GENERATION_MODEL = os.environ.get("GENERATION_MODEL", "gpt-4o-mini")
 EVAL_QUERIES_PATH = Path(__file__).resolve().parents[1] / "eval" / "test-queries.json"
-_RATE_OR_TIMEFRAME = re.compile(
-    r"(?:[$€£]\s?\d+(?:[.,]\d+)?|\d+(?:[.,]\d+)?\s?%|"
-    r"\d+(?:[.,]\d+)?(?:\s*(?:to|-)\s*\d+(?:[.,]\d+)?)?\s*"
-    r"(?:(?:calendar|business)\s+)?(?:hours?|days?|weeks?|months?|years?))",
-    re.IGNORECASE,
-)
-
-SYSTEM_PROMPT = """You are a TrackFlow salesperson / account manager assisting colleagues \
-on client and prospect calls. Answer ONLY using the retrieved knowledge base context below.
-
-Hard rules:
-- Never invent rates, SLAs, timeframes, discounts, carrier exceptions, or policy terms.
-- During declared high-demand dates (Black Friday, Cyber Monday, major Sales), do not \
-promise standard delivery SLAs; follow the peak-demand warning in the context.
-- International returns are never automatic — always describe them as manual handling.
-- Any storage discount or off-rate-card pricing requires Miguel Torres's written approval; \
-say so explicitly when discounts are discussed.
-- If the context does not contain enough information, say honestly that the knowledge base \
-does not have relevant information and do not invent company facts.
-- Keep answers concise, commercial, and faithful to percentages, rates, and timeframes \
-exactly as stated in the context.
-"""
 
 NO_CONTEXT_MESSAGE = (
     "I do not have relevant information in the TrackFlow knowledge base "
@@ -120,20 +100,21 @@ def build_context(chunks: list[dict]) -> str:
 
 
 def generate_answer(
-    question: str, context: str, *, openai_client: OpenAI | None = None
+    question: str,
+    context: str,
+    *,
+    openai_client: OpenAI | None = None,
+    user_memory_context: str = "",
 ) -> str:
     client = openai_client or get_openai_client()
-    user_prompt = (
-        f"Retrieved context:\n{context}\n\n"
-        f"Client / prospect question:\n{question}\n\n"
-        "Respond as a TrackFlow salesperson using only the context."
+    messages = build_generation_messages(
+        question=question,
+        context=context,
+        user_memory_context=user_memory_context,
     )
     response = client.chat.completions.create(
         model=GENERATION_MODEL,
-        messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": user_prompt},
-        ],
+        messages=messages,
         temperature=0.2,
     )
     content = response.choices[0].message.content
@@ -161,22 +142,7 @@ def citation_metadata(chunks: list[dict]) -> list[dict[str, str]]:
     return citations
 
 
-def check_faithfulness(answer: str, context: str) -> dict[str, Any]:
-    """Flag rates and timeframes in the answer that are absent from context."""
-    context_claims = {
-        re.sub(r"\s+", " ", match.group(0)).strip().casefold()
-        for match in _RATE_OR_TIMEFRAME.finditer(context)
-    }
-    answer_claims = [
-        re.sub(r"\s+", " ", match.group(0)).strip()
-        for match in _RATE_OR_TIMEFRAME.finditer(answer)
-    ]
-    unsupported = [
-        claim for claim in answer_claims if claim.casefold() not in context_claims
-    ]
-    return {"faithful": not unsupported, "unsupported_claims": unsupported}
-
-
+from data.pipelines.faithfulness import check_faithfulness
 def evaluate_recall_at_3(
     *,
     retrieve_fn=None,
