@@ -30,9 +30,15 @@ uvicorn app.main:app --reload
 
 ## Test
 
+Quick run:
+
 ```bash
-pytest -q
+cd apps/trackflow-api
+uv sync
+uv run pytest -q
 ```
+
+**Full testing guide** (endpoint cases, coverage steps, AI-suggested example): **[TESTING.md](./TESTING.md)**
 
 ## Notes
 
