@@ -1,0 +1,37 @@
+# TrackFlow Pricing Proposal RFP
+
+Client: Aurora Fashion Group
+Submission deadline: 2026-09-15
+
+Requested services:
+- Warehousing in Los Angeles and Zaragoza
+- Last-mile delivery across domestic lanes
+- Returns handling and customer support
+
+## Warehouse Operations
+
+TrackFlow will provide inventory capacity for 10,000 units across Los Angeles and Zaragoza warehouses.
+Inbound volume supports seasonal peaks with shared inventory visibility.
+
+## Last Mile and Carriers
+
+Carrier coverage includes UPS, FedEx, and DHL for domestic lanes.
+Delivery SLA: standard ground delivery is 3-5 business days for domestic shipments.
+Tracking integration is available through unified endpoints.
+
+## Reverse Logistics
+
+Returns process follows the TrackFlow standard return window.
+Return window: 30 calendar days from delivery.
+Inspection workflow uses AI-assisted condition classification.
+
+## Customer Experience
+
+Support channels include email, WhatsApp, and phone during business hours.
+Response times target same-day acknowledgement for brand clients.
+Escalation path routes unresolved cases to account managers.
+
+## Commercial
+
+Pricing model follows TrackFlow rate card with annual contract term.
+Account management includes monthly performance reviews with Miguel Torres oversight.

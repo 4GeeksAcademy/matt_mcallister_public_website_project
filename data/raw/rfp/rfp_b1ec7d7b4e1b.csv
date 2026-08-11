@@ -1,0 +1,2 @@
+incident_id,date,category,description,status,customer_email,satisfaction_score
+INC-001,2026-01-01,carrier_issue,late delivery,open,customer@example.com,2

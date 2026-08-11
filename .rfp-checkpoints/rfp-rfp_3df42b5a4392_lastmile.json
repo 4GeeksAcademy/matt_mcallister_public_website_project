@@ -1,0 +1,14 @@
+{
+  "ticket_id": "rfp_3df42b5a4392",
+  "department_id": "lastmile",
+  "awaiting_human": true,
+  "approval_summary": {
+    "department_id": "lastmile",
+    "draft_excerpt": "## Last Mile and Carrier Management\nContact: Carlos Vega (carlos.vega@trackflow.com)\n\n- delivery SLA: covered per TrackFlow standard operations.\nCarrier coverage includes UPS, FedEx, and DHL for domestic lanes.\nCost per shipment is quoted as a final client rate in USD (carrier negotiated rates are not disclosed).\nQuoted monthly shipment volume: 5000 orders/month.\nRevision note: Remove or revise fo",
+    "overall_pass": false,
+    "compliance_violations": [
+      "No proposal may disclose negotiated rates with specific carriers."
+    ],
+    "iteration": 3
+  }
+}

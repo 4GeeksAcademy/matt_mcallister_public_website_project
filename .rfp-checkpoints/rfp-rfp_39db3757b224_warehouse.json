@@ -1,0 +1,13 @@
+{
+  "ticket_id": "rfp_39db3757b224",
+  "department_id": "warehouse",
+  "awaiting_human": false,
+  "approval_summary": {
+    "department_id": "warehouse",
+    "draft_excerpt": "## Warehouse Operations\nContact: Ana Whitfield (ana.whitfield@trackflow.com)\n\n- storage capacity: covered per TrackFlow standard operations.\nTrackFlow will provide pallet and SKU storage aligned to the requested scope.\nCommitted warehouse capacity: 6000 order-equivalent units per month.\nOn-time delivery SLA commitment: 96%.\nVolume-based discount tier table (USD):\n| Monthly volume | Discount |\n| --",
+    "overall_pass": true,
+    "compliance_violations": [],
+    "iteration": 0
+  },
+  "decision": "approve"
+}

@@ -1,0 +1,23 @@
+Subject: TrackFlow logistics proposal request — Luna Cosmetics
+
+Client: Luna Cosmetics
+Country of origin: United States (Los Angeles)
+Deadline: 2026-09-20
+
+Hi Miguel,
+
+We are looking for a TrackFlow pricing proposal for:
+- Warehousing in Los Angeles
+- Last mile delivery across US domestic lanes
+
+Estimated volume: 5,000 orders/month
+
+## Warehouse Operations
+
+Luna Cosmetics needs SKU storage and pick/pack in Los Angeles.
+Storage capacity should support ~5,000 orders/month with seasonal peaks.
+
+## Last Mile and Carrier Management
+
+Domestic last mile across US lanes with carrier coverage and delivery SLA commitments.
+Tracking integration required for DTC shipments.
