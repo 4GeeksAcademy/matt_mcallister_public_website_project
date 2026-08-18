@@ -5,15 +5,20 @@
 - Milestone 2: Business logic module implemented.
 - Milestone 3: Initial repository structure established.
 
+## Milestone 4 (agent harness + UIs)
+- Memory bank, `AGENTS.md`, `.agents/development_rules.md`, and `skills/recurring_task_skill.md` in place.
+- `uis/website`: corporate TrackFlow site (`npm run dev --webpack`).
+- `uis/backoffice`: distinct layout with nav; Milestone 2 logic at `/operations-analysis`.
+- Windows grader fix: Webpack + `distDir: "build"` documented in UI READMEs.
+
 ## Next Steps
-- Implement memory bank and agent rules.
-- Develop frontend applications (public website and backoffice).
-- Integrate business logic into the backoffice application.
-- Define and implement reusable agent skills.
+- Continue later milestones (auth, inventory, RAG, agents) per course roadmap.
 
--5/31/26 In milestone 4, I went through the "What We Will Evauate" section and made sure each criteria was met.
+- 5/31/26 Milestone 4: verified "What We Will Evaluate" checklist (memory bank, agents, skills, both UIs, shared logic import).
 
--7/29/26 Milestone 4 runtime fix: forced Webpack (`next dev --webpack` / `next build --webpack`) in `uis/website` and `uis/backoffice` so Windows graders avoid Turbopack MAX_PATH failures during output generation. Both apps build successfully with Webpack.
+- 7/29/26 Milestone 4 runtime fix: forced Webpack in both UI apps to avoid Turbopack MAX_PATH failures on Windows.
+
+- 8/18/26 Milestone 4 resubmission: added `distDir: "build"`, UI README Windows grader notes, refreshed memory bank from `CONTEXT.md`.
 
 -8/3/26 Repository consolidation: audited every remote branch and integrated all unique project lines into `master`. Removed tracked dependency folders, Python caches, a local database, and `.env.local`; expanded ignore rules; removed an empty Windows-incompatible filename; and separated the telemetry demo login from the primary authentication route. See `BRANCH_AUDIT.md` for the branch-by-branch record.
 

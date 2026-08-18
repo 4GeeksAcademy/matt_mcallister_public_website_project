@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 import path from "path";
 
 const nextConfig: NextConfig = {
+  // Shorter output dir helps Windows graders avoid MAX_PATH issues in dev/build caches.
+  distDir: "build",
   // Allow importing shared packages from the monorepo root
   experimental: {
     externalDir: true,

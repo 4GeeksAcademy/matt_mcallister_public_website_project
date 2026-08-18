@@ -1,24 +1,29 @@
 # Technical Context
 
-## Tech Stack
-- **Frontend**: Next.js (App Router), TypeScript, React, Tailwind CSS
-- **Backend**: FastAPI (Python) microservices; Express leads API (Node.js)
-- **Shared logic**: `packages/trackflow-core` (canonical Milestone 2)
-- **Persistence**: TinyDB (auth/supplier/talent), SQLite/SQLModel (inventory),
-  PostgreSQL (telemetry/jobs/pipelines), Qdrant (RAG)
-- **Orchestration**: Docker Compose, Prefect (weekly warehouse ETL), Celery/Redis
-- **Validation**: Root `npm run validate` (git integrity, lint, TS/Python tests,
-  production builds, dependency audits)
+## Tech Stack (Milestone 4 baseline + monorepo evolution)
+- **Public UI**: Next.js App Router, TypeScript, React, Tailwind — [`uis/website`](uis/website)
+- **Backoffice UI**: Next.js App Router with its own layout/nav — [`uis/backoffice`](uis/backoffice)
+- **Shared business logic**: [`packages/trackflow-core`](packages/trackflow-core) (canonical Milestone 2; imported by backoffice, not copied)
+- **Later services** (same monorepo): FastAPI microservices, Celery/Redis, PostgreSQL pipelines, Qdrant RAG — see `services/` and `data/pipelines/`
+
+## Milestone 4 layout
+| Path | Purpose |
+| --- | --- |
+| `uis/website` | Corporate marketing site; `/` renders full TrackFlow website in TS components |
+| `uis/backoffice` | Internal ops UI; `/operations-analysis` shows Milestone 2 output from `trackflow-core` |
+| `packages/trackflow-core` | Single source of business rules (inventory, carriers, shipments) |
+| `memory-bank/` | Persistent agent context (business + technical) |
+| `AGENTS.md` | Mandatory pre-commit workflow for agents |
+| `.agents/` | Scoped development rules |
+| `skills/` | Reusable agent skills with acceptance criteria |
 
 ## Architectural Decisions
-- Monorepo with four canonical UIs and distinct service ports (see README).
-- Runtime telemetry vocabulary (`warehouse`, `client_id`, `user_login_*`) is
-  authoritative across schema, shared types, emitters, and pipelines.
-- `packages/trackflow-core` is the only Milestone 2 business-logic module.
-- Historical apps live under `archive/` and are excluded from Docker/CI.
+- Monorepo: UIs under `uis/`, APIs under `services/`, pipelines under `data/pipelines/`.
+- **No duplicated business logic** in UI apps — import from `packages/trackflow-core`.
+- Next.js dev/build uses **Webpack** (`--webpack` scripts) and `distDir: "build"` to avoid Windows Turbopack MAX_PATH failures for graders.
+- Memory bank and `AGENTS.md` are restricted; edit only with explicit developer confirmation.
 
 ## Technical Constraints
-- Align contracts with context documents before adding features.
-- Keep each service independently runnable with health endpoints.
-- Do not commit secrets, dependency folders, build output, or local databases.
-- Memory-bank and AGENTS.md require explicit confirmation before edits.
+- Align features with [`CONTEXT.md`](CONTEXT.md) before implementation.
+- Do not commit `node_modules/`, `build/`, `.next/`, secrets, or local databases.
+- Each runnable app must start with documented commands (`npm run dev` in each UI folder).

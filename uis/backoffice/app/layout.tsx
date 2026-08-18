@@ -26,9 +26,14 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full bg-slate-950 antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="flex min-h-full flex-col text-slate-100">
+        <header className="border-b border-slate-800 bg-slate-900 px-4 py-3 md:px-8">
+          <p className="mx-auto max-w-6xl text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300">
+            TrackFlow Backoffice · Internal Operations
+          </p>
+        </header>
         <IncidentNav />
         {children}
       </body>
