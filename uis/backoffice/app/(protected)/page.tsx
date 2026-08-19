@@ -1,7 +1,7 @@
 import {
   buildExecutiveSnapshot,
   milestone2SampleInput,
-} from "../../../../packages/shared/business-logic/milestone2";
+} from "@/lib/milestone2";
 
 export default function DashboardPage() {
   const snapshot = buildExecutiveSnapshot(milestone2SampleInput);

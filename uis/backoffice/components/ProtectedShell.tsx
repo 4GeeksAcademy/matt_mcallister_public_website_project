@@ -20,6 +20,7 @@ export default function ProtectedShell({ children }: PropsWithChildren) {
   const links = useMemo(
     () => [
       { href: "/", label: "Dashboard" },
+      { href: "/inventory/products", label: "Inventory" },
       { href: "/account/profile", label: "Profile" },
       { href: "/account/change-password", label: "Change password" },
     ],
@@ -53,7 +54,12 @@ export default function ProtectedShell({ children }: PropsWithChildren) {
         </div>
         <nav className="mx-auto flex w-full max-w-6xl gap-3 px-6 pb-4 md:px-10">
           {links.map((link) => {
-            const isActive = pathname === link.href;
+            const isActive =
+              link.href === "/"
+                ? pathname === "/"
+                : link.href.startsWith("/inventory")
+                  ? pathname.startsWith("/inventory")
+                  : pathname === link.href;
 
             return (
               <Link

@@ -34,9 +34,37 @@ const getErrorMessage = (errorBody: unknown, fallback: string) => {
     return fallback;
   }
 
-  const candidate = (errorBody as { message?: unknown }).message;
-  if (typeof candidate === "string" && candidate.trim().length > 0) {
-    return candidate;
+  const body = errorBody as { message?: unknown; detail?: unknown };
+
+  if (typeof body.message === "string" && body.message.trim().length > 0) {
+    return body.message;
+  }
+
+  const { detail } = body;
+
+  if (typeof detail === "string" && detail.trim().length > 0) {
+    return detail;
+  }
+
+  if (Array.isArray(detail)) {
+    const parts = detail
+      .map((item) => {
+        if (typeof item === "string") {
+          return item;
+        }
+
+        if (typeof item === "object" && item && "msg" in item) {
+          const msg = (item as { msg?: unknown }).msg;
+          return typeof msg === "string" ? msg : null;
+        }
+
+        return null;
+      })
+      .filter((part): part is string => Boolean(part));
+
+    if (parts.length > 0) {
+      return parts.join(" ");
+    }
   }
 
   return fallback;
